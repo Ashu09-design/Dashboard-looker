@@ -75,7 +75,8 @@ async function loadWorkbook() {
 
   // Fall back to local Excel file
   if (!fs.existsSync(EXCEL_PATH)) {
-    throw new Error(`Excel file not found at: ${EXCEL_PATH}`);
+    console.warn(`Excel file not found at: ${EXCEL_PATH} — returning null`);
+    return null;
   }
   return XLSX.readFile(EXCEL_PATH);
 }
@@ -164,6 +165,7 @@ function detectColumns(headerRow) {
 app.get('/api/bandwidth', async (req, res) => {
   try {
     const wb = await loadWorkbook();
+    if (!wb) return res.json([]);
     const { detailsByProject, managerByProject } = buildDropdownLookup(wb);
     const ws = wb.Sheets['Bandwidth Tracker'];
     if (!ws) return res.status(404).json({ error: 'Sheet "Bandwidth Tracker" not found' });
@@ -214,6 +216,7 @@ app.get('/api/bandwidth', async (req, res) => {
 app.get('/api/qbr', async (req, res) => {
   try {
     const wb = await loadWorkbook();
+    if (!wb) return res.json([]);
     const { detailsByProject, managerByProject } = buildDropdownLookup(wb);
     const ws = wb.Sheets['QBR Date & Blockers'];
     if (!ws) return res.status(404).json({ error: 'Sheet "QBR Date & Blockers" not found' });
@@ -258,6 +261,7 @@ app.get('/api/qbr', async (req, res) => {
 app.get('/api/dropdown', async (req, res) => {
   try {
     const wb = await loadWorkbook();
+    if (!wb) return res.json([]);
     const ws = wb.Sheets['Drop Down'];
     if (!ws) return res.status(404).json({ error: 'Sheet "Drop Down" not found' });
 
