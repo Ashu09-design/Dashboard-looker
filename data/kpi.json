@@ -1,0 +1,833 @@
+{
+  "success": true,
+  "source": "kpi",
+  "data": {
+    "metrics": [
+      {
+        "account": "AZ",
+        "metric": "Quality",
+        "name": "Service Quality",
+        "description": "A measure of the delivery error",
+        "formula": "Total Tasks Closed – Tasks with Errors/Total Tasks Closed",
+        "target": 0.98,
+        "actual": 1,
+        "targetRaw": "0.98",
+        "actualRaw": "1",
+        "status": ""
+      },
+      {
+        "account": "AZ",
+        "metric": "Timeliness",
+        "name": "On time delivery of projects",
+        "description": "Was the deliverable completed within agreed SLA",
+        "formula": "Total # of Tasks closed within SLA /Total # of Tasks closed",
+        "target": 0.95,
+        "actual": 1,
+        "targetRaw": "0.95",
+        "actualRaw": "1",
+        "status": ""
+      },
+      {
+        "account": "AZ",
+        "metric": "Utilization",
+        "name": "Utilisation (FTE)",
+        "description": "The amount of an employee's available time that's used for productive, billable work",
+        "formula": "Total # of Actual working hours / Total # of Available Hours (7 hours per day*actual working days)",
+        "target": 0,
+        "actual": 0.94,
+        "targetRaw": "85% - 95%",
+        "actualRaw": "0.94",
+        "status": ""
+      },
+      {
+        "account": "AZ",
+        "metric": "Process Adherence & Compliance",
+        "name": "Mandatory Trainings",
+        "description": "A measure of completion of mandatory training before due date",
+        "formula": "Complete all assigned mandatory trainings before due date",
+        "target": 1,
+        "actual": 1,
+        "targetRaw": "1",
+        "actualRaw": "1",
+        "status": ""
+      },
+      {
+        "account": "AZ",
+        "metric": "Work Load",
+        "name": "Volume - No of active projects",
+        "description": "Total number of Tasks Active in the month",
+        "formula": "Absolute number",
+        "target": 0,
+        "actual": 16,
+        "targetRaw": "",
+        "actualRaw": "16",
+        "status": ""
+      },
+      {
+        "account": "GSK",
+        "metric": "Utilization",
+        "name": "Utilisation (FTE)",
+        "description": "Employee's available time that's utilized for billable work",
+        "formula": "(Utilized hours / Total available hours) X 100%",
+        "target": 0.9,
+        "actual": 0,
+        "targetRaw": "0.9",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "GSK",
+        "metric": "Process Adherence & Compliance",
+        "name": "Mandatory Trainings",
+        "description": "A measure of completion of mandatory training before due date",
+        "formula": "Complete all assigned mandatory trainings before due date",
+        "target": 0.9,
+        "actual": 1,
+        "targetRaw": "0.9",
+        "actualRaw": "1",
+        "status": ""
+      },
+      {
+        "account": "GSK",
+        "metric": "Quality",
+        "name": "Service Quality",
+        "description": "A measure of the delivery error",
+        "formula": "",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "GSK",
+        "metric": "Process Adherence & Compliance",
+        "name": "No of Escalations",
+        "description": "No of Escalations",
+        "formula": "No. of Escalation Reported",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Incyte",
+        "metric": "Work Load",
+        "name": "Volume - No of active projects",
+        "description": "Total number of projects Active in the month",
+        "formula": "Absolute number",
+        "target": 0,
+        "actual": 15,
+        "targetRaw": "",
+        "actualRaw": "15",
+        "status": ""
+      },
+      {
+        "account": "Incyte",
+        "metric": "Timeliness",
+        "name": "On time delivery of projects",
+        "description": "(Total no. of projects closed within SLA /Total no. of Projects closed) *100",
+        "formula": "(Total no. of projects closed within SLA /Total no. of Projects closed) *100",
+        "target": 1,
+        "actual": 1,
+        "targetRaw": "1",
+        "actualRaw": "1",
+        "status": ""
+      },
+      {
+        "account": "Incyte",
+        "metric": "Quality",
+        "name": "Service Quality",
+        "description": "A measure of the delivery error",
+        "formula": "",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Incyte",
+        "metric": "Process Adherence & Compliance",
+        "name": "No of Escalations",
+        "description": "No of Escalations",
+        "formula": "No. of Escalation Reported",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "Work Load",
+        "name": "Volume - No of active projects",
+        "description": "Total number of projects Active in the month",
+        "formula": "Absolute number",
+        "target": 0,
+        "actual": 28,
+        "targetRaw": "N",
+        "actualRaw": "28",
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "Utilization",
+        "name": "Resource Utilization Rate",
+        "description": "Employee's available time that's utilized for billable work",
+        "formula": "(Utilized hours / Total available hours) X 100%",
+        "target": 0.85,
+        "actual": 0.81,
+        "targetRaw": "0.85",
+        "actualRaw": "0.81",
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "Timeliness",
+        "name": "On time delivery of projects",
+        "description": "(Total no. of projects closed within SLA /Total no. of Projects closed) *100",
+        "formula": "(Total no. of projects closed within SLA /Total no. of Projects closed) *100",
+        "target": 1,
+        "actual": 1,
+        "targetRaw": "1",
+        "actualRaw": "1",
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "Quality",
+        "name": "Service Quality",
+        "description": "A measure of the delivery error",
+        "formula": "No of quality issues reported",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "Process Adherence & Compliance",
+        "name": "No of Escalations",
+        "description": "No of Escalations",
+        "formula": "No. of Escalation Reported",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Fresenius",
+        "metric": "Utilization",
+        "name": "Utilisation (FTE)",
+        "description": "Employee's available time that's utilized for billable work",
+        "formula": "(Utilized hours / Total available hours) X 100%",
+        "target": 0.85,
+        "actual": 0.95,
+        "targetRaw": "0.85",
+        "actualRaw": "0.95",
+        "status": "Met"
+      },
+      {
+        "account": "Fresenius",
+        "metric": "Quality",
+        "name": "Service Quality",
+        "description": "A measure of the delivery error",
+        "formula": "",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Fresenius",
+        "metric": "Process Adherence & Compliance",
+        "name": "No of Escalations",
+        "description": "No of Escalations",
+        "formula": "No. of Escalation Reported",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Abbvie",
+        "metric": "Utilization",
+        "name": "Utilisation (FTE)",
+        "description": "Employee's available time that's utilized for billable work",
+        "formula": "(Utilized hours / Total available hours) X 100%",
+        "target": 0.85,
+        "actual": 0.99,
+        "targetRaw": "0.85",
+        "actualRaw": "0.99",
+        "status": "Met"
+      },
+      {
+        "account": "Abbvie",
+        "metric": "Quality",
+        "name": "Service Quality",
+        "description": "A measure of the delivery error",
+        "formula": "",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Abbvie",
+        "metric": "Process Adherence & Compliance",
+        "name": "No of Escalations",
+        "description": "No of Escalations",
+        "formula": "No. of Escalation Reported",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": ""
+      },
+      {
+        "account": "Regeneron",
+        "metric": "Quality",
+        "name": "Service Quality",
+        "description": "A measure of the delivery error",
+        "formula": "",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": "Met"
+      },
+      {
+        "account": "Regeneron",
+        "metric": "Process Adherence & Compliance",
+        "name": "No of Escalations",
+        "description": "No of Escalations",
+        "formula": "No. of Escalation Reported",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": "Met"
+      },
+      {
+        "account": "Amgen",
+        "metric": "Quality",
+        "name": "Service Quality",
+        "description": "A measure of the delivery error",
+        "formula": "",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": "Met"
+      },
+      {
+        "account": "Amgen",
+        "metric": "Process Adherence & Compliance",
+        "name": "No of Escalations",
+        "description": "No of Escalations",
+        "formula": "No. of Escalation Reported",
+        "target": 0,
+        "actual": 0,
+        "targetRaw": "0",
+        "actualRaw": "0",
+        "status": "Met"
+      },
+      {
+        "account": "Amgen",
+        "metric": "Utilization",
+        "name": "Utilisation (FTE)",
+        "description": "Employee's available time that's utilized for billable work",
+        "formula": "(Utilized hours / Total available hours) X 100%",
+        "target": 0.9,
+        "actual": 0.98,
+        "targetRaw": "0.9",
+        "actualRaw": "0.98",
+        "status": "Met"
+      }
+    ],
+    "kpis": [
+      {
+        "account": "AZ",
+        "metric": "Service Quality",
+        "target": 0.98,
+        "actual": 1,
+        "status": ""
+      },
+      {
+        "account": "AZ",
+        "metric": "On time delivery of projects",
+        "target": 0.95,
+        "actual": 1,
+        "status": ""
+      },
+      {
+        "account": "AZ",
+        "metric": "Utilisation (FTE)",
+        "target": 0,
+        "actual": 0.94,
+        "status": ""
+      },
+      {
+        "account": "AZ",
+        "metric": "Mandatory Trainings",
+        "target": 1,
+        "actual": 1,
+        "status": ""
+      },
+      {
+        "account": "AZ",
+        "metric": "Volume - No of active projects",
+        "target": 0,
+        "actual": 16,
+        "status": ""
+      },
+      {
+        "account": "GSK",
+        "metric": "Utilisation (FTE)",
+        "target": 0.9,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "GSK",
+        "metric": "Mandatory Trainings",
+        "target": 0.9,
+        "actual": 1,
+        "status": ""
+      },
+      {
+        "account": "GSK",
+        "metric": "Service Quality",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "GSK",
+        "metric": "No of Escalations",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Incyte",
+        "metric": "Volume - No of active projects",
+        "target": 0,
+        "actual": 15,
+        "status": ""
+      },
+      {
+        "account": "Incyte",
+        "metric": "On time delivery of projects",
+        "target": 1,
+        "actual": 1,
+        "status": ""
+      },
+      {
+        "account": "Incyte",
+        "metric": "Service Quality",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Incyte",
+        "metric": "No of Escalations",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "Volume - No of active projects",
+        "target": 0,
+        "actual": 28,
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "Resource Utilization Rate",
+        "target": 0.85,
+        "actual": 0.81,
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "On time delivery of projects",
+        "target": 1,
+        "actual": 1,
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "Service Quality",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Takeda",
+        "metric": "No of Escalations",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Fresenius",
+        "metric": "Utilisation (FTE)",
+        "target": 0.85,
+        "actual": 0.95,
+        "status": "Met"
+      },
+      {
+        "account": "Fresenius",
+        "metric": "Service Quality",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Fresenius",
+        "metric": "No of Escalations",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Abbvie",
+        "metric": "Utilisation (FTE)",
+        "target": 0.85,
+        "actual": 0.99,
+        "status": "Met"
+      },
+      {
+        "account": "Abbvie",
+        "metric": "Service Quality",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Abbvie",
+        "metric": "No of Escalations",
+        "target": 0,
+        "actual": 0,
+        "status": ""
+      },
+      {
+        "account": "Regeneron",
+        "metric": "Service Quality",
+        "target": 0,
+        "actual": 0,
+        "status": "Met"
+      },
+      {
+        "account": "Regeneron",
+        "metric": "No of Escalations",
+        "target": 0,
+        "actual": 0,
+        "status": "Met"
+      },
+      {
+        "account": "Amgen",
+        "metric": "Service Quality",
+        "target": 0,
+        "actual": 0,
+        "status": "Met"
+      },
+      {
+        "account": "Amgen",
+        "metric": "No of Escalations",
+        "target": 0,
+        "actual": 0,
+        "status": "Met"
+      },
+      {
+        "account": "Amgen",
+        "metric": "Utilisation (FTE)",
+        "target": 0.9,
+        "actual": 0.98,
+        "status": "Met"
+      }
+    ],
+    "summary": {
+      "metRate": 45,
+      "totalMetrics": 29,
+      "metCount": 13
+    },
+    "highlights": [
+      {
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "month": "January",
+        "highlight": "• Conducted a working session with DTE and Web Development teams to review and align on the Q1 2026 web updates roadmap, ensuring clear direction for"
+      },
+      {
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "month": "January",
+        "highlight": "upcoming HCP and DTC initiatives"
+      },
+      {
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "month": "January",
+        "highlight": "• Phase 2 Retrospective Campaign Taxonomy has been delivered on January 20th, 2026"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "highlight": "Received client communication on Qualtrics thereby creating an opportunity for having qualtrics functional"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "highlight": "Drupal update go live on all 37 websites and we performed live QA with no major issues found"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "highlight": "Accessibe go live on 8 unbranded sites"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "highlight": "More opportunites to engage with the clients through 1:1 connects"
+      },
+      {
+        "pm": "Nataraj Selvaraj",
+        "project": "Ipsen",
+        "month": "January",
+        "highlight": "Value added: Configuring Key Events for all Ipsen websites"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Completed GA4 basic + custom tracking QA on DEV JP website https://dev.speakerslide.amgenpro.jp/"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Completed GA4 basic + custom tracking QA on DEV DK website https://dev.mitkolesterol.dk/"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Successfully completed GA4 basic tracking setup on Live FR website https://www.amgen.fr/"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Delivered regular monthly and weekly reports for Japan (6 brands)"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://evenity.jp, https://blincyto.jp, https://repatha.jp, https://lumakras.jp, https://aimovig.jp, https://otezla-japan.jp"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Fulfilled GA4 tracking setup on Cloud (Amgen landing page) pages. Example landing page:>"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/BR_Video_Dr_Carmelo"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/instructions_for_the_pre-filled_pen-video"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/cardiomedicalaffairs"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/immunoMIND"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/bfm_video_pt-BR"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Fulfilled campaign tracking (UTM/Newsletter) requests for redamgen.com websites."
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Regeneron",
+        "month": "January",
+        "highlight": ">"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "1. Tag Implementation - 115 tags were implemented/re-implemented in January"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "2. Tag Expiration Process: 6623 tags sent for 11 agency confirmations, 1747 to be retain and 4876 to be pause."
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "a. Among 1747, we have put active labels in tealium on 1380 tags till now"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "b. For 4876 tags to pause: CMI completed (912/1057), pulsepoint completed (10/10) and Aim (1/22) tags have been put on Pause and their QA is WIP"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "3. Tag Hawk:"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "a. Tool Development - Team is validating 500+ tags (either pausing the tags or fixing) for which data is not flowing to Tag Hawk and its WIP"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "b. Master Table -  Started updated Master table also from 2021-2023 implemented tickets. (~4400 tags to update)"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "4. Cookie Consent - Continued working on the required fix for all 85 websites across 11 profiles, 9 profiles are completed"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "1. End of the year deck for 2025 presented to client"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "2. Dashboard delivered for trodelvy DTP"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "3. Work started for migration of first site on EDS Kitemedinfo"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "4.2025 analytics report for careers pages"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "5. Go live of HIVclinicalinsights, where team worked on PST shift and delivered on time"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "6. OT exception work completed for gileadpro websites"
+      }
+    ],
+    "lowlights": [
+      {
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "month": "January",
+        "lowlight": "Awaiting the final signed SOW and PO"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "lowlight": "Awaiting signed SOW and PO"
+      }
+    ]
+  },
+  "diagnostics": {
+    "sheets_found": [
+      "KPI",
+      "Sheet2"
+    ],
+    "sections": {
+      "kpi_main": {
+        "header_row": 0,
+        "columns_found": [
+          "account_name",
+          "metric_name",
+          "kpi_name",
+          "description",
+          "formula",
+          "target",
+          "actual",
+          "status"
+        ],
+        "columns_missing": [],
+        "total_expected": 8,
+        "total_found": 8,
+        "sheet": "KPI"
+      },
+      "highlights_lowlights": {
+        "header_row": 0,
+        "columns_found": [
+          "project_manager",
+          "project",
+          "month",
+          "highlight",
+          "lowlight"
+        ],
+        "columns_missing": [],
+        "total_expected": 5,
+        "total_found": 5,
+        "sheet": "Sheet2"
+      }
+    }
+  },
+  "timestamp": "2026-05-05T19:40:55.860249",
+  "input_file": "C:\\Users\\KIIT\\Downloads\\Dashboard-looker-main\\Dashboard-looker-main\\uploads\\kpi.xlsx"
+}

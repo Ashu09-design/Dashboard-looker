@@ -1,0 +1,317 @@
+{
+  "success": true,
+  "source": "leave",
+  "data": {
+    "months": [
+      {
+        "sheet": "Feb26",
+        "year": 2026,
+        "month": 1
+      },
+      {
+        "sheet": "Jan 26",
+        "year": 2026,
+        "month": 0
+      },
+      {
+        "sheet": "Dec 25",
+        "year": 2025,
+        "month": 11
+      },
+      {
+        "sheet": "May-22",
+        "year": 2022,
+        "month": 4
+      },
+      {
+        "sheet": "Apr-22",
+        "year": 2022,
+        "month": 3
+      },
+      {
+        "sheet": "Mar-22",
+        "year": 2022,
+        "month": 2
+      },
+      {
+        "sheet": "Feb-22",
+        "year": 2022,
+        "month": 1
+      },
+      {
+        "sheet": "Jan-22",
+        "year": 2022,
+        "month": 0
+      },
+      {
+        "sheet": "May-21",
+        "year": 2021,
+        "month": 4
+      },
+      {
+        "sheet": "April-21",
+        "year": 2021,
+        "month": 3
+      },
+      {
+        "sheet": "March-21",
+        "year": 2021,
+        "month": 2
+      },
+      {
+        "sheet": "Feb-21",
+        "year": 2021,
+        "month": 1
+      },
+      {
+        "sheet": "Jan-21",
+        "year": 2021,
+        "month": 0
+      },
+      {
+        "sheet": "Dec-20",
+        "year": 2020,
+        "month": 11
+      }
+    ],
+    "currentMonth": {
+      "byPerson": {
+        "Pooja": 1,
+        "Surbhi": 1,
+        "Vatsala": 3,
+        "Manas": 3,
+        "Nagendrappa": 2,
+        "Navya": 5,
+        "Rutuja": 2,
+        "Chandan": 2,
+        "Jyoti": 3,
+        "Jomol": 2,
+        "Anitha": 1,
+        "Bhola": 1,
+        "Suchit": 1,
+        "Chethan": 1,
+        "Nishanth": 1,
+        "Sharmila": 1,
+        "Sneha": 1
+      },
+      "onLeaveToday": [],
+      "totalLeaves": 31
+    },
+    "allPersons": [
+      "Abdul",
+      "Abhinav",
+      "Abrar",
+      "Ajitesh",
+      "Akram",
+      "Akshay",
+      "Akshita",
+      "Alisha",
+      "Ambar",
+      "Amruthesh",
+      "Anantha",
+      "Ananya",
+      "Andrew",
+      "Anitha",
+      "Ankit",
+      "Anshul",
+      "Anupam",
+      "Anushka",
+      "Apurv",
+      "Arijit",
+      "Arpan",
+      "Arpana",
+      "Arpita",
+      "Aryaman",
+      "Ashutosh",
+      "Atul",
+      "Avaiz",
+      "Ayush",
+      "Bajivali",
+      "Balkhiz",
+      "Bhavana",
+      "Bhavani",
+      "Bhola",
+      "Chandan",
+      "Chandra",
+      "Chethan",
+      "Deepa",
+      "Deepan",
+      "Divya",
+      "Gajendra",
+      "Gopi",
+      "Harita",
+      "Himanshu",
+      "Isaac",
+      "Jay",
+      "Jinan",
+      "Jomol",
+      "Joshua",
+      "Jyoti",
+      "Karthikeyan",
+      "Karuppasamy",
+      "Karuppusamy",
+      "Kavya",
+      "Keshav",
+      "Kranthi",
+      "Krishna",
+      "Krishnaprasad",
+      "Kruthi",
+      "Leela",
+      "Malarvizhi",
+      "Manas",
+      "Manjeet",
+      "Marina",
+      "Mohan",
+      "Mohit",
+      "Mrudula",
+      "Nagendrappa",
+      "Namitha",
+      "Nataraj",
+      "Navya",
+      "Neetu",
+      "Niranjan",
+      "Nishanth",
+      "Om",
+      "Pamei",
+      "Pandit",
+      "Parveen",
+      "Pavan",
+      "Peri",
+      "Pooja",
+      "Prakhar",
+      "Praneeth",
+      "Praveen",
+      "Preetha",
+      "Preeti",
+      "Prithvi",
+      "Priya",
+      "Puneeth",
+      "Raghavendra",
+      "Rahul",
+      "Rajesh",
+      "Ranjani",
+      "Rashmi",
+      "Ravindra",
+      "Ritika",
+      "Rushikesh",
+      "Rutuja",
+      "Sabha",
+      "Sai",
+      "Samanvey",
+      "Sameer",
+      "Sanjeev",
+      "Sanket",
+      "Sharmila",
+      "Shiva",
+      "Shivam",
+      "Shivani",
+      "Shobika",
+      "Shraddha",
+      "Shreya",
+      "Shubham",
+      "Shubhankar",
+      "Shubhojit",
+      "Siddharth",
+      "Sneha",
+      "Sonam",
+      "Srikanth",
+      "Suchit",
+      "Sudhir",
+      "Sujay",
+      "Sumanth",
+      "Sumit",
+      "Suprit",
+      "Surbhi",
+      "Tanmoy",
+      "Utkarsh",
+      "Utsav",
+      "Vatsala",
+      "Veda",
+      "Venkatesh",
+      "Vipul",
+      "Zaid"
+    ]
+  },
+  "diagnostics": {
+    "sheets_found": [
+      "Dec-20",
+      "Jan-21",
+      "Feb-21",
+      "March-21",
+      "April-21",
+      "May-21",
+      "Jan-22",
+      "Feb-22",
+      "Mar-22",
+      "Apr-22",
+      "May-22",
+      "Legend",
+      "Holiday List - 2026",
+      "Dec 25",
+      "Jan 26",
+      "Feb26",
+      "Template",
+      "Checklist"
+    ],
+    "sections": {
+      "Dec-20": {
+        "header_row": 4,
+        "persons_found": 19
+      },
+      "Jan-21": {
+        "header_row": 4,
+        "persons_found": 20
+      },
+      "Feb-21": {
+        "header_row": 4,
+        "persons_found": 20
+      },
+      "March-21": {
+        "header_row": 4,
+        "persons_found": 20
+      },
+      "April-21": {
+        "header_row": 5,
+        "persons_found": 21
+      },
+      "May-21": {
+        "header_row": 4,
+        "persons_found": 21
+      },
+      "Jan-22": {
+        "header_row": 4,
+        "persons_found": 44
+      },
+      "Feb-22": {
+        "header_row": 4,
+        "persons_found": 47
+      },
+      "Mar-22": {
+        "header_row": 4,
+        "persons_found": 51
+      },
+      "Apr-22": {
+        "header_row": 4,
+        "persons_found": 51
+      },
+      "May-22": {
+        "header_row": 4,
+        "persons_found": 55
+      },
+      "Dec 25": {
+        "header_row": 1,
+        "persons_found": 102
+      },
+      "Jan 26": {
+        "header_row": 0,
+        "persons_found": 106
+      },
+      "Feb26": {
+        "header_row": 0,
+        "persons_found": 103
+      }
+    }
+  },
+  "timestamp": "2026-05-05T19:40:53.845127",
+  "input_file": "C:\\Users\\KIIT\\Downloads\\Dashboard-looker-main\\Dashboard-looker-main\\uploads\\leave.xlsb"
+}

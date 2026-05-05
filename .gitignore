@@ -1,0 +1,9 @@
+node_modules/
+.env
+__pycache__/
+*.pyc
+api_test.json
+qbr_test.json
+excel_data.txt
+add_data.py
+fill_recent_data.py

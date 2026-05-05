@@ -1,0 +1,1359 @@
+{
+  "success": true,
+  "source": "governance",
+  "data": {
+    "highlights": [
+      {
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "month": "January",
+        "highlight": "• Conducted a working session with DTE and Web Development teams to review and align on the Q1 2026 web updates roadmap, ensuring clear direction for"
+      },
+      {
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "month": "January",
+        "highlight": "upcoming HCP and DTC initiatives"
+      },
+      {
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "month": "January",
+        "highlight": "• Phase 2 Retrospective Campaign Taxonomy has been delivered on January 20th, 2026"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "highlight": "Received client communication on Qualtrics thereby creating an opportunity for having qualtrics functional"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "highlight": "Drupal update go live on all 37 websites and we performed live QA with no major issues found"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "highlight": "Accessibe go live on 8 unbranded sites"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "highlight": "More opportunites to engage with the clients through 1:1 connects"
+      },
+      {
+        "pm": "Nataraj Selvaraj",
+        "project": "Ipsen",
+        "month": "January",
+        "highlight": "Value added: Configuring Key Events for all Ipsen websites"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Completed GA4 basic + custom tracking QA on DEV JP website https://dev.speakerslide.amgenpro.jp/"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Completed GA4 basic + custom tracking QA on DEV DK website https://dev.mitkolesterol.dk/"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Successfully completed GA4 basic tracking setup on Live FR website https://www.amgen.fr/"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Delivered regular monthly and weekly reports for Japan (6 brands)"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://evenity.jp, https://blincyto.jp, https://repatha.jp, https://lumakras.jp, https://aimovig.jp, https://otezla-japan.jp"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Fulfilled GA4 tracking setup on Cloud (Amgen landing page) pages. Example landing page:>"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/BR_Video_Dr_Carmelo"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/instructions_for_the_pre-filled_pen-video"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/cardiomedicalaffairs"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/immunoMIND"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "https://cloud.amgeninfo.com/bfm_video_pt-BR"
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "month": "January",
+        "highlight": "> Fulfilled campaign tracking (UTM/Newsletter) requests for redamgen.com websites."
+      },
+      {
+        "pm": "Prithvi Raj",
+        "project": "Regeneron",
+        "month": "January",
+        "highlight": ">"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "1. Tag Implementation - 115 tags were implemented/re-implemented in January"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "2. Tag Expiration Process: 6623 tags sent for 11 agency confirmations, 1747 to be retain and 4876 to be pause."
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "a. Among 1747, we have put active labels in tealium on 1380 tags till now"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "b. For 4876 tags to pause: CMI completed (912/1057), pulsepoint completed (10/10) and Aim (1/22) tags have been put on Pause and their QA is WIP"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "3. Tag Hawk:"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "a. Tool Development - Team is validating 500+ tags (either pausing the tags or fixing) for which data is not flowing to Tag Hawk and its WIP"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "b. Master Table -  Started updated Master table also from 2021-2023 implemented tickets. (~4400 tags to update)"
+      },
+      {
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "month": "January",
+        "highlight": "4. Cookie Consent - Continued working on the required fix for all 85 websites across 11 profiles, 9 profiles are completed"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "1. End of the year deck for 2025 presented to client"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "2. Dashboard delivered for trodelvy DTP"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "3. Work started for migration of first site on EDS Kitemedinfo"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "4.2025 analytics report for careers pages"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "5. Go live of HIVclinicalinsights, where team worked on PST shift and delivered on time"
+      },
+      {
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "month": "January",
+        "highlight": "6. OT exception work completed for gileadpro websites"
+      }
+    ],
+    "lowlights": [
+      {
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "month": "January",
+        "lowlight": "Awaiting the final signed SOW and PO"
+      },
+      {
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "month": "January",
+        "lowlight": "Awaiting signed SOW and PO"
+      }
+    ],
+    "qbr": [
+      {
+        "account": "Abbvie",
+        "pms": "Joshua",
+        "offshoreLeads": "Pooja, Joshua",
+        "deliveryLeads": "Harish, Anshul",
+        "startDate": "2023-01-01",
+        "qbrStartDate": "2023-01-01",
+        "deliveryType": "Independently",
+        "comments": "Follows Jan-Dec(FY)"
+      },
+      {
+        "account": "Amgen",
+        "pms": "Prithvi",
+        "offshoreLeads": "",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "Follows Jan-Dec(FY). Currently in talks Planning to happen in next Quarter."
+      },
+      {
+        "account": "AZ",
+        "pms": "Abrar/Vatsala",
+        "offshoreLeads": "",
+        "deliveryLeads": "Bonnie Sananda",
+        "startDate": "2022-09-01",
+        "qbrStartDate": "2023-01-01",
+        "deliveryType": "In Collaboration",
+        "comments": "Indegene present Monthly, Quaterly, Half yearly and annual decks to AZ. 2022 was presented as an Annual Business Review to client and as QBR to Sharan. 2023 Q1 and Q2 was delivered together  as H1 review."
+      },
+      {
+        "account": "Bayer",
+        "pms": "Jinan",
+        "offshoreLeads": "",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "In Collaboration",
+        "comments": ""
+      },
+      {
+        "account": "Fresenius",
+        "pms": "Joshua",
+        "offshoreLeads": "Malhar,  Joshua",
+        "deliveryLeads": "Malhar, Anshul",
+        "startDate": "2023-01-01",
+        "qbrStartDate": "2023-01-01",
+        "deliveryType": "Independently",
+        "comments": "Follows Jan-Dec(FY)."
+      },
+      {
+        "account": "Genmab",
+        "pms": "Rashmi",
+        "offshoreLeads": "",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "A collaborative QBR prepared in 2024 along with OT and SFMC teams and presented by Janice in May 2024"
+      },
+      {
+        "account": "GSK",
+        "pms": "Jinan",
+        "offshoreLeads": "",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "Q3 completed."
+      },
+      {
+        "account": "Incyte",
+        "pms": "Shreya",
+        "offshoreLeads": "Shreya, Avishek, Apurv, Mohit",
+        "deliveryLeads": "Anshul",
+        "startDate": "2023-01-01",
+        "qbrStartDate": "",
+        "deliveryType": "In Collaboration",
+        "comments": "QBR occurred till mid last year, after that Client requested for separate connect with smaller group (attendees : Heidi, Jay Khan and Incyte team)"
+      },
+      {
+        "account": "Ipsen",
+        "pms": "Nataraj",
+        "offshoreLeads": "Rohan, Vikas, Anmol",
+        "deliveryLeads": "Rohan & Anmol",
+        "startDate": "2023-01-01",
+        "qbrStartDate": "2023-10-01",
+        "deliveryType": "In Collaboration",
+        "comments": "1. Clients were on holiday in Q4,2023."
+      },
+      {
+        "account": "Novartis",
+        "pms": "Kunal",
+        "offshoreLeads": "",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "QBR planned in March"
+      },
+      {
+        "account": "Regeneron",
+        "pms": "Prithvi",
+        "offshoreLeads": "Avishek, Rajesh",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "Follows Jan-Dec(FY). QBR planning in progress for Q1. Likely to happen in Q2 ."
+      },
+      {
+        "account": "Takeda",
+        "pms": "Himanshu",
+        "offshoreLeads": "Nandita , Rashprit",
+        "deliveryLeads": "Nandita Prasad and Arun Kumar",
+        "startDate": "2022-07-01",
+        "qbrStartDate": "",
+        "deliveryType": "In Collaboration",
+        "comments": "Indegene present Monthly, Quaterly, Half yearly and annual decks to Takeda."
+      },
+      {
+        "account": "Eisai",
+        "pms": "Nataraj",
+        "offshoreLeads": "",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "New project, in initial phase"
+      },
+      {
+        "account": "Beigene",
+        "pms": "",
+        "offshoreLeads": "",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "No QBR Planned"
+      },
+      {
+        "account": "Calliditas",
+        "pms": "Nataraj",
+        "offshoreLeads": "",
+        "deliveryLeads": "",
+        "startDate": "",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "QBR planned in March"
+      },
+      {
+        "account": "Gilead",
+        "pms": "Vatsala",
+        "offshoreLeads": "Surbhi",
+        "deliveryLeads": "Surbhi,Namrata",
+        "startDate": "2025-01-01",
+        "qbrStartDate": "",
+        "deliveryType": "",
+        "comments": "We do have monthly operational review in place"
+      }
+    ],
+    "fte": [
+      {
+        "account": "Abbvie",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 5,
+          "2025-11-01 00:00:00": 5,
+          "2025-12-01 00:00:00": 5,
+          "2026-01-01 00:00:00": 5,
+          "2026-02-01 00:00:00": 5,
+          "2026-03-01 00:00:00": 5,
+          "2026-04-01 00:00:00": 5,
+          "2026-05-01 00:00:00": 5,
+          "2026-06-01 00:00:00": 5,
+          "2026-07-01 00:00:00": 5,
+          "2026-08-01 00:00:00": 5,
+          "2026-09-01 00:00:00": 5,
+          "2026-10-01 00:00:00": 5,
+          "2026-11-01 00:00:00": 5,
+          "2026-12-01 00:00:00": 5,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Amgen",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 2,
+          "2025-11-01 00:00:00": 2,
+          "2025-12-01 00:00:00": 2,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "AZ",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Bayer",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Fresenius",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 4.5,
+          "2025-11-01 00:00:00": 4.5,
+          "2025-12-01 00:00:00": 4.5,
+          "2026-01-01 00:00:00": 4.5,
+          "2026-02-01 00:00:00": 4.5,
+          "2026-03-01 00:00:00": 4.5,
+          "2026-04-01 00:00:00": 4.5,
+          "2026-05-01 00:00:00": 4.5,
+          "2026-06-01 00:00:00": 4.5,
+          "2026-07-01 00:00:00": 4.5,
+          "2026-08-01 00:00:00": 4.5,
+          "2026-09-01 00:00:00": 4.5,
+          "2026-10-01 00:00:00": 4.5,
+          "2026-11-01 00:00:00": 4.5,
+          "2026-12-01 00:00:00": 4.5,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "AZ tealium",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "GenMab",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "GSK",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "GSK 3rd party tagging",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Incyte",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Incyte Web studio",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 3.5,
+          "2025-11-01 00:00:00": 3.5,
+          "2025-12-01 00:00:00": 3.5,
+          "2026-01-01 00:00:00": 3.5,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Ipsen",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 1.25,
+          "2025-11-01 00:00:00": 1.25,
+          "2025-12-01 00:00:00": 1.25,
+          "2026-01-01 00:00:00": 1.25,
+          "2026-02-01 00:00:00": 1.25,
+          "2026-03-01 00:00:00": 1.25,
+          "2026-04-01 00:00:00": 1.25,
+          "2026-05-01 00:00:00": 1.25,
+          "2026-06-01 00:00:00": 1.25,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Novartis",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Regeneron",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 8.75,
+          "2025-11-01 00:00:00": 8.75,
+          "2025-12-01 00:00:00": 8.75,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Takeda",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 8.5,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "EASAI",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Alnylam",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 0,
+          "2025-11-01 00:00:00": 0,
+          "2025-12-01 00:00:00": 0,
+          "2026-01-01 00:00:00": 0,
+          "2026-02-01 00:00:00": 0,
+          "2026-03-01 00:00:00": 0,
+          "2026-04-01 00:00:00": 0,
+          "2026-05-01 00:00:00": 0,
+          "2026-06-01 00:00:00": 0,
+          "2026-07-01 00:00:00": 0,
+          "2026-08-01 00:00:00": 0,
+          "2026-09-01 00:00:00": 0,
+          "2026-10-01 00:00:00": 0,
+          "2026-11-01 00:00:00": 0,
+          "2026-12-01 00:00:00": 0,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      },
+      {
+        "account": "Vertex",
+        "monthlyFTE": {
+          "2025-10-01 00:00:00": 5,
+          "2025-11-01 00:00:00": 5,
+          "2025-12-01 00:00:00": 5,
+          "2026-01-01 00:00:00": 5,
+          "2026-02-01 00:00:00": 5,
+          "2026-03-01 00:00:00": 5,
+          "2026-04-01 00:00:00": 5,
+          "2026-05-01 00:00:00": 5,
+          "2026-06-01 00:00:00": 5,
+          "2026-07-01 00:00:00": 5,
+          "2026-08-01 00:00:00": 5,
+          "2026-09-01 00:00:00": 5,
+          "2026-10-01 00:00:00": 5,
+          "2026-11-01 00:00:00": 5,
+          "2026-12-01 00:00:00": 5,
+          "2027-01-01 00:00:00": 0,
+          "2027-02-01 00:00:00": 0,
+          "2027-03-01 00:00:00": 0,
+          "2027-04-01 00:00:00": 0,
+          "2027-05-01 00:00:00": 0
+        }
+      }
+    ],
+    "risks": [
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "description": "Movement of One trust and addition of new resource in between the deliverables",
+        "owner": "",
+        "rootCause": "Team alignemnet changes",
+        "mitigation": "Planning for smooth KT with the new resource till they can handle tasks independently",
+        "impact": "Loss of Revenue for the BU",
+        "status": "Ongoing"
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Prithvi Raj",
+        "project": "Amgen",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Prithvi Raj",
+        "project": "Regeneron",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Shobika",
+        "project": "GSK",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Andrew",
+        "project": "Allergan",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Andrew",
+        "project": "Fresenius",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3 and 4",
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3 and 4",
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3",
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "description": "Cookie Consent Compliance - 85 websites across 11 profiles (6000+ tags)",
+        "owner": "GSK 3rd party tagging team",
+        "rootCause": "3rd party Tags firing before accepting cookies",
+        "mitigation": "Completed required fix for 8 profile websites, Need to work for pending 3 profiles websites (Need ~3 hours/profile)",
+        "impact": "Legal compliance issues can be raised",
+        "status": "In Progress"
+      },
+      {
+        "month": "January",
+        "week": "Week 3",
+        "pm": "Andrew",
+        "project": "Allergan",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3",
+        "pm": "Andrew",
+        "project": "Fresenius",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3",
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3 and 4",
+        "pm": "Shobika",
+        "project": "GSK",
+        "description": "Use of outdated iPhone models for QA",
+        "owner": "Indegene",
+        "rootCause": "We are encountering challenges in mobile QA because the currently available iPhone devices are outdated, causing several UI elements and functionalities to either not display correctly or fail to function as intended.",
+        "mitigation": "1. Replace the current outdated iPhone devices with a more recent iPhone model to ensure compatibility with latest OS versions and to support reliable, thorough mobile QA.",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3 and 4",
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 4",
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "description": "1. Cookie Consent Compliance - 85 websites across 11 profiles (6000+ tags)",
+        "owner": "1. Indegene working team",
+        "rootCause": "1. 3rd party Tags firing before accepting cookies",
+        "mitigation": "1. Completed required fix for 9 profile websites, Need to work for pending 2 profiles websites (Need ~3 hours/profile)",
+        "impact": "1. Legal compliance issues can be raised",
+        "status": "In Progress"
+      },
+      {
+        "month": "January",
+        "week": "Week 4",
+        "pm": "Andrew",
+        "project": "Allergan",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 4",
+        "pm": "Andrew",
+        "project": "Fresenius",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 4",
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 5",
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "description": "Week 4 Issues: Deliverables delayed. From 16th Jan, only bhola worked as implementation engineer as we didn't receive Atul tealium access. Team lost 36 hours of development work (considering 6 working days with ~6hrs/day capacity for 1 engineer). Bhola also had leave on 22nd Jan, so zero development happened on the project on 22nd Jan",
+        "owner": "1. Indegene working team",
+        "rootCause": "1. 3rd party Tags firing before accepting cookies",
+        "mitigation": "1. Completed required fix for 9 profile websites, Need to work for pending 2 profiles websites (Need ~3 hours/profile) but don't have bandwidth to do this",
+        "impact": "1. Legal compliance issues can be raised",
+        "status": "In Progress"
+      },
+      {
+        "month": "January",
+        "week": "Week 5",
+        "pm": "Andrew",
+        "project": "Allergan",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 5",
+        "pm": "Andrew",
+        "project": "Fresenius",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "February",
+        "week": "Week 1",
+        "pm": "Andrew",
+        "project": "Allergan",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "February",
+        "week": "Week 1",
+        "pm": "Andrew",
+        "project": "Fresenius",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Nataraj Selvaraj",
+        "project": "Ipsen",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3 and 4",
+        "pm": "Nataraj Selvaraj",
+        "project": "Ipsen",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Nataraj Selvaraj",
+        "project": "Soleno",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3 and 4",
+        "pm": "Nataraj Selvaraj",
+        "project": "Soleno",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 1 and 2",
+        "pm": "Nataraj Selvaraj",
+        "project": "Calliditas",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "January",
+        "week": "Week 3 and 4",
+        "pm": "Nataraj Selvaraj",
+        "project": "Calliditas",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "February",
+        "week": "Week 1",
+        "pm": "Samanvey Gupta",
+        "project": "GSK 3rd Party tagging",
+        "description": "Jan Week 5 Issues: Atul still didn't receive Tealium PROD publish access.",
+        "owner": "1. Indegene working team",
+        "rootCause": "1. 3rd party Tags firing before accepting cookies",
+        "mitigation": "1. Completed required fix for 9 profile websites, Need to work for pending 2 profiles websites (Need ~3 hours/profile) but don't have bandwidth to do this",
+        "impact": "1. Legal compliance issues can be raised",
+        "status": "In Progress"
+      },
+      {
+        "month": "February",
+        "week": "Week 1",
+        "pm": "Vatsala Mishra",
+        "project": "Gilead",
+        "description": "no Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      },
+      {
+        "month": "February",
+        "week": "Week 1 and 2",
+        "pm": "Joshua Samuel",
+        "project": "Vertex",
+        "description": "No Risk",
+        "owner": "",
+        "rootCause": "",
+        "mitigation": "",
+        "impact": "",
+        "status": ""
+      }
+    ],
+    "audits": [
+      {
+        "month": "January",
+        "pm": "Sanket Agrawal",
+        "project": "Takeda",
+        "details": "",
+        "findings": "",
+        "closureDate": ""
+      },
+      {
+        "month": "January",
+        "pm": "Shreya Rao",
+        "project": "Incyte",
+        "details": "Performed PII audit on MPN connect",
+        "findings": "NO PII data recorded",
+        "closureDate": "2026-01-24"
+      }
+    ],
+    "summary": {
+      "activeRisks": 1,
+      "totalAudits": 2
+    }
+  },
+  "diagnostics": {
+    "sheets_found": [
+      "Highlights & Low lights",
+      "QBR",
+      "FTE",
+      "Risks and Mitigation",
+      "Audits"
+    ],
+    "sections": {
+      "highlights": {
+        "header_row": 0,
+        "columns_found": [
+          "project_manager",
+          "project",
+          "month",
+          "highlight",
+          "lowlight"
+        ],
+        "columns_missing": [],
+        "total_expected": 5,
+        "total_found": 5,
+        "sheet": "Highlights & Low lights"
+      },
+      "qbr": {
+        "header_row": 0,
+        "columns_found": [
+          "account",
+          "pms",
+          "offshore_leads",
+          "delivery_leads",
+          "project_start_date",
+          "qbr_start_date",
+          "qbr_delivery_type",
+          "comments"
+        ],
+        "columns_missing": [],
+        "total_expected": 8,
+        "total_found": 8,
+        "sheet": "QBR"
+      },
+      "fte": {
+        "sheet": "FTE"
+      },
+      "risks": {
+        "header_row": 0,
+        "columns_found": [
+          "project_manager",
+          "project",
+          "month",
+          "risks",
+          "week",
+          "owner",
+          "root_cause",
+          "mitigation",
+          "impact",
+          "status"
+        ],
+        "columns_missing": [],
+        "total_expected": 10,
+        "total_found": 10,
+        "sheet": "Risks and Mitigation"
+      },
+      "audits": {
+        "header_row": 0,
+        "columns_found": [
+          "project_manager",
+          "project",
+          "month",
+          "audit_details",
+          "findings",
+          "audit_closure_date"
+        ],
+        "columns_missing": [],
+        "total_expected": 6,
+        "total_found": 6,
+        "sheet": "Audits"
+      }
+    }
+  },
+  "timestamp": "2026-05-05T19:40:50.589924",
+  "input_file": "C:\\Users\\KIIT\\Downloads\\Dashboard-looker-main\\Dashboard-looker-main\\uploads\\governance.xlsx"
+}

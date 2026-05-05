@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manager Login — Executive Dashboard</title>
+    <meta name="description" content="Secure manager login for the Digital Enablement Executive Dashboard." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="login.css" />
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="lock-icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#fff" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" />
+                        <path d="M7 11V7a5 5 0 0110 0v4" />
+                    </svg>
+                </div>
+                <h1>Executive Dashboard</h1>
+                <p>Manager-level access required</p>
+            </div>
+            <div class="login-body">
+                <div id="loginError" class="error-msg hidden"></div>
+                <div class="field">
+                    <label for="username">User ID</label>
+                    <input id="username" type="text" placeholder="Enter your user ID" autocomplete="username" />
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" placeholder="Enter your password"
+                        autocomplete="current-password" />
+                </div>
+                <button id="loginBtn" class="login-btn">
+                    <span id="btnText">Sign In</span>
+                    <span id="btnSpinner" class="btn-spinner hidden"></span>
+                </button>
+            </div>
+            <div class="login-footer">
+                <a href="/" class="back-link">← Back to Standup Dashboard</a>
+            </div>
+        </div>
+        <div class="brand-footer">
+            <span>Digital Enablement Team Dashboard © 2025</span>
+        </div>
+    </div>
+
+    <script>
+        const $ = sel => document.querySelector(sel);
+        document.addEventListener('DOMContentLoaded', () => {
+            // If already logged in, redirect
+            const token = sessionStorage.getItem('exec_token');
+            if (token) {
+                fetch('/api/auth/verify', { headers: { Authorization: 'Bearer ' + token } })
+                    .then(r => r.json())
+                    .then(d => { if (d.valid) window.location.href = '/executive.html'; })
+                    .catch(() => { });
+            }
+
+            $('#loginBtn').addEventListener('click', doLogin);
+            $('#password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+            $('#username').addEventListener('keydown', e => { if (e.key === 'Enter') $('#password').focus(); });
+        });
+
+        async function doLogin() {
+            const username = $('#username').value.trim();
+            const password = $('#password').value;
+            const errEl = $('#loginError');
+            errEl.classList.add('hidden');
+
+            if (!username || !password) {
+                errEl.textContent = 'Please enter both User ID and Password.';
+                errEl.classList.remove('hidden');
+                return;
+            }
+
+            $('#btnText').textContent = 'Signing in…';
+            $('#btnSpinner').classList.remove('hidden');
+            $('#loginBtn').disabled = true;
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                });
+                const data = await res.json();
+
+                if (res.ok && data.token) {
+                    sessionStorage.setItem('exec_token', data.token);
+                    window.location.href = '/executive.html';
+                } else {
+                    errEl.textContent = data.error || 'Login failed. Please try again.';
+                    errEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                errEl.textContent = 'Network error. Please try again.';
+                errEl.classList.remove('hidden');
+            } finally {
+                $('#btnText').textContent = 'Sign In';
+                $('#btnSpinner').classList.add('hidden');
+                $('#loginBtn').disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

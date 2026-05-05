@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Enablement Team - Daily Standup Updates</title>
+  <meta name="description"
+    content="Digital Enablement Team Dashboard — Daily standup updates, bandwidth tracker, and QBR reporting." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <!-- ════════ LOADING SPINNER ════════ -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading dashboard data…</p>
+  </div>
+
+  <!-- ════════ HEADER ════════ -->
+  <header id="main-header">
+    <h1>Digital Enablement Team - Daily Standup Updates</h1>
+    <div class="header-actions">
+      <button id="btnRefresh" class="header-btn phase1-only" title="Refresh data now">
+        <svg class="icon-spin" viewBox="0 0 24 24" width="16" height="16">
+          <path d="M17.65 6.35A7.96 7.96 0 0012 4a8 8 0 00-8 8 8 8 0 008 8 7.99 7.99 0 007.35-4.82" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <polyline points="17.65 2 17.65 6.35 13.3 6.35" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Refresh
+      </button>
+      <button id="btnPresent" class="header-btn phase1-only" title="Enter presentation mode">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <rect x="2" y="3" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
+          <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2" />
+          <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2" />
+        </svg>
+        Present
+      </button>
+      <button id="btnDataSource" class="header-btn phase1-only" title="Connect data source">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" />
+          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" />
+        </svg>
+        Data Source
+      </button>
+      <button id="btnManagerLogin" class="header-btn header-btn-exec" title="Manager Login">
+        🔐 Manager Login
+      </button>
+      <button id="btnExecLogout" class="header-btn header-btn-danger exec-only" style="display:none" title="Logout">
+        🔓 Logout
+      </button>
+      <span id="refreshBadge" class="refresh-badge phase1-only">Auto-refresh: <strong>5 min</strong></span>
+      <span id="lastUpdated" class="last-updated phase1-only"></span>
+    </div>
+  </header>
+
+  <!-- ════════ PRESENT MODE EXIT BAR ════════ -->
+  <div id="presentBar" class="present-bar hidden">
+    <span>📺 Presentation Mode</span>
+    <span id="presentTitle" class="present-title">Digital Enablement Team - Daily Standup Updates</span>
+    <button id="exitPresent" class="header-btn exit-btn">✕ Exit</button>
+  </div>
+
+  <!-- ════════ DATA SOURCE MODAL ════════ -->
+  <div id="dataSourceModal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Connect Data Source</h2>
+        <button id="closeModal" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="source-option">
+          <div class="source-icon google-icon">
+            <svg viewBox="0 0 24 24" width="28" height="28">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                fill="#4285F4" />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853" />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z"
+                fill="#FBBC05" />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335" />
+            </svg>
+          </div>
+          <div class="source-info">
+            <h3>Google Sheets</h3>
+            <p>Connect using a published Google Sheets link (CSV export)</p>
+            <input id="googleSheetUrl" type="url"
+              placeholder="https://docs.google.com/spreadsheets/d/SHEET_ID/export?format=csv" />
+            <button class="btn-connect" onclick="connectSource('google')">Connect Google Sheet</button>
+          </div>
+        </div>
+        <div class="source-divider"><span>OR</span></div>
+        <div class="source-option">
+          <div class="source-icon sharepoint-icon">
+            <svg viewBox="0 0 24 24" width="28" height="28">
+              <circle cx="12" cy="8" r="5" fill="#036C70" />
+              <circle cx="7" cy="16" r="4" fill="#1A9BA1" />
+              <circle cx="17" cy="16" r="4" fill="#37C6D0" />
+            </svg>
+          </div>
+          <div class="source-info">
+            <h3>SharePoint / OneDrive Excel</h3>
+            <p>Paste a SharePoint or OneDrive public link to an Excel file</p>
+            <input id="sharepointUrl" type="url" placeholder="https://yourorg.sharepoint.com/sites/.../file.xlsx" />
+            <button class="btn-connect" onclick="connectSource('sharepoint')">Connect Excel</button>
+          </div>
+        </div>
+        <div id="sourceStatus" class="source-status hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ MAIN GRID ════════ -->
+  <main id="dashboard">
+
+    <!-- ── LEFT SIDEBAR ── -->
+    <aside id="left-sidebar">
+      <div class="widget" id="dateRangeWidget">
+        <button id="dateRangeBtn" class="date-range-btn">
+          <span id="dateRangeLabel">Loading…</span>
+          <span class="caret">▾</span>
+        </button>
+        <div id="dateRangeDropdown" class="dropdown-panel hidden">
+          <label>From <input id="filterDateFrom" type="date" /></label>
+          <label>To <input id="filterDateTo" type="date" /></label>
+          <button id="applyDateRange" class="apply-btn">Apply</button>
+        </div>
+      </div>
+      <div class="widget info-widget">
+        <div class="widget-title">Project Details</div>
+        <div id="projectDetailsDisplay" class="widget-value">—</div>
+      </div>
+      <div class="widget info-widget">
+        <div class="widget-title">Project Manager</div>
+        <div id="pmDisplay" class="widget-value">—</div>
+      </div>
+      <div class="widget info-widget">
+        <div class="widget-title">Blockers / Dependencies</div>
+        <div id="blockersDisplay" class="widget-value">No data</div>
+      </div>
+      <div class="widget info-widget qbr-widget">
+        <div class="widget-title">MBR/QBR Date</div>
+        <div id="qbrDateDisplay" class="widget-value">—</div>
+      </div>
+    </aside>
+
+    <!-- ── CENTER ── -->
+    <section id="center-section">
+
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16">
+          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" />
+        </svg>
+        <input id="globalSearch" type="text" placeholder="Search across all data…" />
+      </div>
+
+      <!-- Team Table -->
+      <div class="table-card">
+        <div class="table-header">
+          <span class="th sortable" id="sortName">Team Details <span class="sort-arrow">▼</span></span>
+          <span class="th">Role</span>
+          <span class="th">Free Bandwidth</span>
+          <span class="th">Leave Status</span>
+        </div>
+        <div id="teamTableBody" class="table-body"></div>
+      </div>
+
+      <!-- Yesterday / Today Panels -->
+      <div class="twin-panels">
+        <div class="panel-card">
+          <div class="panel-header pink-gradient">What was done yesterday? <span class="panel-arrow">⬇</span></div>
+          <div id="yesterdayList" class="panel-body"></div>
+        </div>
+        <div class="panel-card">
+          <div class="panel-header pink-gradient">What will be done today? <span class="panel-arrow">⬆</span></div>
+          <div id="todayList" class="panel-body"></div>
+        </div>
+      </div>
+
+      <!-- ════════ FREE BANDWIDTH OVERVIEW ════════ -->
+      <div class="bw-overview-card">
+        <div class="bw-overview-header">
+          <span>📊 Free Bandwidth Overview</span>
+          <span id="bwOverviewSubtitle" class="bw-overview-sub">Person-wise bandwidth fill status</span>
+        </div>
+        <div class="bw-legend">
+          <span class="legend-item"><span class="legend-dot dot-full"></span>Full Day (On Leave)</span>
+          <span class="legend-item"><span class="legend-dot dot-half"></span>Half Day</span>
+          <span class="legend-item"><span class="legend-dot dot-partial"></span>Partial Bandwidth</span>
+          <span class="legend-item"><span class="legend-dot dot-avail"></span>Available</span>
+        </div>
+        <div id="bwOverviewBody" class="bw-overview-body"></div>
+      </div>
+
+    </section>
+
+    <!-- ── RIGHT SIDEBAR: PROJECT LIST ── -->
+    <aside id="right-sidebar">
+      <div class="project-card">
+        <div class="project-header">
+          <span class="collapse-icon">▬</span>
+          Project Name <span id="projectCount">(0)</span>
+        </div>
+        <div class="project-actions">
+          <button id="selectAll" class="chip-btn">Select All</button>
+          <button id="deselectAll" class="chip-btn">Deselect All</button>
+        </div>
+        <div id="projectCheckboxes" class="project-body"></div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ════════ FOOTER ════════ -->
+  <footer id="main-footer">
+    <div class="footer-left">
+      <span>Digital Enablement Team Dashboard &copy; 2025</span>
+    </div>
+    <div class="footer-right">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Indegene_Logo.png/220px-Indegene_Logo.png"
+        alt="Indegene" class="footer-logo" onerror="this.style.display='none'" />
+    </div>
+  </footer>
+
+  <!-- ════════ LOGIN MODAL ════════ -->
+  <div id="loginModal" class="modal-overlay" style="display:none">
+    <div class="login-modal-card">
+      <div class="login-modal-header">
+        <div class="login-lock-icon">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#fff" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0110 0v4" />
+          </svg>
+        </div>
+        <h2>Executive Dashboard</h2>
+        <p>Manager-level access required</p>
+      </div>
+      <div class="login-modal-body">
+        <div id="loginError" class="login-error" style="display:none"></div>
+        <div class="login-field"><label>User ID</label><input id="loginUser" type="text" placeholder="Enter user ID" />
+        </div>
+        <div class="login-field"><label>Password</label><input id="loginPass" type="password"
+            placeholder="Enter password" /></div>
+        <button id="loginSubmit" class="login-submit-btn">Sign In</button>
+      </div>
+      <div class="login-modal-footer">
+        <button id="loginClose" class="login-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ EXECUTIVE DASHBOARD SECTION ════════ -->
+  <section id="execSection" style="display:none">
+    <div class="exec-divider">
+      <div class="exec-divider-left">
+        <span class="exec-divider-icon">📊</span>
+        <div>
+          <div class="exec-divider-title">Executive Strategic Overview</div>
+          <div class="exec-divider-sub">Real-time insights · <span id="execLastRefresh">—</span></div>
+        </div>
+      </div>
+      <div class="exec-divider-actions">
+        <button id="btnExecRefresh" class="exec-action-btn">🔄 Refresh</button>
+        <button id="btnExecSources" class="exec-action-btn">📤 Upload Files</button>
+        <button id="btnExecPrint" class="exec-action-btn">📄 PDF</button>
+      </div>
+    </div>
+    <div class="exec-kpi-row">
+      <div class="exec-kpi exec-kpi-cyan" data-kpi="team">
+        <div class="exec-kpi-icon">👥</div>
+        <div class="exec-kpi-info">
+          <div class="exec-kpi-val" id="valTeamSize">—</div>
+          <div class="exec-kpi-lbl">Team Size</div>
+        </div>
+      </div>
+      <div class="exec-kpi exec-kpi-purple" data-kpi="projects">
+        <div class="exec-kpi-icon">📂</div>
+        <div class="exec-kpi-info">
+          <div class="exec-kpi-val" id="valActiveProjects">—</div>
+          <div class="exec-kpi-lbl">Active Projects</div>
+        </div>
+      </div>
+      <div class="exec-kpi exec-kpi-green" data-kpi="sow">
+        <div class="exec-kpi-icon">💰</div>
+        <div class="exec-kpi-info">
+          <div class="exec-kpi-val" id="valSOWValue">—</div>
+          <div class="exec-kpi-lbl">SOW Value</div>
+        </div>
+      </div>
+      <div class="exec-kpi exec-kpi-blue" data-kpi="kpi">
+        <div class="exec-kpi-icon">🎯</div>
+        <div class="exec-kpi-info">
+          <div class="exec-kpi-val" id="valKPIMetRate">—</div>
+          <div class="exec-kpi-lbl">KPI Met Rate</div>
+        </div>
+      </div>
+      <div class="exec-kpi exec-kpi-teal" data-kpi="ftr">
+        <div class="exec-kpi-icon">✅</div>
+        <div class="exec-kpi-info">
+          <div class="exec-kpi-val" id="valFTRRating">—</div>
+          <div class="exec-kpi-lbl">FTR Rating</div>
+        </div>
+      </div>
+      <div class="exec-kpi exec-kpi-amber" data-kpi="leave">
+        <div class="exec-kpi-icon">🏖️</div>
+        <div class="exec-kpi-info">
+          <div class="exec-kpi-val" id="valOnLeave">—</div>
+          <div class="exec-kpi-lbl">On Leave Today</div>
+        </div>
+      </div>
+      <div class="exec-kpi exec-kpi-red" data-kpi="risks">
+        <div class="exec-kpi-icon">⚠️</div>
+        <div class="exec-kpi-info">
+          <div class="exec-kpi-val" id="valActiveRisks">—</div>
+          <div class="exec-kpi-lbl">Active Risks</div>
+        </div>
+      </div>
+      <div class="exec-kpi exec-kpi-pink" data-kpi="highlights">
+        <div class="exec-kpi-icon">📋</div>
+        <div class="exec-kpi-info">
+          <div class="exec-kpi-val" id="valSOWReceived">—</div>
+          <div class="exec-kpi-lbl">SOW Received</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Detail Panel -->
+    <div id="kpiDetailPanel" class="kpi-detail-panel" style="display:none">
+      <div class="kpi-detail-header">
+        <span id="kpiDetailTitle" class="kpi-detail-title">Detail</span>
+        <button id="kpiDetailClose" class="kpi-detail-close">&times;</button>
+      </div>
+      <div class="kpi-detail-body">
+        <div class="kpi-detail-chart"><canvas id="kpiDetailChart"></canvas></div>
+        <div id="kpiDetailTable" class="kpi-detail-table"></div>
+      </div>
+    </div>
+
+    <div class="exec-charts-grid">
+      <div class="exec-chart-card exec-chart-wide">
+        <div class="exec-chart-hdr"><span>📈 FTE Utilization Trend</span><span
+            class="exec-chart-badge">Governance</span></div><canvas id="chartFTETrend"></canvas>
+      </div>
+      <div class="exec-chart-card">
+        <div class="exec-chart-hdr"><span>🎯 KPI — Target vs Actual</span><span class="exec-chart-badge">KPI</span>
+        </div><canvas id="chartKPI"></canvas>
+      </div>
+    </div>
+    <div class="exec-charts-grid exec-charts-4col">
+      <div class="exec-chart-card">
+        <div class="exec-chart-hdr"><span>📋 SOW/PO Status</span><span class="exec-chart-badge">SOW</span></div><canvas
+          id="chartSOW"></canvas>
+      </div>
+      <div class="exec-chart-card">
+        <div class="exec-chart-hdr"><span>👥 Role Distribution</span><span class="exec-chart-badge">Team</span></div>
+        <canvas id="chartRoles"></canvas>
+      </div>
+      <div class="exec-chart-card">
+        <div class="exec-chart-hdr"><span>✅ QA Rating by Project</span><span class="exec-chart-badge">FTR</span></div>
+        <canvas id="chartQA"></canvas>
+      </div>
+      <div class="exec-chart-card">
+        <div class="exec-chart-hdr"><span>🏖️ Top Leave Takers</span><span class="exec-chart-badge">Leave</span></div>
+        <canvas id="chartLeave"></canvas>
+      </div>
+    </div>
+    <div class="exec-panels-row">
+      <div class="exec-panel">
+        <div class="exec-panel-title">⚠️ Governance & Risk Alerts <span id="riskCount" class="exec-badge-count">0</span>
+        </div>
+        <div id="riskPanelBody" class="exec-panel-body">Loading…</div>
+      </div>
+      <div class="exec-panel">
+        <div class="exec-panel-title">🏖️ Leave Impact — Today & This Month</div>
+        <div id="leavePanelBody" class="exec-panel-body">Loading…</div>
+      </div>
+    </div>
+    <div class="exec-health-section">
+      <div class="exec-health-header">
+        <h3>🏥 Project Health Status</h3>
+        <div class="exec-rag-legend"><span class="exec-rag-g">● Green</span><span class="exec-rag-a">● Amber</span><span
+            class="exec-rag-r">● Red</span></div>
+      </div>
+      <div class="exec-health-wrap">
+        <table class="exec-health-tbl">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Client</th>
+              <th>PM</th>
+              <th>Status</th>
+              <th>SOW</th>
+              <th>PO</th>
+              <th>Health</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="healthTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TRACKER LINKS ── -->
+    <div class="exec-trackers">
+      <div class="exec-trackers-hdr">
+        <h3>🔗 Tracker Links</h3>
+        <button id="btnAddTracker" class="exec-action-btn">+ Add Tracker</button>
+      </div>
+      <div id="trackerLinksGrid" class="exec-trackers-grid">
+        <a class="exec-tracker-card" href="#" data-key="ftr" target="_blank">
+          <span class="exec-tc-icon">📊</span><span class="exec-tc-name">FTR Tracker</span><span
+            class="exec-tc-url">Click to set link</span>
+        </a>
+        <a class="exec-tracker-card" href="#" data-key="team" target="_blank">
+          <span class="exec-tc-icon">👥</span><span class="exec-tc-name">Team Details</span><span
+            class="exec-tc-url">Click to set link</span>
+        </a>
+        <a class="exec-tracker-card" href="#" data-key="sow" target="_blank">
+          <span class="exec-tc-icon">💰</span><span class="exec-tc-name">SOW & PO Tracker</span><span
+            class="exec-tc-url">Click to set link</span>
+        </a>
+        <a class="exec-tracker-card" href="#" data-key="governance" target="_blank">
+          <span class="exec-tc-icon">📋</span><span class="exec-tc-name">Governance</span><span
+            class="exec-tc-url">Click to set link</span>
+        </a>
+        <a class="exec-tracker-card" href="#" data-key="leave" target="_blank">
+          <span class="exec-tc-icon">🏖️</span><span class="exec-tc-name">Leave Tracker</span><span
+            class="exec-tc-url">Click to set link</span>
+        </a>
+        <a class="exec-tracker-card" href="#" data-key="kpi" target="_blank">
+          <span class="exec-tc-icon">🎯</span><span class="exec-tc-name">KPI Tracker</span><span
+            class="exec-tc-url">Click to set link</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ── TRACKER EDIT MODAL ── -->
+    <div id="trackerEditModal" class="modal-overlay" style="display:none">
+      <div class="login-modal-card" style="width:420px">
+        <div class="login-modal-header" style="padding:16px 20px 12px">
+          <h2 id="trackerEditTitle">Edit Tracker Link</h2>
+          <p>Set the name and URL for this tracker</p>
+        </div>
+        <div class="login-modal-body">
+          <div class="login-field"><label>Tracker Name</label><input id="trackerEditName" type="text"
+              placeholder="e.g. FTR Tracker" /></div>
+          <div class="login-field"><label>Tracker URL</label><input id="trackerEditUrl" type="url"
+              placeholder="https://sharepoint.com/..." /></div>
+          <button id="trackerEditSave" class="login-submit-btn">Save Link</button>
+        </div>
+        <div class="login-modal-footer"><button id="trackerEditCancel" class="login-cancel-btn">Cancel</button></div>
+      </div>
+    </div>
+
+    <!-- ══════ EXCEL DATA BROWSER ══════ -->
+    <div class="exec-data-browser">
+      <div class="exec-data-browser-hdr">
+        <h3>📂 Excel Data Browser — View All Tabs</h3>
+        <span id="excelBrowserStatus" style="font-size:.75rem;color:#999">Loading…</span>
+      </div>
+      <div class="exec-data-browser-body">
+        <!-- Sidebar: parent/child nav -->
+        <div id="excelNav" class="excel-nav">
+          <!-- dynamically populated -->
+        </div>
+        <!-- Table view -->
+        <div id="excelTableArea" class="excel-table-area">
+          <div class="excel-table-placeholder">← Select a tab from any Excel file to view its data</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exec-hl-row">
+      <div class="exec-panel">
+        <div class="exec-panel-title">🌟 Recent Highlights</div>
+        <div id="highlightsList" class="exec-panel-body">Loading…</div>
+      </div>
+      <div class="exec-panel">
+        <div class="exec-panel-title">⬇️ Recent Lowlights</div>
+        <div id="lowlightsList" class="exec-panel-body">Loading…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ UPLOAD MODAL ════════ -->
+  <div id="execSourceModal" class="modal-overlay" style="display:none">
+    <div class="exec-upload-modal">
+      <div class="exec-upload-modal-hdr">
+        <h3>📤 Upload Executive Data Files</h3><button id="closeExecSrcModal" class="modal-close-x">&times;</button>
+      </div>
+      <div class="exec-upload-modal-body">
+        <p class="exec-upload-desc">Drop your 6 Excel files below. Only upload the ones you want to update.</p>
+        <form id="uploadForm" class="exec-upload-cards">
+          <label class="exec-upload-card"><span class="exec-uc-icon">📊</span><span class="exec-uc-name">FTR
+              Tracker</span><input type="file" name="ftr" accept=".xlsx,.xlsb,.xls" hidden /><span
+              class="exec-uc-file">No file</span></label>
+          <label class="exec-upload-card"><span class="exec-uc-icon">👥</span><span class="exec-uc-name">Team
+              Details</span><input type="file" name="team" accept=".xlsx,.xlsb,.xls" hidden /><span
+              class="exec-uc-file">No file</span></label>
+          <label class="exec-upload-card"><span class="exec-uc-icon">💰</span><span class="exec-uc-name">SOW &
+              PO</span><input type="file" name="sow" accept=".xlsx,.xlsb,.xls" hidden /><span class="exec-uc-file">No
+              file</span></label>
+          <label class="exec-upload-card"><span class="exec-uc-icon">📋</span><span
+              class="exec-uc-name">Governance</span><input type="file" name="governance" accept=".xlsx,.xlsb,.xls"
+              hidden /><span class="exec-uc-file">No file</span></label>
+          <label class="exec-upload-card"><span class="exec-uc-icon">🏖️</span><span class="exec-uc-name">Leave
+              Tracker</span><input type="file" name="leave" accept=".xlsx,.xlsb,.xls" hidden /><span
+              class="exec-uc-file">No file</span></label>
+          <label class="exec-upload-card"><span class="exec-uc-icon">🎯</span><span
+              class="exec-uc-name">KPI</span><input type="file" name="kpi" accept=".xlsx,.xlsb,.xls" hidden /><span
+              class="exec-uc-file">No file</span></label>
+        </form>
+        <button id="btnUploadAll" class="login-submit-btn" style="width:100%;margin-top:14px">📤 Upload & Refresh All
+          Data</button>
+        <div id="execSrcStatus" class="exec-src-status" style="display:none"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

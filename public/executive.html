@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Executive Dashboard — Digital Enablement</title>
+    <meta name="description" content="Strategic executive overview dashboard for Digital Enablement Team." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="executive.css" />
+</head>
+
+<body>
+
+    <!-- ════════ LOADING ════════ -->
+    <div id="loadingOverlay" class="exec-loading">
+        <div class="exec-spinner"></div>
+        <p>Loading executive data…</p>
+    </div>
+
+    <!-- ════════ HEADER ════════ -->
+    <header id="exec-header">
+        <div class="exec-header-left">
+            <h1>📊 Executive Dashboard</h1>
+            <span class="exec-subtitle">Digital Enablement Team — Strategic Overview</span>
+        </div>
+        <div class="exec-header-right">
+            <button id="btnExecRefresh" class="exec-btn" title="Refresh data">
+                <svg class="icon-spin" viewBox="0 0 24 24" width="15" height="15">
+                    <path d="M17.65 6.35A7.96 7.96 0 0012 4a8 8 0 00-8 8 8 8 0 008 8 7.99 7.99 0 007.35-4.82"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <polyline points="17.65 2 17.65 6.35 13.3 6.35" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                Refresh
+            </button>
+            <button id="btnExecPresent" class="exec-btn" title="Presentation mode">📺 Present</button>
+            <button id="btnExecSources" class="exec-btn" title="Configure data sources">📁 Data Sources</button>
+            <button id="btnExecPrint" class="exec-btn" title="Export as PDF">📄 Export PDF</button>
+            <span id="execLastUpdated" class="exec-updated"></span>
+            <button id="btnLogout" class="exec-btn exec-btn-danger" title="Logout">🔓 Logout</button>
+        </div>
+    </header>
+
+    <!-- ════════ PRESENT MODE BAR ════════ -->
+    <div id="execPresentBar" class="exec-present-bar hidden">
+        <span>📺 Presentation Mode</span>
+        <span class="exec-present-title">Executive Dashboard — Digital Enablement Team</span>
+        <button id="exitExecPresent" class="exec-btn exec-btn-danger">✕ Exit</button>
+    </div>
+
+    <!-- ════════ LAYOUT: SIDEBAR + CONTENT ════════ -->
+    <div id="app-layout">
+
+        <!-- ── SIDEBAR ── -->
+        <aside id="sidebar">
+            <div class="sidebar-title">📂 Data Sources</div>
+            <nav id="sidebarNav">
+                <!-- Overview link -->
+                <div class="nav-item nav-overview active" data-view="overview">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-label">Dashboard Overview</span>
+                </div>
+                <!-- Dynamic parent/child items injected by JS -->
+            </nav>
+        </aside>
+
+        <!-- ── MAIN CONTENT ── -->
+        <main id="exec-main">
+
+            <!-- Overview Section (default) -->
+            <section id="viewOverview" class="content-view active">
+                <!-- KPI CARDS -->
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">👥</div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="valTeamSize">—</div>
+                            <div class="kpi-label">Team Size</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">📂</div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="valActiveProjects">—</div>
+                            <div class="kpi-label">Active Projects</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="valSOWValue">—</div>
+                            <div class="kpi-label">Total SOW Value</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">🎯</div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="valKPIMetRate">—</div>
+                            <div class="kpi-label">KPI Met Rate</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">✅</div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="valFTRRating">—</div>
+                            <div class="kpi-label">Avg FTR Rating</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-card-alert">
+                        <div class="kpi-icon">🏖️</div>
+                        <div class="kpi-content">
+                            <div class="kpi-value" id="valOnLeave">—</div>
+                            <div class="kpi-label">On Leave Today</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHARTS ROW -->
+                <div class="charts-row">
+                    <div class="chart-card">
+                        <div class="chart-title">📈 FTE Utilization Trend</div>
+                        <canvas id="chartFTETrend"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">🎯 KPI Scorecards — Target vs Actual</div>
+                        <canvas id="chartKPI"></canvas>
+                    </div>
+                    <div class="chart-card chart-card-sm">
+                        <div class="chart-title">📋 SOW Status Breakdown</div>
+                        <canvas id="chartSOW"></canvas>
+                    </div>
+                </div>
+
+                <!-- PANELS ROW -->
+                <div class="panels-row">
+                    <div class="panel-card">
+                        <div class="panel-title">⚠️ Governance & Risk Alerts <span id="riskCount"
+                                class="badge-count">0</span></div>
+                        <div id="riskPanelBody" class="panel-body">Loading…</div>
+                    </div>
+                    <div class="panel-card">
+                        <div class="panel-title">🏖️ Leave Impact Summary</div>
+                        <div id="leavePanelBody" class="panel-body">Loading…</div>
+                    </div>
+                </div>
+
+                <!-- PROJECT HEALTH TABLE -->
+                <div class="health-section">
+                    <div class="health-header">
+                        <h2>🏥 Project Health Status</h2>
+                        <div class="health-legend">
+                            <span class="rag rag-green">● Green</span>
+                            <span class="rag rag-amber">● Amber</span>
+                            <span class="rag rag-red">● Red</span>
+                        </div>
+                    </div>
+                    <div class="health-table-wrap">
+                        <table id="healthTable" class="health-table">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Client</th>
+                                    <th>PM</th>
+                                    <th>Status</th>
+                                    <th>SOW</th>
+                                    <th>PO</th>
+                                    <th>Health</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="healthTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- HIGHLIGHTS / LOWLIGHTS -->
+                <div class="hl-section">
+                    <div class="panel-card">
+                        <div class="panel-title">🌟 Recent Highlights</div>
+                        <div id="highlightsList" class="panel-body">Loading…</div>
+                    </div>
+                    <div class="panel-card">
+                        <div class="panel-title">⬇️ Recent Lowlights</div>
+                        <div id="lowlightsList" class="panel-body">Loading…</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sheet View (dynamic content) -->
+            <section id="viewSheet" class="content-view">
+                <div class="sheet-header">
+                    <div class="sheet-breadcrumb">
+                        <span id="sheetParentName" class="breadcrumb-parent"></span>
+                        <span class="breadcrumb-sep">›</span>
+                        <span id="sheetChildName" class="breadcrumb-child"></span>
+                    </div>
+                    <div class="sheet-meta">
+                        <span id="sheetRowCount" class="sheet-badge"></span>
+                        <span id="sheetColCount" class="sheet-badge"></span>
+                        <input id="sheetSearch" type="text" class="sheet-search" placeholder="🔍 Filter rows…" />
+                    </div>
+                </div>
+                <div id="sheetTableWrap" class="sheet-table-wrap">
+                    <!-- Dynamic table rendered here -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ════════ DATA SOURCE MODAL ════════ -->
+    <div id="execSourceModal" class="exec-modal-overlay hidden">
+        <div class="exec-modal">
+            <div class="exec-modal-header">
+                <h2>📁 Configure Executive Data Sources</h2>
+                <button id="closeExecModal" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="exec-modal-body">
+                <div class="source-tabs">
+                    <button class="tab-btn active" data-tab="upload">📤 Upload Files</button>
+                    <button class="tab-btn" data-tab="urls">🔗 SharePoint URLs</button>
+                </div>
+                <div id="tabUpload" class="tab-content active">
+                    <p class="tab-desc">Upload Excel files for each data source. Supported formats: .xlsx, .xlsb</p>
+                    <form id="uploadForm" class="upload-grid">
+                        <div class="upload-field"><label>FTR Tracker</label><input type="file" name="ftr"
+                                accept=".xlsx,.xlsb,.xls" /></div>
+                        <div class="upload-field"><label>Team Details</label><input type="file" name="team"
+                                accept=".xlsx,.xlsb,.xls" /></div>
+                        <div class="upload-field"><label>SOW & PO Tracker</label><input type="file" name="sow"
+                                accept=".xlsx,.xlsb,.xls" /></div>
+                        <div class="upload-field"><label>Governance</label><input type="file" name="governance"
+                                accept=".xlsx,.xlsb,.xls" /></div>
+                        <div class="upload-field"><label>Leave Tracker</label><input type="file" name="leave"
+                                accept=".xlsx,.xlsb,.xls" /></div>
+                        <div class="upload-field"><label>KPI</label><input type="file" name="kpi"
+                                accept=".xlsx,.xlsb,.xls" /></div>
+                    </form>
+                    <button id="btnUploadAll" class="exec-btn exec-btn-primary">Upload & Refresh Data</button>
+                </div>
+                <div id="tabUrls" class="tab-content">
+                    <p class="tab-desc">Paste SharePoint or OneDrive direct links to each Excel file.</p>
+                    <div class="url-grid">
+                        <div class="url-field"><label>FTR Tracker</label><input id="urlFtr" type="url"
+                                placeholder="https://..." /></div>
+                        <div class="url-field"><label>Team Details</label><input id="urlTeam" type="url"
+                                placeholder="https://..." /></div>
+                        <div class="url-field"><label>SOW & PO Tracker</label><input id="urlSow" type="url"
+                                placeholder="https://..." /></div>
+                        <div class="url-field"><label>Governance</label><input id="urlGovernance" type="url"
+                                placeholder="https://..." /></div>
+                        <div class="url-field"><label>Leave Tracker</label><input id="urlLeave" type="url"
+                                placeholder="https://..." /></div>
+                        <div class="url-field"><label>KPI</label><input id="urlKpi" type="url"
+                                placeholder="https://..." /></div>
+                    </div>
+                    <button id="btnConnectUrls" class="exec-btn exec-btn-primary">Connect & Refresh Data</button>
+                </div>
+                <div id="execSourceStatus" class="source-status-box hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="exec-footer">
+        <span>Digital Enablement Executive Dashboard © 2025</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Indegene_Logo.png/220px-Indegene_Logo.png"
+            alt="Indegene" class="exec-footer-logo" onerror="this.style.display='none'" />
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="executive.js"></script>
+</body>
+
+</html>

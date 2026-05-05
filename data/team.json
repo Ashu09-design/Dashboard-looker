@@ -1,0 +1,1060 @@
+{
+  "success": true,
+  "source": "team",
+  "data": {
+    "activeMembers": [
+      {
+        "name": "Anshul Saini",
+        "role": "Manager",
+        "designation": "Senior Manager",
+        "empId": "IND5364",
+        "email": "anshul.saini@indegene.com",
+        "doj": "2020-02-03",
+        "phone": "9897921178",
+        "birthday": "2023-03-30",
+        "location": "Uttarakhand"
+      },
+      {
+        "name": "Bhavani V",
+        "role": "Manager",
+        "designation": "Manager",
+        "empId": "IND9279",
+        "email": "bhavani.venkatesh@indegene.com",
+        "doj": "2022-03-21",
+        "phone": "9880133833",
+        "birthday": "2023-04-13",
+        "location": "Bangalore"
+      },
+      {
+        "name": "Krishna Kumar",
+        "role": "Manager",
+        "designation": "Manager",
+        "empId": "IND4864",
+        "email": "krishna.kumar@indegene.com",
+        "doj": "2019-05-13",
+        "phone": "9620903030",
+        "birthday": "2023-04-15",
+        "location": "US"
+      },
+      {
+        "name": "Mohit Goyal",
+        "role": "Manager",
+        "designation": "Manager",
+        "empId": "IND13607",
+        "email": "mohit.goyal@indegene.com",
+        "doj": "2023-04-28",
+        "phone": "9463333853",
+        "birthday": "2023-07-31",
+        "location": "Zirakpur, Punjab"
+      },
+      {
+        "name": "Shreya Rao",
+        "role": "PM",
+        "designation": "Project Lead",
+        "empId": "IND8728",
+        "email": "shreya.rao@indegene.com",
+        "doj": "2021-12-01",
+        "phone": "9731816144",
+        "birthday": "2023-11-18",
+        "location": "Bangalore"
+      },
+      {
+        "name": "Prithvi Raj",
+        "role": "PM",
+        "designation": "Project Lead",
+        "empId": "IND9206",
+        "email": "prithvi.raj1@indegene.com",
+        "doj": "2022-03-07",
+        "phone": "9739865052",
+        "birthday": "2023-12-22",
+        "location": "Bangalore"
+      },
+      {
+        "name": "Nataraj Selvaraj",
+        "role": "PM",
+        "designation": "Senior Project Associate",
+        "empId": "IND8387",
+        "email": "nataraj.selvaraj@indegene.com",
+        "doj": "2021-10-08",
+        "phone": "9786038824/\n8668192506",
+        "birthday": "2023-06-10",
+        "location": "Chennai"
+      },
+      {
+        "name": "Apurv Rustagi",
+        "role": "Leads",
+        "designation": "Lead - Business Analyst",
+        "empId": "IND8493",
+        "email": "apurv.rustagi@indegene.com",
+        "doj": "2021-10-27",
+        "phone": "8296502757",
+        "birthday": "2023-10-01",
+        "location": "Bangalore"
+      },
+      {
+        "name": "Sujay Shet",
+        "role": "Leads",
+        "designation": "Lead - Business Analyst",
+        "empId": "IND13649",
+        "email": "sujay.shet@indegene.com",
+        "doj": "2023-05-05",
+        "phone": "9029218428",
+        "birthday": "2023-05-13",
+        "location": "Mumbai,Maharashtra"
+      },
+      {
+        "name": "Ananya Khuntia",
+        "role": "Engineers",
+        "designation": "Junior Software Engineer",
+        "empId": "DAP0522",
+        "email": "ananya.khuntia@indegene.com",
+        "doj": "2025-08-18",
+        "phone": "9439111362",
+        "birthday": "2025-02-07",
+        "location": "Bangalore"
+      },
+      {
+        "name": "Aryaman Mohapatra",
+        "role": "Engineers",
+        "designation": "Junior Software Engineer",
+        "empId": "DAP0551",
+        "email": "aryaman.mohapatra@indegene.com",
+        "doj": "2025-10-28",
+        "phone": "9883976895",
+        "birthday": "2026-01-15",
+        "location": "Bangalore"
+      },
+      {
+        "name": "Karthikeyan S",
+        "role": "BA",
+        "designation": "Senior Business Analyst",
+        "empId": "IND20597",
+        "email": "karthikeyan.s@indegene.com",
+        "doj": "2025-08-11",
+        "phone": "8903557875",
+        "birthday": "2025-02-04",
+        "location": "Hosur,Tamilnadu"
+      },
+      {
+        "name": "Kranthi Kumar Karuturi",
+        "role": "BA",
+        "designation": "Senior Business Analyst",
+        "empId": "IND20510",
+        "email": "kranthi.karuturi@indegene.com",
+        "doj": "2025-07-15",
+        "phone": "8328034606",
+        "birthday": "2025-02-28",
+        "location": "Yadgir, Karnataka"
+      },
+      {
+        "name": "Anushkha",
+        "role": "Analyst",
+        "designation": "Analyst",
+        "empId": "IND12522",
+        "email": "anushkha.kumari@indegene.com",
+        "doj": "2023-02-03",
+        "phone": "8123710981",
+        "birthday": "2023-02-18",
+        "location": ""
+      },
+      {
+        "name": "Akshita Mathur",
+        "role": "Analyst",
+        "designation": "Analyst",
+        "empId": "IND15951",
+        "email": "akshita.mathur@indegene.com",
+        "doj": "2023-11-08",
+        "phone": "8740987693",
+        "birthday": "2024-12-29",
+        "location": "Jaipur"
+      }
+    ],
+    "exitResources": [
+      {
+        "name": "Ritika Dhania",
+        "empId": "AO786",
+        "designation": "QA",
+        "email": "ritika.dhania@Indegene.com",
+        "lastWorkingDay": ""
+      },
+      {
+        "name": "Rushikesh Lad",
+        "empId": "IND9691",
+        "designation": "Test Engineer",
+        "email": "rushikesh.lad@indegene.com",
+        "lastWorkingDay": ""
+      }
+    ],
+    "roleDistribution": {
+      "Manager": 4,
+      "PM": 3,
+      "Leads": 2,
+      "Engineers": 2,
+      "BA": 2,
+      "Analyst": 2
+    },
+    "designationDistribution": {
+      "Senior Manager": 1,
+      "Manager": 3,
+      "Project Lead": 2,
+      "Senior Project Associate": 1,
+      "Lead - Business Analyst": 2,
+      "Junior Software Engineer": 2,
+      "Senior Business Analyst": 2,
+      "Analyst": 2
+    },
+    "totalHeadcount": 15,
+    "certifications": {
+      "ga4": {
+        "certified": 7,
+        "total": 8,
+        "rate": 88
+      },
+      "oneTrust": {
+        "certified": 0,
+        "total": 94,
+        "rate": 0
+      },
+      "google": {
+        "certified": 76,
+        "total": 95,
+        "rate": 80
+      },
+      "adobe": {
+        "certified": 0,
+        "total": 94,
+        "rate": 0
+      },
+      "tealium": {
+        "certified": 98,
+        "total": 98,
+        "rate": 100
+      }
+    },
+    "skillMatrix": [
+      {
+        "name": "Abdulkhadar Nadaf",
+        "role": "Software Engineer",
+        "skills": {
+          "Verified": "",
+          "Launch": "Intermediate",
+          "Jquery": "Expert",
+          "Javascript": "Expert",
+          "SQL": "Intermediate",
+          "GTM": "Expert",
+          "Tealium iQ": "Expert",
+          "Tealium CDP": "Exposure",
+          "Adobe Analytics": "Expert",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Interested",
+          "GDS": "Interested",
+          "Tableau": "Interested",
+          "Power BI": "Interested",
+          "Observepoint": "Interested",
+          "OneTrust": "Interested",
+          "Qualtrics": "Interested",
+          "Claravine": "Interested",
+          "Eventstream": "Exposure",
+          "AEM": "Interested",
+          "Adobe Target": "Interested",
+          "Google Optimize": "Interested",
+          "Optimizely": "Interested",
+          "Cookie Bot": "Interested",
+          "Alteryx": "Interested",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": "AEP and CJA"
+        }
+      },
+      {
+        "name": "Abhinav Borgohain",
+        "role": "Senior Software Engineer",
+        "skills": {
+          "Verified": "",
+          "Launch": "Interested",
+          "Jquery": "Expert",
+          "Javascript": "Expert",
+          "SQL": "Expert",
+          "GTM": "Expert",
+          "Tealium iQ": "Exposure",
+          "Tealium CDP": "Interested",
+          "Adobe Analytics": "Interested",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Interested",
+          "GDS": "Interested",
+          "Tableau": "Interested",
+          "Power BI": "Interested",
+          "Observepoint": "Expert",
+          "OneTrust": "Expert",
+          "Qualtrics": "Interested",
+          "Claravine": "Interested",
+          "Eventstream": "Interested",
+          "AEM": "Interested",
+          "Adobe Target": "Interested",
+          "Google Optimize": "Interested",
+          "Optimizely": "Interested",
+          "Cookie Bot": "Expert",
+          "Alteryx": "Interested",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": "Google Ads all task types, Google Merchant center, Dynamic remarketing retail and non retail"
+        }
+      },
+      {
+        "name": "Akshay Khanna",
+        "role": "Software Engineer",
+        "skills": {
+          "Verified": "",
+          "Launch": "Interested",
+          "Jquery": "Exposure",
+          "Javascript": "Expert",
+          "SQL": "Expert",
+          "GTM": "Expert",
+          "Tealium iQ": "Interested",
+          "Tealium CDP": "Interested",
+          "Adobe Analytics": "Interested",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Interested",
+          "GDS": "Expert",
+          "Tableau": "Intermediate",
+          "Power BI": "Intermediate",
+          "Observepoint": "Interested",
+          "OneTrust": "Exposure",
+          "Qualtrics": "Interested",
+          "Claravine": "Interested",
+          "Eventstream": "Interested",
+          "AEM": "Interested",
+          "Adobe Target": "Interested",
+          "Google Optimize": "Expert",
+          "Optimizely": "Intermediate",
+          "Cookie Bot": "Intermediate",
+          "Alteryx": "Interested",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": "Google Search Console, Bigquery, R, Python, Google Ads, Hotjar, VWO, MongoDB"
+        }
+      },
+      {
+        "name": "Akshita Mathur",
+        "role": "Analyst",
+        "skills": {
+          "Verified": "",
+          "Launch": "",
+          "Jquery": "",
+          "Javascript": "Exposure",
+          "SQL": "Intermediate",
+          "GTM": "Intermediate",
+          "Tealium iQ": "Interested",
+          "Tealium CDP": "Interested",
+          "Adobe Analytics": "Interested",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Interested",
+          "GDS": "Intermediate",
+          "Tableau": "Exposure",
+          "Power BI": "Intermediate",
+          "Observepoint": "exposure",
+          "OneTrust": "Interested",
+          "Qualtrics": "",
+          "Claravine": "Interested",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "interested",
+          "Google Optimize": "Interested",
+          "Optimizely": "Interested",
+          "Cookie Bot": "Interested",
+          "Alteryx": "Interested",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": "SEO, Ahref, Keyword Optimization, Locker Studio,"
+        }
+      },
+      {
+        "name": "Alisha Jose",
+        "role": "Business Analyst",
+        "skills": {
+          "Verified": "Yes",
+          "Launch": "",
+          "Jquery": "Interested",
+          "Javascript": "Interested",
+          "SQL": "Intermediate",
+          "GTM": "Exposure",
+          "Tealium iQ": "Interested",
+          "Tealium CDP": "Interested",
+          "Adobe Analytics": "Exposure",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Expert",
+          "GDS": "Expert",
+          "Tableau": "Interested",
+          "Power BI": "Intermediate",
+          "Observepoint": "Interested",
+          "OneTrust": "Interested",
+          "Qualtrics": "",
+          "Claravine": "Interested",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "Interested",
+          "Google Optimize": "Interested",
+          "Optimizely": "",
+          "Cookie Bot": "Interested",
+          "Alteryx": "",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": ""
+        }
+      },
+      {
+        "name": "Ambar Vishwakarma",
+        "role": "Senior Software Engineer",
+        "skills": {
+          "Verified": "",
+          "Launch": "Intermediate",
+          "Jquery": "Exposure",
+          "Javascript": "Exposure",
+          "SQL": "Interested",
+          "GTM": "Expert",
+          "Tealium iQ": "Intermediate",
+          "Tealium CDP": "Intermediate",
+          "Adobe Analytics": "Intermediate",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Intermediate",
+          "GDS": "Intermediate",
+          "Tableau": "Interested",
+          "Power BI": "Interested",
+          "Observepoint": "Interested",
+          "OneTrust": "Intermediate",
+          "Qualtrics": "Intermediate",
+          "Claravine": "Interested",
+          "Eventstream": "Interested",
+          "AEM": "Interested",
+          "Adobe Target": "Interested",
+          "Google Optimize": "Interested",
+          "Optimizely": "Interested",
+          "Cookie Bot": "Interested",
+          "Alteryx": "Interested",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": ""
+        }
+      },
+      {
+        "name": "Ananthakrishna Shettigar V",
+        "role": "Senior Software Engineer",
+        "skills": {
+          "Verified": "",
+          "Launch": "Interested",
+          "Jquery": "Expert",
+          "Javascript": "Expert",
+          "SQL": "Exposure",
+          "GTM": "Expert",
+          "Tealium iQ": "Exposure",
+          "Tealium CDP": "Interested",
+          "Adobe Analytics": "Exposure",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Expert",
+          "GDS": "Expert",
+          "Tableau": "Interested",
+          "Power BI": "Interested",
+          "Observepoint": "Interested",
+          "OneTrust": "Interested",
+          "Qualtrics": "Interested",
+          "Claravine": "Interested",
+          "Eventstream": "Interested",
+          "AEM": "Interested",
+          "Adobe Target": "Interested",
+          "Google Optimize": "Intermediate",
+          "Optimizely": "Interested",
+          "Cookie Bot": "Interested",
+          "Alteryx": "Interested",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": "Firebase, Adjust , Moengage, Segment , Customer.io"
+        }
+      },
+      {
+        "name": "Anitha Sriram",
+        "role": "Senior Software Engineer",
+        "skills": {
+          "Verified": "",
+          "Launch": "",
+          "Jquery": "",
+          "Javascript": "",
+          "SQL": "",
+          "GTM": "",
+          "Tealium iQ": "",
+          "Tealium CDP": "",
+          "Adobe Analytics": "",
+          "Google Analytics4": "",
+          "Matomo Analytics": "",
+          "GDS": "",
+          "Tableau": "",
+          "Power BI": "",
+          "Observepoint": "",
+          "OneTrust": "",
+          "Qualtrics": "",
+          "Claravine": "",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "",
+          "Google Optimize": "",
+          "Optimizely": "",
+          "Cookie Bot": "",
+          "Alteryx": "",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": ""
+        }
+      },
+      {
+        "name": "Ankit Kumar",
+        "role": "Junior Analyst",
+        "skills": {
+          "Verified": "",
+          "Launch": "",
+          "Jquery": "Exposure",
+          "Javascript": "Intermediate",
+          "SQL": "Intermediate",
+          "GTM": "Intermediate",
+          "Tealium iQ": "",
+          "Tealium CDP": "",
+          "Adobe Analytics": "",
+          "Google Analytics4": "Intermediate",
+          "Matomo Analytics": "",
+          "GDS": "",
+          "Tableau": "Interested",
+          "Power BI": "Exposure",
+          "Observepoint": "",
+          "OneTrust": "",
+          "Qualtrics": "",
+          "Claravine": "",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "",
+          "Google Optimize": "Interested",
+          "Optimizely": "",
+          "Cookie Bot": "",
+          "Alteryx": "",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": ""
+        }
+      },
+      {
+        "name": "Anushkha",
+        "role": "Analyst",
+        "skills": {
+          "Verified": "Yes",
+          "Launch": "",
+          "Jquery": "",
+          "Javascript": "",
+          "SQL": "Intermediate",
+          "GTM": "Intermediate",
+          "Tealium iQ": "Expert",
+          "Tealium CDP": "Interested",
+          "Adobe Analytics": "Interested",
+          "Google Analytics4": "Intermediate",
+          "Matomo Analytics": "",
+          "GDS": "",
+          "Tableau": "",
+          "Power BI": "Interested",
+          "Observepoint": "Interested",
+          "OneTrust": "Interested",
+          "Qualtrics": "",
+          "Claravine": "",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "",
+          "Google Optimize": "",
+          "Optimizely": "",
+          "Cookie Bot": "",
+          "Alteryx": "",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": ""
+        }
+      },
+      {
+        "name": "Apurv Rustagi",
+        "role": "Lead - Business Analyst",
+        "skills": {
+          "Verified": "Yes",
+          "Launch": "",
+          "Jquery": "",
+          "Javascript": "",
+          "SQL": "",
+          "GTM": "Exposure",
+          "Tealium iQ": "Exposure",
+          "Tealium CDP": "",
+          "Adobe Analytics": "Expert",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Interested",
+          "GDS": "Intermediate",
+          "Tableau": "",
+          "Power BI": "Exposure",
+          "Observepoint": "Exposure",
+          "OneTrust": "Exposure",
+          "Qualtrics": "Interested",
+          "Claravine": "Exposure",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "",
+          "Google Optimize": "",
+          "Optimizely": "",
+          "Cookie Bot": "",
+          "Alteryx": "",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": ""
+        }
+      },
+      {
+        "name": "Arijit Bhowmick",
+        "role": "Senior Software Engineer",
+        "skills": {
+          "Verified": "",
+          "Launch": "Interested",
+          "Jquery": "Expert",
+          "Javascript": "Intermediate",
+          "SQL": "Exposure",
+          "GTM": "Expert",
+          "Tealium iQ": "Exposure",
+          "Tealium CDP": "Interested",
+          "Adobe Analytics": "Interested",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Exposure",
+          "GDS": "Exposure",
+          "Tableau": "Interested",
+          "Power BI": "Interested",
+          "Observepoint": "Interested",
+          "OneTrust": "Exposure",
+          "Qualtrics": "Interested",
+          "Claravine": "Interested",
+          "Eventstream": "Interested",
+          "AEM": "Interested",
+          "Adobe Target": "Interested",
+          "Google Optimize": "Exposure",
+          "Optimizely": "Interested",
+          "Cookie Bot": "Interested",
+          "Alteryx": "Interested",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": ""
+        }
+      },
+      {
+        "name": "Arka Paul",
+        "role": "Junior Analyst",
+        "skills": {
+          "Verified": "Yes",
+          "Launch": "",
+          "Jquery": "",
+          "Javascript": "",
+          "SQL": "Exposure",
+          "GTM": "Exposure",
+          "Tealium iQ": "",
+          "Tealium CDP": "",
+          "Adobe Analytics": "Exposure",
+          "Google Analytics4": "Exposure",
+          "Matomo Analytics": "Interested",
+          "GDS": "Exposure",
+          "Tableau": "Intermediate",
+          "Power BI": "Intermediate",
+          "Observepoint": "Exposure",
+          "OneTrust": "",
+          "Qualtrics": "Intermediate",
+          "Claravine": "",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "",
+          "Google Optimize": "Interested",
+          "Optimizely": "Interested",
+          "Cookie Bot": "",
+          "Alteryx": "",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": "Adobe Analytics, Python, Power BI, Tableau"
+        }
+      },
+      {
+        "name": "Arpan Srivastava",
+        "role": "Senior Business Analyst",
+        "skills": {
+          "Verified": "",
+          "Launch": "Intermediate",
+          "Jquery": "Beginner",
+          "Javascript": "Intermediate",
+          "SQL": "Beginner",
+          "GTM": "Expert",
+          "Tealium iQ": "Interested",
+          "Tealium CDP": "Interested",
+          "Adobe Analytics": "Interested",
+          "Google Analytics4": "Expert",
+          "Matomo Analytics": "Interested",
+          "GDS": "Interested",
+          "Tableau": "",
+          "Power BI": "",
+          "Observepoint": "",
+          "OneTrust": "Exposure",
+          "Qualtrics": "",
+          "Claravine": "",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "",
+          "Google Optimize": "Exposure",
+          "Optimizely": "",
+          "Cookie Bot": "",
+          "Alteryx": "",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": "Hotjar"
+        }
+      },
+      {
+        "name": "Arpana Kulkarni",
+        "role": "Lead Engineer -  Qualtrics",
+        "skills": {
+          "Verified": "",
+          "Launch": "",
+          "Jquery": "",
+          "Javascript": "",
+          "SQL": "",
+          "GTM": "",
+          "Tealium iQ": "",
+          "Tealium CDP": "",
+          "Adobe Analytics": "",
+          "Google Analytics4": "",
+          "Matomo Analytics": "",
+          "GDS": "",
+          "Tableau": "",
+          "Power BI": "",
+          "Observepoint": "",
+          "OneTrust": "",
+          "Qualtrics": "",
+          "Claravine": "",
+          "Eventstream": "",
+          "AEM": "",
+          "Adobe Target": "",
+          "Google Optimize": "",
+          "Optimizely": "",
+          "Cookie Bot": "",
+          "Alteryx": "",
+          "Do you have experience in any other tools or platform? If so, please list them down along with experience level.": ""
+        }
+      }
+    ],
+    "expertise": [
+      {
+        "name": "Bhavani V",
+        "scores": {
+          "GA": "1",
+          "GTM": "1",
+          "Tealium iQ": "3",
+          "Matomo Analytics": "1",
+          "Adobe Analytics": "3",
+          "Tealium CDP": "3",
+          "Verified": "Yes",
+          "Expert": "Intermediate",
+          "1": "2"
+        }
+      },
+      {
+        "name": "Krishna Kumar",
+        "scores": {
+          "GA": "",
+          "GTM": "",
+          "Tealium iQ": "",
+          "Matomo Analytics": "",
+          "Adobe Analytics": "",
+          "Tealium CDP": "",
+          "Verified": "",
+          "Expert": "Beginner",
+          "1": "3"
+        }
+      },
+      {
+        "name": "Pooja Manohar Jadhav",
+        "scores": {
+          "GA": "1",
+          "GTM": "1",
+          "Tealium iQ": "4",
+          "Matomo Analytics": "4",
+          "Adobe Analytics": "3",
+          "Tealium CDP": "4",
+          "Verified": "",
+          "Expert": "No Knowledge",
+          "1": "4"
+        }
+      },
+      {
+        "name": "Mohit Goyal",
+        "scores": {
+          "GA": "1",
+          "GTM": "1",
+          "Tealium iQ": "2",
+          "Matomo Analytics": "4",
+          "Adobe Analytics": "2",
+          "Tealium CDP": "3",
+          "Verified": "",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Gajendra Reddy",
+        "scores": {
+          "GA": "1",
+          "GTM": "1",
+          "Tealium iQ": "3",
+          "Matomo Analytics": "3",
+          "Adobe Analytics": "2",
+          "Tealium CDP": "4",
+          "Verified": "",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Apurv Rustagi",
+        "scores": {
+          "GA": "",
+          "GTM": "",
+          "Tealium iQ": "",
+          "Matomo Analytics": "",
+          "Adobe Analytics": "",
+          "Tealium CDP": "",
+          "Verified": "",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Arpana Kulkarni",
+        "scores": {
+          "GA": "4",
+          "GTM": "4",
+          "Tealium iQ": "4",
+          "Matomo Analytics": "4",
+          "Adobe Analytics": "4",
+          "Tealium CDP": "4",
+          "Verified": "",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Atul Thakur",
+        "scores": {
+          "GA": "1",
+          "GTM": "1",
+          "Tealium iQ": "1",
+          "Matomo Analytics": "4",
+          "Adobe Analytics": "2",
+          "Tealium CDP": "2",
+          "Verified": "Yes",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Deepan Sundaram",
+        "scores": {
+          "GA": "2",
+          "GTM": "4",
+          "Tealium iQ": "4",
+          "Matomo Analytics": "2",
+          "Adobe Analytics": "1",
+          "Tealium CDP": "3",
+          "Verified": "Yes",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "L Rajesh Kumar",
+        "scores": {
+          "GA": "2",
+          "GTM": "1",
+          "Tealium iQ": "1",
+          "Matomo Analytics": "3",
+          "Adobe Analytics": "1",
+          "Tealium CDP": "2",
+          "Verified": "Yes",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Pavan Kumar Rai",
+        "scores": {
+          "GA": "2",
+          "GTM": "3",
+          "Tealium iQ": "4",
+          "Matomo Analytics": "3",
+          "Adobe Analytics": "4",
+          "Tealium CDP": "4",
+          "Verified": "Yes",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Rutuja Tupe",
+        "scores": {
+          "GA": "3",
+          "GTM": "4",
+          "Tealium iQ": "4",
+          "Matomo Analytics": "4",
+          "Adobe Analytics": "2",
+          "Tealium CDP": "4",
+          "Verified": "Yes",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Sujay Shet",
+        "scores": {
+          "GA": "2",
+          "GTM": "2",
+          "Tealium iQ": "3",
+          "Matomo Analytics": "1",
+          "Adobe Analytics": "3",
+          "Tealium CDP": "3",
+          "Verified": "Yes",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Surbhi Dhimole",
+        "scores": {
+          "GA": "2",
+          "GTM": "3",
+          "Tealium iQ": "1",
+          "Matomo Analytics": "4",
+          "Adobe Analytics": "2",
+          "Tealium CDP": "1",
+          "Verified": "Yes",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Ambar Vishwakarma",
+        "scores": {
+          "GA": "1",
+          "GTM": "1",
+          "Tealium iQ": "3",
+          "Matomo Analytics": "4",
+          "Adobe Analytics": "3",
+          "Tealium CDP": "3",
+          "Verified": "Yes",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Anitha Sriram",
+        "scores": {
+          "GA": "1",
+          "GTM": "1",
+          "Tealium iQ": "1",
+          "Matomo Analytics": "2",
+          "Adobe Analytics": "2",
+          "Tealium CDP": "2",
+          "Verified": "",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Arijit Bhowmick",
+        "scores": {
+          "GA": "1",
+          "GTM": "1",
+          "Tealium iQ": "3",
+          "Matomo Analytics": "3",
+          "Adobe Analytics": "4",
+          "Tealium CDP": "4",
+          "Verified": "",
+          "Expert": "",
+          "1": ""
+        }
+      },
+      {
+        "name": "Avaiz Sait",
+        "scores": {
+          "GA": "",
+          "GTM": "",
+          "Tealium iQ": "",
+          "Matomo Analytics": "",
+          "Adobe Analytics": "",
+          "Tealium CDP": "",
+          "Verified": "",
+          "Expert": "",
+          "1": ""
+        }
+      }
+    ],
+    "historicalTeamSize": {
+      "2023": 105,
+      "2024": 88,
+      "2026": 15
+    }
+  },
+  "diagnostics": {
+    "sheets_found": [
+      "Team details 2023",
+      "Team details 2024",
+      "Team details",
+      "Skillset Expertise",
+      "Skillset Expertise (2)",
+      "Drop down",
+      "OneTrust Certification",
+      "Google Certification",
+      "Adobe Certification",
+      "Tealium Certification",
+      "Expertise",
+      "Team details 2026",
+      "Exit resources",
+      "Skillset Expertise 2025",
+      "GA4 Certification",
+      "Expertise  2024"
+    ],
+    "sections": {
+      "current_team": {
+        "header_row": 0,
+        "columns_found": [
+          "name",
+          "role",
+          "designation",
+          "emp_id",
+          "email",
+          "doj",
+          "phone",
+          "birthday",
+          "location"
+        ],
+        "columns_missing": [],
+        "total_expected": 9,
+        "total_found": 9,
+        "sheet": "Team details 2026"
+      },
+      "exit_resources": {
+        "header_row": 0,
+        "columns_found": [
+          "name",
+          "designation",
+          "emp_id",
+          "email",
+          "last_working_day"
+        ],
+        "columns_missing": [],
+        "total_expected": 5,
+        "total_found": 5,
+        "sheet": "Exit resources"
+      },
+      "skillset": {
+        "sheet": "Skillset Expertise 2025",
+        "header_row": 5
+      },
+      "cert_ga4": {
+        "sheet": "GA4 Certification",
+        "header_row": 0
+      },
+      "cert_oneTrust": {
+        "sheet": "OneTrust Certification",
+        "header_row": 3
+      },
+      "cert_google": {
+        "sheet": "Google Certification",
+        "header_row": 2
+      },
+      "cert_adobe": {
+        "sheet": "Adobe Certification",
+        "header_row": 1
+      },
+      "cert_tealium": {
+        "sheet": "Tealium Certification",
+        "header_row": 3
+      },
+      "expertise": {
+        "sheet": "Expertise  2024",
+        "header_row": 0
+      }
+    }
+  },
+  "timestamp": "2026-05-05T19:40:39.472515",
+  "input_file": "C:\\Users\\KIIT\\Downloads\\Dashboard-looker-main\\Dashboard-looker-main\\uploads\\team.xlsx"
+}

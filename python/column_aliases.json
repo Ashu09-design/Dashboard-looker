@@ -1,0 +1,98 @@
+{
+  "_comment": "Maps canonical field names to known aliases (case-insensitive matching). The normalizer uses fuzzy matching on top of this.",
+
+  "team": {
+    "name": ["Name", "Employee Name", "Full Name", "Resource Name", "Member Name", "Resources"],
+    "role": ["Role", "Job Role", "Position", "Team Role", "Function"],
+    "designation": ["Designation", "Title", "Job Title", "Level"],
+    "emp_id": ["Emp ID", "Employee ID", "EmpId", "Emp. ID", "ID", "Emp No", "Employee No"],
+    "email": ["Email-ID", "Email", "Email ID", "E-mail", "Email Address", "Mail ID"],
+    "doj": ["DOJ", "Date of Joining", "Joining Date", "Start Date", "Date Of Joining"],
+    "phone": ["Phone No:", "Phone No", "Phone", "Mobile", "Contact No", "Phone Number", "Mobile No"],
+    "birthday": ["Birthday (Month/date)", "Birthday", "DOB", "Date of Birth", "Birth Date"],
+    "location": ["Current residing Location", "Location", "City", "Office Location", "Base Location"],
+    "last_working_day": ["Last Working Day", "LWD", "Exit Date", "Relieving Date", "End Date"]
+  },
+
+  "ftr": {
+    "engagement_name": ["Engagement Name", "Account", "Account Name", "Client", "Client Name"],
+    "qa_tracking": ["QA Metrics Tracking", "QA Tracking", "QA Status", "Tracking"],
+    "expected_projects": ["Expected projects per month", "Expected Projects", "Projects/Month", "Monthly Projects"],
+    "scrapping": ["Datalayer/DOM scrapping", "Datalayer/DOM Scrapping", "Scrapping", "Data Layer"],
+    "web_team": ["Web team- Internal/External", "Web Team", "Team Type", "Internal/External"],
+    "comments": ["Comments", "Notes", "Remarks"],
+    "project_name": ["Project Name", "Project", "Engagement", "Account Name"],
+    "qa_date": ["QA Date", "Date", "Audit Date", "Check Date"],
+    "global": ["Global", "Global Tags", "Global Passed"],
+    "global_failed": ["Global Failed", "Global Fail", "Global Failures"],
+    "inpage": ["Inpage", "In-page", "Inpage Tags", "Inpage Passed"],
+    "inpage_failed": ["Inpage Failed", "In-page Failed", "Inpage Fail"],
+    "form": ["Form", "Form Tags", "Forms", "Form Passed"],
+    "form_failed": ["Form Failed", "Form Fail", "Forms Failed"],
+    "videos": ["Videos", "Video", "Video Tags", "Video Passed"],
+    "videos_failed": ["Videos Failed", "Video Failed", "Video Fail"]
+  },
+
+  "kpi": {
+    "account_name": ["Account Name", "Account", "Client", "Client Name", "BU Name"],
+    "metric_name": ["Metric Name", "Metric", "KPI Name", "KPI Metric", "Measure"],
+    "kpi_name": ["KPI/Metric Name", "KPI", "KPI Name", "Key Metric"],
+    "description": ["Metric Description", "Description", "Details", "KPI Description"],
+    "formula": ["Formula", "Calculation", "Method"],
+    "target": ["Target", "Target Value", "Goal", "Benchmark", "Expected"],
+    "actual": ["Actual", "Actual Value", "Achieved", "Current", "Result"],
+    "status": ["Status", "KPI Status", "Achievement Status", "Result Status"],
+    "department": ["Department Name", "Department", "Dept"],
+    "service_line": ["Service Line", "Service", "Line of Service"],
+    "project_manager": ["Project Manager", "PM", "PM Name", "Manager"],
+    "project": ["Project", "Project Name", "Engagement"],
+    "month": ["Month", "Period", "Reporting Month"],
+    "highlight": ["Highlight", "Highlights", "Achievement", "Win"],
+    "lowlight": ["Lowlight", "Lowlights", "Low Light", "Challenge", "Issue"]
+  },
+
+  "leave": {
+    "date": ["Date", "Day Date", "Cal Date"],
+    "day": ["Day", "Week Day", "Day Name"]
+  },
+
+  "sow": {
+    "pm": ["PM Name", "PM", "Project Manager", "Manager", "Lead"],
+    "client": ["Client", "Client Name", "Account", "Account Name", "Customer"],
+    "project_name": ["Project Name", "Project", "Engagement", "Sub Project"],
+    "sub_project": ["Sub Project", "Sub-Project", "Sub Project Name", "Work Stream"],
+    "mysheets_pid": ["MySheets PID", "MySheets", "PID", "Project ID"],
+    "total_sow_value": ["Total SOW Value", "SOW Value", "SOW Amount", "SOW Val", "Contract Value", "Total SOW"],
+    "de_revenue_share": ["DE Revenue Share", "DE Revenue", "Revenue Share", "DE Share"],
+    "project_start": ["Project Start Date", "Project Start", "Start Date", "SOW Start"],
+    "project_end": ["Project End Date", "Project End", "End Date", "SOW End"],
+    "sow_status": ["SOW Status", "SOW", "SOW Received", "SOW State"],
+    "po_status": ["PO Status", "PO", "PO Received", "PO State"],
+    "project_status": ["Project Status", "Status", "Project State", "Engagement Status"]
+  },
+
+  "governance": {
+    "project_manager": ["Project Manager", "PM", "PM Name", "Manager"],
+    "project": ["Project", "Project Name", "Engagement", "Account"],
+    "month": ["Month", "Period", "Reporting Month"],
+    "highlight": ["Highlight", "Highlights", "Achievement"],
+    "lowlight": ["Lowlight", "Lowlights", "Low Light", "Challenge"],
+    "account": ["Account", "Account Name", "Client", "Client Name"],
+    "pms": ["PMs", "PM", "Project Managers"],
+    "offshore_leads": ["Offshore Leads", "Offshore Lead", "Offshore"],
+    "delivery_leads": ["Delivery Leads", "Delivery Lead", "Delivery"],
+    "project_start_date": ["Project Start date", "Project Start Date", "Start Date"],
+    "qbr_start_date": ["QBR Start Date", "QBR Date", "QBR Start"],
+    "qbr_delivery_type": ["QBR Delivery Type", "Delivery Type", "QBR Type"],
+    "risks": ["Risks", "Risk", "Risk Description", "Risk Details"],
+    "week": ["Week", "Week No", "Week Number"],
+    "owner": ["Owner", "Risk Owner", "Assigned To"],
+    "root_cause": ["Root cause", "Root Cause", "Cause", "Why"],
+    "mitigation": ["Mitigation Steps", "Mitigation", "Action Plan", "Resolution"],
+    "impact": ["Impact", "Risk Impact", "Severity", "Effect"],
+    "status": ["Status", "Risk Status", "Current Status", "State"],
+    "audit_details": ["Audit details", "Audit Details", "Audit Description", "Audit"],
+    "findings": ["Details", "Findings", "Audit Findings", "Results"],
+    "audit_closure_date": ["Audit Closure Date", "Closure Date", "Close Date", "Closed On"]
+  }
+}
