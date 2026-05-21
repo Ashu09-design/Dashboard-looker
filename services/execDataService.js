@@ -106,11 +106,19 @@ if (!fs.existsSync(DATA_DIR)) {
  * Detect Python command available on this system.
  */
 let _pythonCmd = null;
+let _pythonChecked = false;
 function getPythonCmd() {
-    if (_pythonCmd) return _pythonCmd;
+    if (process.env.VERCEL) {
+        throw new Error('Python not found (disabled in Vercel environment).');
+    }
+    if (_pythonChecked) {
+        if (_pythonCmd) return _pythonCmd;
+        throw new Error('Python not found (cached check result).');
+    }
+    _pythonChecked = true;
     for (const cmd of ['python', 'python3', 'py']) {
         try {
-            execSync(`${cmd} --version`, { stdio: 'pipe', timeout: 5000 });
+            execSync(`${cmd} --version`, { stdio: 'pipe', timeout: 1000 });
             _pythonCmd = cmd;
             return cmd;
         } catch (_) { /* try next */ }
@@ -302,6 +310,13 @@ async function loadAll() {
     console.log(`[ExecData] All sources loaded at ${cache.lastRefresh}`);
 }
 
+async function ensureLoaded() {
+    if (!cache.lastRefresh) {
+        console.log('[ExecData] Cache empty, loading all sources lazily...');
+        await loadAll();
+    }
+}
+
 function getData(key) {
     return cache[key];
 }
@@ -441,6 +456,7 @@ function computeSummary() {
 
 module.exports = {
     loadAll,
+    ensureLoaded,
     getData,
     getAllCached,
     getSourceStatus,

@@ -357,6 +357,17 @@ app.get('/api/auth/verify', verifyToken, (req, res) => {
 //  PHASE 2: EXECUTIVE APIs (all JWT-protected)
 // ══════════════════════════════════════════════════════════════════
 
+// Middleware to ensure data is loaded in serverless environments
+app.use('/api/exec/*', async (req, res, next) => {
+  try {
+    await execData.ensureLoaded();
+    next();
+  } catch (err) {
+    console.error('Failed to ensure data is loaded:', err.message);
+    next();
+  }
+});
+
 app.get('/api/exec/summary', verifyToken, (req, res) => {
   try {
     res.json(execData.computeSummary());
