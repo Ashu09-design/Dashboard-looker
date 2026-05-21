@@ -139,16 +139,32 @@ function renderTabNav() {
 // ══════════════════════════════════════════════════════════════════
 
 const TAB_FILTERS = {
-    overview: ['rm', 'month', 'project'],
-    team: ['office', 'designation', 'rm', 'project'],
-    projects: ['project', 'month'],
-    sow: ['project', 'startDate', 'endDate'],
-    kpis: ['project', 'kpiMetric'],
+    overview: ['client', 'rm', 'month', 'project'],
+    team: ['client', 'office', 'designation', 'rm', 'project'],
+    projects: ['client', 'project', 'month'],
+    sow: ['client', 'project', 'startDate', 'endDate'],
+    kpis: ['client', 'project', 'kpiMetric'],
     ftr: ['client', 'month', 'project'],
     leave: ['rm', 'project'],
-    risks: ['project', 'month'],
+    risks: ['client', 'project', 'month'],
     poc: ['pocStatus', 'manager', 'spoc'],
 };
+
+function getClientProjects(clientName) {
+    if (!clientName) return new Set();
+    const sowProjects = state.data.sow?.projects || [];
+    const matched = sowProjects.filter(p => p.client && p.client.toLowerCase() === clientName.toLowerCase());
+    const projectNames = new Set(matched.map(p => p.projectName.toLowerCase()));
+    
+    const kpiMetrics = state.data.kpi?.metrics || [];
+    kpiMetrics.forEach(m => {
+        if (m.account && m.account.toLowerCase() === clientName.toLowerCase() && m.project) {
+            projectNames.add(m.project.toLowerCase());
+        }
+    });
+    return projectNames;
+}
+
 
 function uniqueSorted(arr) {
     return [...new Set(arr.filter(v => v != null && String(v).trim() !== ''))].sort();
@@ -368,11 +384,23 @@ function getRmProjects(rmName) {
 }
 
 function tabOverview(el) {
-    const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project');
+    const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project'), client = getFilter('client');
 
     // 1. Filter Team Size
     let members = state.data.team?.activeMembers || [];
     if (rm) members = members.filter(m => m.manager === rm);
+    if (client) {
+        const clientProjs = getClientProjects(client);
+        const sowProjects = state.data.sow?.projects || [];
+        const pmNames = uniqueSorted(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => p.pm));
+        if (pmNames.length) {
+            members = members.filter(m => pmNames.some(pm => 
+                m.name.toLowerCase().includes(pm.toLowerCase()) || 
+                pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
+                (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
+            ));
+        }
+    }
     if (proj) {
         const sowProjects = state.data.sow?.projects || [];
         const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === proj).map(p => p.pm));
@@ -385,6 +413,7 @@ function tabOverview(el) {
     // 2. Filter Active Projects
     let healthRows = state.data.health || [];
     if (proj) healthRows = healthRows.filter(p => p.projectName === proj);
+    if (client) healthRows = healthRows.filter(p => p.client === client);
     if (rm) {
         const rmProjs = getRmProjects(rm);
         healthRows = healthRows.filter(p => p.projectName && rmProjs.has(p.projectName.toLowerCase()));
@@ -395,6 +424,7 @@ function tabOverview(el) {
     let kpiMetrics = state.data.kpi?.metrics || [];
     if (proj) kpiMetrics = kpiMetrics.filter(m => (m.project || '').toLowerCase().includes(proj.toLowerCase()));
     if (month) kpiMetrics = kpiMetrics.filter(m => m.month === month);
+    if (client) kpiMetrics = kpiMetrics.filter(m => m.account === client);
     if (rm) {
         const rmProjs = getRmProjects(rm);
         kpiMetrics = kpiMetrics.filter(m => m.project && rmProjs.has(m.project.toLowerCase()));
@@ -406,6 +436,10 @@ function tabOverview(el) {
     let qa = state.data.ftr?.qaMetrics || [];
     if (proj) qa = qa.filter(q => (q.project || '').toLowerCase().includes(proj.toLowerCase()));
     if (month) qa = qa.filter(q => monthLabel(q.qaDate) === month);
+    if (client) qa = qa.filter(q => {
+        const lp = (q.project || '').toLowerCase();
+        return lp.includes(client.toLowerCase()) || client.toLowerCase().includes(lp.split(' ')[0]);
+    });
     if (rm) {
         const rmProjs = getRmProjects(rm);
         qa = qa.filter(q => q.project && rmProjs.has(q.project.toLowerCase()));
@@ -414,11 +448,7 @@ function tabOverview(el) {
 
     // 5. Filter On Leave Today
     let onTodayLeaves = state.data.leave?.currentMonth?.onLeaveToday || [];
-    if (rm) {
-        const teamNames = new Set(members.map(m => m.name.toLowerCase()));
-        onTodayLeaves = onTodayLeaves.filter(l => teamNames.has(l.name.toLowerCase()));
-    }
-    if (proj && !rm) {
+    if (rm || proj || client) {
         const teamNames = new Set(members.map(m => m.name.toLowerCase()));
         onTodayLeaves = onTodayLeaves.filter(l => teamNames.has(l.name.toLowerCase()));
     }
@@ -428,6 +458,10 @@ function tabOverview(el) {
     let risks = (state.data.gov?.risks || []).filter(r => (r.status || '').toLowerCase() === 'ongoing');
     if (proj) risks = risks.filter(r => r.project === proj);
     if (month) risks = risks.filter(r => r.month === month);
+    if (client) {
+        const clientProjs = getClientProjects(client);
+        risks = risks.filter(r => r.project && clientProjs.has(r.project.toLowerCase()));
+    }
     if (rm) {
         const rmProjs = getRmProjects(rm);
         risks = risks.filter(r => r.project && rmProjs.has(r.project.toLowerCase()));
@@ -437,6 +471,17 @@ function tabOverview(el) {
     // 7. PoC Use Cases
     let pocs = state.data.poc?.pocs || [];
     if (rm) pocs = pocs.filter(p => p.manager === rm);
+    if (client) {
+        const clientProjs = getClientProjects(client);
+        const sowProjects = state.data.sow?.projects || [];
+        const pmNames = new Set(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => (p.pm || '').toLowerCase()));
+        pocs = pocs.filter(p => p.manager && pmNames.has(p.manager.toLowerCase()));
+    }
+    if (proj) {
+        const sowProjects = state.data.sow?.projects || [];
+        const pmNames = new Set(sowProjects.filter(p => p.projectName === proj).map(p => (p.pm || '').toLowerCase()));
+        pocs = pocs.filter(p => p.manager && pmNames.has(p.manager.toLowerCase()));
+    }
     const pocTotal = pocs.length;
 
     el.innerHTML = `
@@ -458,7 +503,7 @@ function tabOverview(el) {
             <div class="m-card">${section('⬇️ Recent Lowlights')}<div id="ovLL"></div></div>
         </div>`;
 
-    const pf = { project: proj, month: month, rm: rm };
+    const pf = { project: proj, month: month, rm: rm, client: client };
     widgetProjectHealth($('#ovHealth'), pf, 6);
     widgetRiskList($('#ovRisks'), pf, 6);
     widgetHighlights($('#ovHL'), 6, pf);
@@ -473,10 +518,22 @@ function tabTeam(el) {
     const t = state.data.team || {};
     let members = t.activeMembers || [];
     const office = getFilter('office'), designation = getFilter('designation');
-    const rm = getFilter('rm'), proj = getFilter('project');
+    const rm = getFilter('rm'), proj = getFilter('project'), client = getFilter('client');
     if (office) members = members.filter(m => m.location === office);
     if (designation) members = members.filter(m => m.designation === designation);
     if (rm) members = members.filter(m => m.manager === rm);
+    if (client) {
+        const clientProjs = getClientProjects(client);
+        const sowProjects = state.data.sow?.projects || [];
+        const pmNames = uniqueSorted(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => p.pm));
+        if (pmNames.length) {
+            members = members.filter(m => pmNames.some(pm => 
+                m.name.toLowerCase().includes(pm.toLowerCase()) || 
+                pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
+                (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
+            ));
+        }
+    }
     if (proj) {
         // Cross-reference with SOW projects: find PMs for that project, show their team
         const sowProjects = state.data.sow?.projects || [];
@@ -530,6 +587,7 @@ function tabTeam(el) {
 function tabProjects(el) {
     const proj = getFilter('project');
     const monthF = getFilter('month');
+    const client = getFilter('client');
     el.innerHTML = `
         <div class="m-card">${section('🏥 Project Health Status')}<div id="pjHealth"></div></div>
         <div class="grid-2">
@@ -546,17 +604,19 @@ function tabProjects(el) {
             <div class="m-card">${section('🏖️ Leave Impact — Today & This Month')}<div id="pjLeaveImpact"></div></div>
         </div>`;
 
-    const pf = proj ? { project: proj } : {};
-    const month = getFilter('month');
-    if (month) pf.month = month;
+    const pf = {};
+    if (proj) pf.project = proj;
+    if (monthF) pf.month = monthF;
+    if (client) pf.client = client;
+
     widgetProjectHealth($('#pjHealth'), pf);
-    widgetHighlights($('#pjHL'), 10, proj);
-    widgetLowlights($('#pjLL'), 10, proj);
+    widgetHighlights($('#pjHL'), 10, pf);
+    widgetLowlights($('#pjLL'), 10, pf);
     widgetUtilTrendChart('chPjUtil');
     widgetRiskList($('#pjRisks'), pf, 10);
-    widgetFtrReport($('#pjFtr'));
-    widgetTopLeaveTakers($('#pjLeaveTop'));
-    widgetLeaveImpact($('#pjLeaveImpact'));
+    widgetFtrReport($('#pjFtr'), pf);
+    widgetTopLeaveTakers($('#pjLeaveTop'), pf);
+    widgetLeaveImpact($('#pjLeaveImpact'), pf);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -565,7 +625,8 @@ function tabProjects(el) {
 
 function tabSow(el) {
     let projects = state.data.sow?.projects || [];
-    const proj = getFilter('project'), startD = getFilter('startDate'), endD = getFilter('endDate');
+    const client = getFilter('client'), proj = getFilter('project'), startD = getFilter('startDate'), endD = getFilter('endDate');
+    if (client) projects = projects.filter(p => p.client === client);
     if (proj) projects = projects.filter(p => p.projectName === proj);
     if (startD) projects = projects.filter(p => p.startDate >= startD);
     if (endD) projects = projects.filter(p => p.endDate <= endD);
@@ -623,15 +684,33 @@ function tabSow(el) {
 
 function tabKpis(el) {
     const kpi = state.data.kpi || {};
-    const sm = kpi.summary || {};
-    const proj = getFilter('project'), kpiMetric = getFilter('kpiMetric');
+    const client = getFilter('client'), proj = getFilter('project'), kpiMetric = getFilter('kpiMetric');
+
+    let metrics = kpi.metrics || [];
+    if (client) metrics = metrics.filter(m => m.account === client);
+    if (proj) metrics = metrics.filter(m => (m.project || '').toLowerCase().includes(proj.toLowerCase()));
+    if (kpiMetric) {
+        const search = kpiMetric.split('(')[0].trim().toLowerCase();
+        metrics = metrics.filter(m => (m.name || m.metric || '').toLowerCase().includes(search));
+    }
+
+    const totalMetrics = metrics.length;
+    const metCount = metrics.filter(m =>
+        m.status.toLowerCase().includes('met') || m.status.toLowerCase().includes('achieved') ||
+        m.status.toLowerCase().includes('green') || (m.actual >= m.target && m.target > 0)
+    ).length;
+    const metRate = totalMetrics > 0 ? Math.round((metCount / totalMetrics) * 100) : 0;
+
+    let scRows = kpi.scorecardProjects || [];
+    if (client) scRows = scRows.filter(r => r.client === client);
+    if (proj) scRows = scRows.filter(r => r.project === proj);
 
     el.innerHTML = `
         <div class="kpi-row">
-            ${statCard('🎯', sm.metRate != null ? sm.metRate + '%' : '—', 'KPI Met Rate')}
-            ${statCard('📊', sm.totalMetrics || 0, 'Total Metrics')}
-            ${statCard('✅', sm.metCount || 0, 'Targets Met')}
-            ${statCard('📂', (kpi.scorecardProjects || []).length, 'Scorecard Entries')}
+            ${statCard('🎯', totalMetrics > 0 ? metRate + '%' : '—', 'KPI Met Rate')}
+            ${statCard('📊', totalMetrics || 0, 'Total Metrics')}
+            ${statCard('✅', metCount || 0, 'Targets Met')}
+            ${statCard('📂', scRows.length, 'Scorecard Entries')}
         </div>
         <div class="m-card">${section('📊 Project-wise Monthly KPI Breakdown', 'Timeliness, Utilization, Quality, CSAT, Client Training')}<div id="kpiBreakdown"></div></div>
         <div class="m-card">${section('🎯 KPI Scorecard', 'Target vs Actual')}<div id="kpiScore"></div></div>
@@ -642,10 +721,6 @@ function tabKpis(el) {
         </div>
         <div class="m-card">${section('✅ FTR Report', 'Client-wise & monthly')}<div id="kpiFtr"></div></div>
         <div class="m-card">${section('🏥 Project Health Status')}<div id="kpiHealth"></div></div>`;
-
-    // ── Project-wise monthly KPI breakdown table ──
-    let scRows = kpi.scorecardProjects || [];
-    if (proj) scRows = scRows.filter(r => r.project === proj);
 
     // Build a mapping of which columns to show based on kpiMetric filter
     const kpiCols = [
@@ -683,9 +758,9 @@ function tabKpis(el) {
     widgetKpiScorecard($('#kpiScore'));
     widgetKpiPivot($('#kpiPivot'));
     widgetKpiUtilPivot($('#kpiUtil'));
-    const pf = proj ? { project: proj } : {};
+    const pf = { project: proj, client: client };
     widgetRiskList($('#kpiRisks'), pf, 10);
-    widgetFtrReport($('#kpiFtr'));
+    widgetFtrReport($('#kpiFtr'), pf);
     widgetProjectHealth($('#kpiHealth'), pf);
 }
 
@@ -695,11 +770,41 @@ function tabKpis(el) {
 
 function tabFtr(el) {
     const ftr = state.data.ftr || {};
+    const client = getFilter('client'), month = getFilter('month'), proj = getFilter('project');
+
+    let qa = ftr.qaMetrics || [];
+    if (month) qa = qa.filter(q => monthLabel(q.qaDate) === month);
+    if (client) {
+        const clientProjs = getClientProjects(client);
+        qa = qa.filter(q => {
+            if (!q.project) return false;
+            const lp = q.project.toLowerCase();
+            if (clientProjs.has(lp)) return true;
+            if (lp.includes(client.toLowerCase()) || client.toLowerCase().includes(lp.split(' ')[0])) return true;
+            return false;
+        });
+    }
+    if (proj) qa = qa.filter(q => (q.project || '').toLowerCase().includes(proj.toLowerCase()));
+
+    const ftrAvgRating = qa.length ? Math.round(qa.reduce((s, q) => s + (q.passRate || 0), 0) / qa.length) : null;
+    const totalQaRecords = qa.length;
+
+    let accounts = ftr.accounts || [];
+    if (client) accounts = accounts.filter(a => a.account === client);
+    if (proj) {
+        const sowProjects = state.data.sow?.projects || [];
+        const matchedProj = sowProjects.find(p => p.projectName && p.projectName.toLowerCase() === proj.toLowerCase());
+        if (matchedProj && matchedProj.client) {
+            accounts = accounts.filter(a => a.account && a.account.toLowerCase() === matchedProj.client.toLowerCase());
+        }
+    }
+    const accountsCount = accounts.length;
+
     el.innerHTML = `
         <div class="kpi-row">
-            ${statCard('✅', ftr.summary?.avgRating ? ftr.summary.avgRating + '%' : '—', 'Avg FTR Rating')}
-            ${statCard('📂', (ftr.accounts || []).length, 'Accounts')}
-            ${statCard('🔍', (ftr.qaMetrics || []).length, 'QA Records')}
+            ${statCard('✅', ftrAvgRating != null ? ftrAvgRating + '%' : '—', 'Avg FTR Rating')}
+            ${statCard('📂', accountsCount, 'Accounts')}
+            ${statCard('🔍', totalQaRecords, 'QA Records')}
         </div>
         <div class="m-card">${section('✅ FTR Report — Client-wise & Monthly')}<div id="ftrReport"></div></div>
         <div class="m-card">${section('🏷️ FTR by Account (Client-wise)')}<div id="ftrAccounts"></div></div>
@@ -707,9 +812,6 @@ function tabFtr(el) {
 
     widgetFtrReport($('#ftrReport'));
 
-    let accounts = ftr.accounts || [];
-    const client = getFilter('client'), proj = getFilter('project');
-    if (client) accounts = accounts.filter(a => a.account === client);
     $('#ftrAccounts').innerHTML = dataTable(
         ['Account', 'QA Tracking', 'Expected Projects', 'Web Team', 'Avg Rating', 'FTR Pass'],
         accounts.map(a => [
@@ -719,11 +821,6 @@ function tabFtr(el) {
         { empty: 'No accounts match the filter.' }
     );
 
-    let qa = ftr.qaMetrics || [];
-    const month = getFilter('month');
-    if (month) qa = qa.filter(q => monthLabel(q.qaDate) === month);
-    if (client) qa = qa.filter(q => (q.project || '').toLowerCase().includes(client.toLowerCase()));
-    if (proj) qa = qa.filter(q => (q.project || '').toLowerCase().includes(proj.toLowerCase()));
     $('#ftrQa').innerHTML = dataTable(
         ['Project', 'QA Date', 'Month', 'Total Tags', 'Failed', 'Pass Rate'],
         qa.map(q => [
@@ -743,10 +840,21 @@ function tabLeave(el) {
     const cm = leave.currentMonth || {};
     const rm = getFilter('rm'), proj = getFilter('project');
 
-    // Get team members filtered by RM for filtering leave data
+    // Get team members filtered by RM and project for filtering leave data
     let teamMembers = state.data.team?.activeMembers || [];
     if (rm) teamMembers = teamMembers.filter(m => m.manager === rm);
-    const teamNameSet = rm ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
+    if (proj) {
+        const sowProjects = state.data.sow?.projects || [];
+        const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === proj).map(p => p.pm));
+        if (pmNames.length) {
+            teamMembers = teamMembers.filter(m => pmNames.some(pm => 
+                m.name.toLowerCase().includes(pm.toLowerCase()) || 
+                pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
+                (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
+            ));
+        }
+    }
+    const teamNameSet = (rm || proj) ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
 
     let onToday = cm.onLeaveToday || [];
     if (teamNameSet) onToday = onToday.filter(p => teamNameSet.has(p.name.toLowerCase()));
@@ -755,10 +863,12 @@ function tabLeave(el) {
         .filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
     if (teamNameSet) byPerson = byPerson.filter(([n]) => teamNameSet.has(n.toLowerCase()));
 
+    const totalLeavesThisMonth = byPerson.reduce((sum, [, count]) => sum + count, 0);
+
     el.innerHTML = `
         <div class="kpi-row">
-            ${statCard('🏖️', onToday.length, 'On Leave Today', 'kpi-card-alert')}
-            ${statCard('📅', cm.totalLeaves || 0, 'Leaves This Month')}
+            ${statCard('🏖️', onToday.length, 'On Leave Today', onToday.length > 0 ? 'kpi-card-alert' : '')}
+            ${statCard('📅', totalLeavesThisMonth, 'Leaves This Month')}
             ${statCard('🗓️', (leave.months || []).length, 'Months Tracked')}
         </div>
         <div class="grid-2">
@@ -792,19 +902,27 @@ function tabLeave(el) {
 
 function tabRisks(el) {
     const risks = state.data.gov?.risks || [];
-    const active = risks.filter(r => (r.status || '').toLowerCase() === 'ongoing');
+    const client = getFilter('client'), proj = getFilter('project'), month = getFilter('month');
+
+    let pv = risks;
+    if (proj) pv = pv.filter(r => r.project === proj);
+    if (month) pv = pv.filter(r => r.month === month);
+    if (client) {
+        const clientProjs = getClientProjects(client);
+        pv = pv.filter(r => r.project && clientProjs.has(r.project.toLowerCase()));
+    }
+
+    const activeCount = pv.filter(r => (r.status || '').toLowerCase() === 'ongoing').length;
+    const totalCount = pv.length;
+
     el.innerHTML = `
         <div class="kpi-row">
-            ${statCard('⚠️', active.length, 'Active Risks', 'kpi-card-alert')}
-            ${statCard('📋', risks.length, 'Total Risk Records')}
+            ${statCard('⚠️', activeCount, 'Active Risks', activeCount > 0 ? 'kpi-card-alert' : '')}
+            ${statCard('📋', totalCount, 'Total Risk Records')}
         </div>
         <div class="m-card">${section('📊 Risks — Project-wise & Monthly', 'Count of risk records')}<div id="rkPivot"></div></div>
         <div class="m-card">${section('⚠️ Risk Details')}<div id="rkList"></div></div>`;
 
-    const proj = getFilter('project'), month = getFilter('month');
-    let pv = risks;
-    if (proj) pv = pv.filter(r => r.project === proj);
-    if (month) pv = pv.filter(r => r.month === month);
     const rowKeys = uniqueSorted(pv.map(r => r.project || 'Unknown'));
     const colKeys = uniqueSorted(pv.map(r => r.month || 'Unknown'));
     $('#rkPivot').innerHTML = pivotTable(rowKeys, colKeys, (rk, ck) => {
@@ -830,17 +948,36 @@ function tabRisks(el) {
 function tabPoc(el) {
     const poc = state.data.poc || {};
     let pocs = poc.pocs || [];
-    const sm = poc.summary || {};
     const st = getFilter('pocStatus'), mgr = getFilter('manager'), spoc = getFilter('spoc');
     if (st) pocs = pocs.filter(p => p.status === st);
     if (mgr) pocs = pocs.filter(p => p.manager === mgr);
     if (spoc) pocs = pocs.filter(p => p.spoc === spoc);
 
+    // Compute dynamic metrics
+    const totalCount = pocs.length;
+    const byStatus = {};
+    pocs.forEach(p => {
+        const s = p.status || 'Unknown';
+        byStatus[s] = (byStatus[s] || 0) + 1;
+    });
+
+    let completedCount = 0;
+    let inProgressCount = 0;
+    Object.entries(byStatus).forEach(([k, v]) => {
+        const lowerK = k.toLowerCase();
+        if (lowerK.includes('complete') || lowerK === 'done') {
+            completedCount += v;
+        }
+        if (['progress', 'wip', 'ongoing'].some(w => lowerK.includes(w))) {
+            inProgressCount += v;
+        }
+    });
+
     el.innerHTML = `
         <div class="kpi-row">
-            ${statCard('🧪', sm.total || 0, 'Total Use Cases')}
-            ${statCard('✅', sm.completed || 0, 'Completed')}
-            ${statCard('🔧', sm.inProgress || 0, 'In Progress')}
+            ${statCard('🧪', totalCount, 'Total Use Cases')}
+            ${statCard('✅', completedCount, 'Completed')}
+            ${statCard('🔧', inProgressCount, 'In Progress')}
             ${statCard('🤖', (poc.aiUsecases || []).length, 'AI Use Cases')}
         </div>
         <div class="grid-2">
@@ -868,9 +1005,9 @@ function tabPoc(el) {
         { empty: 'No AI use cases recorded.' }
     );
 
-    doughnutChart('chPocStatus', Object.keys(sm.byStatus || {}), Object.values(sm.byStatus || {}));
+    doughnutChart('chPocStatus', Object.keys(byStatus), Object.values(byStatus));
     const mgrCount = {};
-    (poc.pocs || []).forEach(p => { mgrCount[p.manager || 'Unknown'] = (mgrCount[p.manager || 'Unknown'] || 0) + 1; });
+    pocs.forEach(p => { mgrCount[p.manager || 'Unknown'] = (mgrCount[p.manager || 'Unknown'] || 0) + 1; });
     barChart('chPocMgr', Object.keys(mgrCount), Object.values(mgrCount), 'PoCs', '#06b6d4');
 }
 
@@ -882,6 +1019,7 @@ function widgetProjectHealth(el, filter, limit) {
     let rows = state.data.health || [];
     if (filter) {
         if (filter.project) rows = rows.filter(p => p.projectName === filter.project);
+        if (filter.client) rows = rows.filter(p => p.client === filter.client);
         if (filter.rm) {
             const rmProjs = getRmProjects(filter.rm);
             rows = rows.filter(p => p.projectName && rmProjs.has(p.projectName.toLowerCase()));
@@ -904,6 +1042,10 @@ function widgetRiskList(el, filter, limit) {
     if (filter) {
         if (filter.project) risks = risks.filter(r => r.project === filter.project);
         if (filter.month) risks = risks.filter(r => r.month === filter.month);
+        if (filter.client) {
+            const clientProjs = getClientProjects(filter.client);
+            risks = risks.filter(r => r.project && clientProjs.has(r.project.toLowerCase()));
+        }
         if (filter.rm) {
             const rmProjs = getRmProjects(filter.rm);
             risks = risks.filter(r => r.project && rmProjs.has(r.project.toLowerCase()));
@@ -928,6 +1070,10 @@ function widgetHighlights(el, limit, filter) {
         } else {
             if (filter.project) items = items.filter(h => h.project === filter.project);
             if (filter.month) items = items.filter(h => h.month === filter.month);
+            if (filter.client) {
+                const clientProjs = getClientProjects(filter.client);
+                items = items.filter(h => h.project && clientProjs.has(h.project.toLowerCase()));
+            }
             if (filter.rm) {
                 const rmProjs = getRmProjects(filter.rm);
                 items = items.filter(h => h.project && rmProjs.has(h.project.toLowerCase()));
@@ -950,6 +1096,10 @@ function widgetLowlights(el, limit, filter) {
         } else {
             if (filter.project) items = items.filter(h => h.project === filter.project);
             if (filter.month) items = items.filter(h => h.month === filter.month);
+            if (filter.client) {
+                const clientProjs = getClientProjects(filter.client);
+                items = items.filter(h => h.project && clientProjs.has(h.project.toLowerCase()));
+            }
             if (filter.rm) {
                 const rmProjs = getRmProjects(filter.rm);
                 items = items.filter(h => h.project && rmProjs.has(h.project.toLowerCase()));
@@ -965,7 +1115,37 @@ function widgetLowlights(el, limit, filter) {
 }
 
 function widgetUtilTrendChart(canvasId) {
-    const trend = state.data.gov?.fteTrend || [];
+    const gov = state.data.gov || {};
+    const fteData = gov.fte || [];
+    const client = getFilter('client'), project = getFilter('project');
+    
+    let filteredFte = fteData;
+    if (client) {
+        filteredFte = fteData.filter(entry => entry.account && entry.account.toLowerCase() === client.toLowerCase());
+    } else if (project) {
+        const sowProjects = state.data.sow?.projects || [];
+        const matchedProj = sowProjects.find(p => p.projectName && p.projectName.toLowerCase() === project.toLowerCase());
+        if (matchedProj && matchedProj.client) {
+            filteredFte = fteData.filter(entry => entry.account && entry.account.toLowerCase() === matchedProj.client.toLowerCase());
+        } else {
+            filteredFte = fteData.filter(entry => entry.account && (
+                project.toLowerCase().includes(entry.account.toLowerCase()) ||
+                entry.account.toLowerCase().includes(project.toLowerCase())
+            ));
+        }
+    }
+    
+    const fteByMonth = {};
+    filteredFte.forEach(entry => {
+        Object.entries(entry.monthlyFTE || {}).forEach(([month, val]) => {
+            fteByMonth[month] = (fteByMonth[month] || 0) + val;
+        });
+    });
+    
+    const trend = Object.entries(fteByMonth)
+        .map(([month, totalFTE]) => ({ month, totalFTE }))
+        .sort((a, b) => a.month.localeCompare(b.month));
+
     if (!trend.length) {
         const c = document.getElementById(canvasId);
         if (c) c.replaceWith(Object.assign(document.createElement('div'),
@@ -975,23 +1155,94 @@ function widgetUtilTrendChart(canvasId) {
     lineChart(canvasId, trend.map(t => t.month), trend.map(t => t.totalFTE), 'Total FTE');
 }
 
-function widgetTopLeaveTakers(el) {
-    const byPerson = Object.entries(state.data.leave?.currentMonth?.byPerson || {})
-        .filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]).slice(0, 10);
+function widgetTopLeaveTakers(el, filter) {
+    const leave = state.data.leave || {};
+    const cm = leave.currentMonth || {};
+    let teamMembers = state.data.team?.activeMembers || [];
+    if (filter) {
+        if (filter.rm) teamMembers = teamMembers.filter(m => m.manager === filter.rm);
+        if (filter.client) {
+            const clientProjs = getClientProjects(filter.client);
+            const sowProjects = state.data.sow?.projects || [];
+            const pmNames = uniqueSorted(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => p.pm));
+            if (pmNames.length) {
+                teamMembers = teamMembers.filter(m => pmNames.some(pm => 
+                    m.name.toLowerCase().includes(pm.toLowerCase()) || 
+                    pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
+                    (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
+                ));
+            }
+        }
+        if (filter.project) {
+            const sowProjects = state.data.sow?.projects || [];
+            const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === filter.project).map(p => p.pm));
+            if (pmNames.length) {
+                teamMembers = teamMembers.filter(m => pmNames.some(pm => 
+                    m.name.toLowerCase().includes(pm.toLowerCase()) || 
+                    pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
+                    (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
+                ));
+            }
+        }
+    }
+    const teamNameSet = (filter && (filter.rm || filter.project || filter.client)) ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
+    
+    let byPerson = Object.entries(cm.byPerson || {})
+        .filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
+    if (teamNameSet) byPerson = byPerson.filter(([n]) => teamNameSet.has(n.toLowerCase()));
+    
+    const sliced = byPerson.slice(0, 10);
     el.innerHTML = dataTable(
         ['Member', 'Leave Days'],
-        byPerson.map(([n, c]) => [`<strong>${esc(n)}</strong>`, badge(c + ' day(s)', 'b-amber')]),
+        sliced.map(([n, c]) => [`<strong>${esc(n)}</strong>`, badge(c + ' day(s)', 'b-amber')]),
         { empty: 'No leave records this month.' }
     );
 }
 
-function widgetLeaveImpact(el) {
-    const cm = state.data.leave?.currentMonth || {};
-    const onToday = cm.onLeaveToday || [];
+function widgetLeaveImpact(el, filter) {
+    const leave = state.data.leave || {};
+    const cm = leave.currentMonth || {};
+    let teamMembers = state.data.team?.activeMembers || [];
+    if (filter) {
+        if (filter.rm) teamMembers = teamMembers.filter(m => m.manager === filter.rm);
+        if (filter.client) {
+            const clientProjs = getClientProjects(filter.client);
+            const sowProjects = state.data.sow?.projects || [];
+            const pmNames = uniqueSorted(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => p.pm));
+            if (pmNames.length) {
+                teamMembers = teamMembers.filter(m => pmNames.some(pm => 
+                    m.name.toLowerCase().includes(pm.toLowerCase()) || 
+                    pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
+                    (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
+                ));
+            }
+        }
+        if (filter.project) {
+            const sowProjects = state.data.sow?.projects || [];
+            const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === filter.project).map(p => p.pm));
+            if (pmNames.length) {
+                teamMembers = teamMembers.filter(m => pmNames.some(pm => 
+                    m.name.toLowerCase().includes(pm.toLowerCase()) || 
+                    pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
+                    (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
+                ));
+            }
+        }
+    }
+    const teamNameSet = (filter && (filter.rm || filter.project || filter.client)) ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
+    
+    let onToday = cm.onLeaveToday || [];
+    if (teamNameSet) onToday = onToday.filter(p => teamNameSet.has(p.name.toLowerCase()));
+    
+    let byPerson = Object.entries(cm.byPerson || {})
+        .filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
+    if (teamNameSet) byPerson = byPerson.filter(([n]) => teamNameSet.has(n.toLowerCase()));
+    const totalLeavesThisMonth = byPerson.reduce((sum, [, count]) => sum + count, 0);
+
     el.innerHTML = `
         <div class="impact-row">
             <div class="impact-stat"><span class="impact-num">${onToday.length}</span> on leave today</div>
-            <div class="impact-stat"><span class="impact-num">${cm.totalLeaves || 0}</span> leaves this month</div>
+            <div class="impact-stat"><span class="impact-num">${totalLeavesThisMonth}</span> leaves this month</div>
         </div>
         ${onToday.length ? dataTable(['Member', 'Type'],
         onToday.map(p => [esc(p.name), esc(p.type)])) : '<div class="empty-note">Nobody on leave today. ✅</div>'}`;
@@ -1049,7 +1300,7 @@ function widgetKpiUtilPivot(el) {
     }, { corner: 'Client', empty: 'No FTE utilization data.' });
 }
 
-function widgetFtrReport(el) {
+function widgetFtrReport(el, filter) {
     const qa = state.data.ftr?.qaMetrics || [];
     const accounts = (state.data.ftr?.accounts || []).map(a => a.account);
     function clientOf(project) {
@@ -1058,9 +1309,12 @@ function widgetFtrReport(el) {
         return hit || 'Unmapped';
     }
     let recs = qa.map(q => ({ ...q, client: clientOf(q.project), month: monthLabel(q.qaDate) }));
-    const client = getFilter('client'), month = getFilter('month');
+    const client = filter?.client || getFilter('client');
+    const month = filter?.month || getFilter('month');
+    const project = filter?.project || getFilter('project');
     if (client) recs = recs.filter(r => r.client === client);
     if (month) recs = recs.filter(r => r.month === month);
+    if (project) recs = recs.filter(r => (r.project || '').toLowerCase().includes(project.toLowerCase()));
     const rowKeys = uniqueSorted(recs.map(r => r.client));
     const colKeys = uniqueSorted(recs.map(r => r.month));
     el.innerHTML = pivotTable(rowKeys, colKeys, (rk, ck) => {
