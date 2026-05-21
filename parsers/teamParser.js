@@ -35,6 +35,7 @@ function parseTeamDetails(filePath) {
             const role = String(r['Role'] || '').trim();
             if (role) lastRole = role;
             const designation = String(r['Designation'] || '').trim();
+            const manager = String(r['Reporting Manager'] || r['Manager'] || r['RM'] || r['Line Manager'] || r['Reports To'] || '').trim();
             result.activeMembers.push({
                 name, role: lastRole, designation,
                 empId: String(r['Emp ID'] || ''),
@@ -43,6 +44,7 @@ function parseTeamDetails(filePath) {
                 phone: String(r['Phone No:'] || r['Phone No'] || ''),
                 birthday: excelDate(r['Birthday (Month/date)']),
                 location: String(r['Current residing Location'] || ''),
+                manager,
             });
             const dKey = designation || 'Unspecified';
             result.designationDistribution[dKey] = (result.designationDistribution[dKey] || 0) + 1;
@@ -60,16 +62,21 @@ function parseTeamDetails(filePath) {
             if (headerIdx >= 0) {
                 const headers = raw[headerIdx].map(h => String(h).trim());
                 const ci = name => headers.findIndex(h => h.toLowerCase().includes(name.toLowerCase()));
+                const managerIdx = headers.findIndex(h => {
+                    const l = h.toLowerCase();
+                    return l.includes('manager') || l.includes('rm') || l.includes('reports to');
+                });
                 for (let i = headerIdx + 1; i < raw.length; i++) {
                     const r = raw[i];
                     const name = String(r[ci('Name')] || '').trim();
                     if (!name) continue;
                     const desig = String(r[ci('Designation')] || '').trim();
+                    const manager = managerIdx >= 0 ? String(r[managerIdx] || '').trim() : '';
                     result.activeMembers.push({
                         name, role: desig, designation: desig,
                         empId: String(r[ci('Emp ID')] || ''), email: String(r[ci('Email-ID')] || ''),
                         doj: excelDate(r[ci('DOJ')]), phone: String(r[ci('Phone No')] || ''),
-                        birthday: '', location: ''
+                        birthday: '', location: '', manager
                     });
                     result.designationDistribution[desig || 'Unspecified'] = (result.designationDistribution[desig || 'Unspecified'] || 0) + 1;
                 }
