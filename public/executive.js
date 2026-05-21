@@ -350,19 +350,104 @@ const CHART_LEGEND = { labels: { color: '#94a3b8', font: { size: 11 } } };
 //  TAB: OVERVIEW
 // ══════════════════════════════════════════════════════════════════
 
+function getRmPmAndMemberNames(rmName) {
+    const pmNames = new Set();
+    if (!rmName) return pmNames;
+    pmNames.add(rmName.toLowerCase());
+    const members = (state.data.team?.activeMembers || []).filter(m => m.manager === rmName);
+    members.forEach(m => pmNames.add(m.name.toLowerCase()));
+    return pmNames;
+}
+
+function getRmProjects(rmName) {
+    if (!rmName) return new Set();
+    const pmNames = getRmPmAndMemberNames(rmName);
+    const sowProjects = state.data.sow?.projects || [];
+    const matched = sowProjects.filter(p => p.pm && pmNames.has(p.pm.toLowerCase()));
+    return new Set(matched.map(p => p.projectName.toLowerCase()));
+}
+
 function tabOverview(el) {
-    const s = state.data.summary || {};
-    const poc = state.data.poc?.summary || {};
     const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project');
+
+    // 1. Filter Team Size
+    let members = state.data.team?.activeMembers || [];
+    if (rm) members = members.filter(m => m.manager === rm);
+    if (proj) {
+        const sowProjects = state.data.sow?.projects || [];
+        const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === proj).map(p => p.pm));
+        if (pmNames.length) {
+            members = members.filter(m => pmNames.some(pm => m.name.toLowerCase().includes(pm.toLowerCase()) || pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase())));
+        }
+    }
+    const teamSize = members.length;
+
+    // 2. Filter Active Projects
+    let healthRows = state.data.health || [];
+    if (proj) healthRows = healthRows.filter(p => p.projectName === proj);
+    if (rm) {
+        const rmProjs = getRmProjects(rm);
+        healthRows = healthRows.filter(p => p.projectName && rmProjs.has(p.projectName.toLowerCase()));
+    }
+    const activeProjects = healthRows.length;
+
+    // 3. Filter KPI Met Rate
+    let kpiMetrics = state.data.kpi?.metrics || [];
+    if (proj) kpiMetrics = kpiMetrics.filter(m => (m.project || '').toLowerCase().includes(proj.toLowerCase()));
+    if (month) kpiMetrics = kpiMetrics.filter(m => m.month === month);
+    if (rm) {
+        const rmProjs = getRmProjects(rm);
+        kpiMetrics = kpiMetrics.filter(m => m.project && rmProjs.has(m.project.toLowerCase()));
+    }
+    const metCount = kpiMetrics.filter(m => m.status === 'Met').length;
+    const kpiMetRate = kpiMetrics.length ? Math.round((metCount / kpiMetrics.length) * 100) : null;
+
+    // 4. Filter Avg FTR Rating
+    let qa = state.data.ftr?.qaMetrics || [];
+    if (proj) qa = qa.filter(q => (q.project || '').toLowerCase().includes(proj.toLowerCase()));
+    if (month) qa = qa.filter(q => monthLabel(q.qaDate) === month);
+    if (rm) {
+        const rmProjs = getRmProjects(rm);
+        qa = qa.filter(q => q.project && rmProjs.has(q.project.toLowerCase()));
+    }
+    const ftrAvgRating = qa.length ? Math.round(qa.reduce((s, q) => s + (q.passRate || 0), 0) / qa.length) : null;
+
+    // 5. Filter On Leave Today
+    let onTodayLeaves = state.data.leave?.currentMonth?.onLeaveToday || [];
+    if (rm) {
+        const teamNames = new Set(members.map(m => m.name.toLowerCase()));
+        onTodayLeaves = onTodayLeaves.filter(l => teamNames.has(l.name.toLowerCase()));
+    }
+    if (proj && !rm) {
+        const teamNames = new Set(members.map(m => m.name.toLowerCase()));
+        onTodayLeaves = onTodayLeaves.filter(l => teamNames.has(l.name.toLowerCase()));
+    }
+    const onLeaveToday = onTodayLeaves.length;
+
+    // 6. Filter Active Risks
+    let risks = (state.data.gov?.risks || []).filter(r => (r.status || '').toLowerCase() === 'ongoing');
+    if (proj) risks = risks.filter(r => r.project === proj);
+    if (month) risks = risks.filter(r => r.month === month);
+    if (rm) {
+        const rmProjs = getRmProjects(rm);
+        risks = risks.filter(r => r.project && rmProjs.has(r.project.toLowerCase()));
+    }
+    const activeRisks = risks.length;
+
+    // 7. PoC Use Cases
+    let pocs = state.data.poc?.pocs || [];
+    if (rm) pocs = pocs.filter(p => p.manager === rm);
+    const pocTotal = pocs.length;
+
     el.innerHTML = `
         <div class="kpi-row">
-            ${statCard('👥', s.teamSize || 0, 'Team Size')}
-            ${statCard('📂', s.activeProjects || 0, 'Active Projects')}
-            ${statCard('🎯', s.kpiMetRate ? s.kpiMetRate + '%' : '—', 'KPI Met Rate')}
-            ${statCard('✅', s.ftrAvgRating ? s.ftrAvgRating + '%' : '—', 'Avg FTR Rating')}
-            ${statCard('🏖️', s.onLeaveToday || 0, 'On Leave Today', 'kpi-card-alert')}
-            ${statCard('⚠️', s.activeRisks || 0, 'Active Risks', 'kpi-card-alert')}
-            ${statCard('🧪', poc.total || 0, 'PoC Use Cases')}
+            ${statCard('👥', teamSize, 'Team Size')}
+            ${statCard('📂', activeProjects, 'Active Projects')}
+            ${statCard('🎯', kpiMetRate != null ? kpiMetRate + '%' : '—', 'KPI Met Rate')}
+            ${statCard('✅', ftrAvgRating != null ? ftrAvgRating + '%' : '—', 'Avg FTR Rating')}
+            ${statCard('🏖️', onLeaveToday, 'On Leave Today', onLeaveToday > 0 ? 'kpi-card-alert' : '')}
+            ${statCard('⚠️', activeRisks, 'Active Risks', activeRisks > 0 ? 'kpi-card-alert' : '')}
+            ${statCard('🧪', pocTotal, 'PoC Use Cases')}
         </div>
         <div class="grid-2">
             <div class="m-card">${section('🏥 Project Health Snapshot')}<div id="ovHealth"></div></div>
@@ -372,12 +457,12 @@ function tabOverview(el) {
             <div class="m-card">${section('🌟 Recent Highlights')}<div id="ovHL"></div></div>
             <div class="m-card">${section('⬇️ Recent Lowlights')}<div id="ovLL"></div></div>
         </div>`;
-    const pf = proj ? { project: proj } : {};
-    if (month) pf.month = month;
+
+    const pf = { project: proj, month: month, rm: rm };
     widgetProjectHealth($('#ovHealth'), pf, 6);
     widgetRiskList($('#ovRisks'), pf, 6);
-    widgetHighlights($('#ovHL'), 6, proj);
-    widgetLowlights($('#ovLL'), 6, proj);
+    widgetHighlights($('#ovHL'), 6, pf);
+    widgetLowlights($('#ovLL'), 6, pf);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -795,7 +880,13 @@ function tabPoc(el) {
 
 function widgetProjectHealth(el, filter, limit) {
     let rows = state.data.health || [];
-    if (filter && filter.project) rows = rows.filter(p => p.projectName === filter.project);
+    if (filter) {
+        if (filter.project) rows = rows.filter(p => p.projectName === filter.project);
+        if (filter.rm) {
+            const rmProjs = getRmProjects(filter.rm);
+            rows = rows.filter(p => p.projectName && rmProjs.has(p.projectName.toLowerCase()));
+        }
+    }
     if (limit) rows = rows.slice(0, limit);
     el.innerHTML = dataTable(
         ['Project', 'Client', 'PM', 'Status', 'SOW', 'PO', 'Health', 'Notes'],
@@ -810,8 +901,14 @@ function widgetProjectHealth(el, filter, limit) {
 
 function widgetRiskList(el, filter, limit) {
     let risks = (state.data.gov?.risks || []).filter(r => (r.status || '').toLowerCase() === 'ongoing');
-    if (filter && filter.project) risks = risks.filter(r => r.project === filter.project);
-    if (filter && filter.month) risks = risks.filter(r => r.month === filter.month);
+    if (filter) {
+        if (filter.project) risks = risks.filter(r => r.project === filter.project);
+        if (filter.month) risks = risks.filter(r => r.month === filter.month);
+        if (filter.rm) {
+            const rmProjs = getRmProjects(filter.rm);
+            risks = risks.filter(r => r.project && rmProjs.has(r.project.toLowerCase()));
+        }
+    }
     if (limit) risks = risks.slice(0, limit);
     if (!risks.length) { el.innerHTML = '<div class="empty-note">No active risks. ✅</div>'; return; }
     el.innerHTML = risks.map(r => `
@@ -823,9 +920,20 @@ function widgetRiskList(el, filter, limit) {
         </div>`).join('');
 }
 
-function widgetHighlights(el, limit, project) {
+function widgetHighlights(el, limit, filter) {
     let items = (state.data.gov?.highlights || []).filter(h => h.highlight);
-    if (project) items = items.filter(h => h.project === project);
+    if (filter) {
+        if (typeof filter === 'string') {
+            items = items.filter(h => h.project === filter);
+        } else {
+            if (filter.project) items = items.filter(h => h.project === filter.project);
+            if (filter.month) items = items.filter(h => h.month === filter.month);
+            if (filter.rm) {
+                const rmProjs = getRmProjects(filter.rm);
+                items = items.filter(h => h.project && rmProjs.has(h.project.toLowerCase()));
+            }
+        }
+    }
     items = items.slice(0, limit || 10);
     el.innerHTML = items.length ? items.map(h => `
         <div class="hl-item">
@@ -834,9 +942,20 @@ function widgetHighlights(el, limit, project) {
         </div>`).join('') : '<div class="empty-note">No highlights reported.</div>';
 }
 
-function widgetLowlights(el, limit, project) {
+function widgetLowlights(el, limit, filter) {
     let items = (state.data.gov?.lowlights || []).filter(h => h.lowlight);
-    if (project) items = items.filter(h => h.project === project);
+    if (filter) {
+        if (typeof filter === 'string') {
+            items = items.filter(h => h.project === filter);
+        } else {
+            if (filter.project) items = items.filter(h => h.project === filter.project);
+            if (filter.month) items = items.filter(h => h.month === filter.month);
+            if (filter.rm) {
+                const rmProjs = getRmProjects(filter.rm);
+                items = items.filter(h => h.project && rmProjs.has(h.project.toLowerCase()));
+            }
+        }
+    }
     items = items.slice(0, limit || 10);
     el.innerHTML = items.length ? items.map(h => `
         <div class="hl-item ll-item">
