@@ -384,31 +384,48 @@ function getRmProjects(rmName) {
     return new Set(matched.map(p => p.projectName.toLowerCase()));
 }
 
+// PMs running the given client's projects.
+function pmsForClient(client) {
+    if (!client) return [];
+    const clientProjs = getClientProjects(client);
+    const sowProjects = state.data.sow?.projects || [];
+    return uniqueSorted(sowProjects
+        .filter(p => p.projectName && clientProjs.has(p.projectName.toLowerCase()))
+        .map(p => p.pm));
+}
+
+// PMs running a specific project.
+function pmsForProject(projectName) {
+    if (!projectName) return [];
+    const sowProjects = state.data.sow?.projects || [];
+    return uniqueSorted(sowProjects
+        .filter(p => p.projectName === projectName)
+        .map(p => p.pm));
+}
+
+// Members under the given PMs — the PM themselves or anyone reporting to
+// them. Returns [] when pmNames is empty so an unresolved filter shows
+// nothing rather than the whole team.
+function membersForPMs(members, pmNames) {
+    const pms = pmNames.filter(Boolean).map(p => p.toLowerCase().trim());
+    if (!pms.length) return [];
+    return members.filter(m => {
+        const nm = (m.name || '').toLowerCase().trim();
+        const mgr = (m.manager || '').toLowerCase().trim();
+        return pms.some(pm =>
+            nm === pm || mgr === pm ||
+            (nm && (nm.includes(pm) || pm.includes(nm))));
+    });
+}
+
 function tabOverview(el) {
     const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project'), client = getFilter('client');
 
     // 1. Filter Team Size
     let members = state.data.team?.activeMembers || [];
     if (rm) members = members.filter(m => m.manager === rm);
-    if (client) {
-        const clientProjs = getClientProjects(client);
-        const sowProjects = state.data.sow?.projects || [];
-        const pmNames = uniqueSorted(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => p.pm));
-        if (pmNames.length) {
-            members = members.filter(m => pmNames.some(pm => 
-                m.name.toLowerCase().includes(pm.toLowerCase()) || 
-                pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
-                (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
-            ));
-        }
-    }
-    if (proj) {
-        const sowProjects = state.data.sow?.projects || [];
-        const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === proj).map(p => p.pm));
-        if (pmNames.length) {
-            members = members.filter(m => pmNames.some(pm => m.name.toLowerCase().includes(pm.toLowerCase()) || pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase())));
-        }
-    }
+    if (client) members = membersForPMs(members, pmsForClient(client));
+    if (proj) members = membersForPMs(members, pmsForProject(proj));
     const teamSize = members.length;
 
     // 2. Filter Active Projects
@@ -473,15 +490,12 @@ function tabOverview(el) {
     let pocs = state.data.poc?.pocs || [];
     if (rm) pocs = pocs.filter(p => p.manager === rm);
     if (client) {
-        const clientProjs = getClientProjects(client);
-        const sowProjects = state.data.sow?.projects || [];
-        const pmNames = new Set(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => (p.pm || '').toLowerCase()));
-        pocs = pocs.filter(p => p.manager && pmNames.has(p.manager.toLowerCase()));
+        const pmSet = new Set(pmsForClient(client).map(n => n.toLowerCase()));
+        pocs = pocs.filter(p => p.manager && pmSet.has(p.manager.toLowerCase()));
     }
     if (proj) {
-        const sowProjects = state.data.sow?.projects || [];
-        const pmNames = new Set(sowProjects.filter(p => p.projectName === proj).map(p => (p.pm || '').toLowerCase()));
-        pocs = pocs.filter(p => p.manager && pmNames.has(p.manager.toLowerCase()));
+        const pmSet = new Set(pmsForProject(proj).map(n => n.toLowerCase()));
+        pocs = pocs.filter(p => p.manager && pmSet.has(p.manager.toLowerCase()));
     }
     const pocTotal = pocs.length;
 
@@ -523,26 +537,8 @@ function tabTeam(el) {
     if (office) members = members.filter(m => m.location === office);
     if (designation) members = members.filter(m => m.designation === designation);
     if (rm) members = members.filter(m => m.manager === rm);
-    if (client) {
-        const clientProjs = getClientProjects(client);
-        const sowProjects = state.data.sow?.projects || [];
-        const pmNames = uniqueSorted(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => p.pm));
-        if (pmNames.length) {
-            members = members.filter(m => pmNames.some(pm => 
-                m.name.toLowerCase().includes(pm.toLowerCase()) || 
-                pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
-                (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
-            ));
-        }
-    }
-    if (proj) {
-        // Cross-reference with SOW projects: find PMs for that project, show their team
-        const sowProjects = state.data.sow?.projects || [];
-        const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === proj).map(p => p.pm));
-        if (pmNames.length) {
-            members = members.filter(m => pmNames.some(pm => m.name.toLowerCase().includes(pm.toLowerCase()) || pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase())));
-        }
-    }
+    if (client) members = membersForPMs(members, pmsForClient(client));
+    if (proj) members = membersForPMs(members, pmsForProject(proj));
 
     const desigDist = {};
     members.forEach(m => { desigDist[m.designation || 'Unknown'] = (desigDist[m.designation || 'Unknown'] || 0) + 1; });
@@ -846,17 +842,7 @@ function tabLeave(el) {
     // Get team members filtered by RM and project for filtering leave data
     let teamMembers = state.data.team?.activeMembers || [];
     if (rm) teamMembers = teamMembers.filter(m => m.manager === rm);
-    if (proj) {
-        const sowProjects = state.data.sow?.projects || [];
-        const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === proj).map(p => p.pm));
-        if (pmNames.length) {
-            teamMembers = teamMembers.filter(m => pmNames.some(pm => 
-                m.name.toLowerCase().includes(pm.toLowerCase()) || 
-                pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
-                (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
-            ));
-        }
-    }
+    if (proj) teamMembers = membersForPMs(teamMembers, pmsForProject(proj));
     const teamNameSet = (rm || proj) ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
 
     let onToday = cm.onLeaveToday || [];
@@ -1164,29 +1150,8 @@ function widgetTopLeaveTakers(el, filter) {
     let teamMembers = state.data.team?.activeMembers || [];
     if (filter) {
         if (filter.rm) teamMembers = teamMembers.filter(m => m.manager === filter.rm);
-        if (filter.client) {
-            const clientProjs = getClientProjects(filter.client);
-            const sowProjects = state.data.sow?.projects || [];
-            const pmNames = uniqueSorted(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => p.pm));
-            if (pmNames.length) {
-                teamMembers = teamMembers.filter(m => pmNames.some(pm => 
-                    m.name.toLowerCase().includes(pm.toLowerCase()) || 
-                    pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
-                    (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
-                ));
-            }
-        }
-        if (filter.project) {
-            const sowProjects = state.data.sow?.projects || [];
-            const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === filter.project).map(p => p.pm));
-            if (pmNames.length) {
-                teamMembers = teamMembers.filter(m => pmNames.some(pm => 
-                    m.name.toLowerCase().includes(pm.toLowerCase()) || 
-                    pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
-                    (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
-                ));
-            }
-        }
+        if (filter.client) teamMembers = membersForPMs(teamMembers, pmsForClient(filter.client));
+        if (filter.project) teamMembers = membersForPMs(teamMembers, pmsForProject(filter.project));
     }
     const teamNameSet = (filter && (filter.rm || filter.project || filter.client)) ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
     
@@ -1208,29 +1173,8 @@ function widgetLeaveImpact(el, filter) {
     let teamMembers = state.data.team?.activeMembers || [];
     if (filter) {
         if (filter.rm) teamMembers = teamMembers.filter(m => m.manager === filter.rm);
-        if (filter.client) {
-            const clientProjs = getClientProjects(filter.client);
-            const sowProjects = state.data.sow?.projects || [];
-            const pmNames = uniqueSorted(sowProjects.filter(p => clientProjs.has(p.projectName.toLowerCase())).map(p => p.pm));
-            if (pmNames.length) {
-                teamMembers = teamMembers.filter(m => pmNames.some(pm => 
-                    m.name.toLowerCase().includes(pm.toLowerCase()) || 
-                    pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
-                    (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
-                ));
-            }
-        }
-        if (filter.project) {
-            const sowProjects = state.data.sow?.projects || [];
-            const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === filter.project).map(p => p.pm));
-            if (pmNames.length) {
-                teamMembers = teamMembers.filter(m => pmNames.some(pm => 
-                    m.name.toLowerCase().includes(pm.toLowerCase()) || 
-                    pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase()) ||
-                    (m.manager && pmNames.some(pName => m.manager.toLowerCase().includes(pName.toLowerCase())))
-                ));
-            }
-        }
+        if (filter.client) teamMembers = membersForPMs(teamMembers, pmsForClient(filter.client));
+        if (filter.project) teamMembers = membersForPMs(teamMembers, pmsForProject(filter.project));
     }
     const teamNameSet = (filter && (filter.rm || filter.project || filter.client)) ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
     
