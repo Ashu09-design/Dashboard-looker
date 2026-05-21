@@ -153,7 +153,8 @@ const TAB_FILTERS = {
 function getClientProjects(clientName) {
     if (!clientName) return new Set();
     const sowProjects = state.data.sow?.projects || [];
-    const matched = sowProjects.filter(p => p.client && p.client.toLowerCase() === clientName.toLowerCase());
+    const matched = sowProjects.filter(p => p.client && p.projectName &&
+        p.client.toLowerCase() === clientName.toLowerCase());
     const projectNames = new Set(matched.map(p => p.projectName.toLowerCase()));
     
     const kpiMetrics = state.data.kpi?.metrics || [];
@@ -379,7 +380,7 @@ function getRmProjects(rmName) {
     if (!rmName) return new Set();
     const pmNames = getRmPmAndMemberNames(rmName);
     const sowProjects = state.data.sow?.projects || [];
-    const matched = sowProjects.filter(p => p.pm && pmNames.has(p.pm.toLowerCase()));
+    const matched = sowProjects.filter(p => p.pm && p.projectName && pmNames.has(p.pm.toLowerCase()));
     return new Set(matched.map(p => p.projectName.toLowerCase()));
 }
 
@@ -695,10 +696,12 @@ function tabKpis(el) {
     }
 
     const totalMetrics = metrics.length;
-    const metCount = metrics.filter(m =>
-        m.status.toLowerCase().includes('met') || m.status.toLowerCase().includes('achieved') ||
-        m.status.toLowerCase().includes('green') || (m.actual >= m.target && m.target > 0)
-    ).length;
+    const metCount = metrics.filter(m => {
+        const s = (m.status || '').toLowerCase();
+        if (s.includes('not') || s.includes('miss')) return false;
+        return s === 'met' || s.includes('achieved') || s.includes('green') ||
+            (m.actual >= m.target && m.target > 0);
+    }).length;
     const metRate = totalMetrics > 0 ? Math.round((metCount / totalMetrics) * 100) : 0;
 
     let scRows = kpi.scorecardProjects || [];

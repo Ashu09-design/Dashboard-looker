@@ -384,36 +384,41 @@ function computeProjectHealth() {
     const govData = cache.governance;
     const kpiData = cache.kpi;
 
-    if (!sowData) return [];
+    if (!sowData || !Array.isArray(sowData.projects)) return [];
 
     return sowData.projects.map(p => {
         let health = 'Green';
         let reasons = [];
 
+        const sowStatus = (p.sowStatus || '').toLowerCase();
+        const poStatus = (p.poStatus || '').toLowerCase();
+        const projectStatus = (p.projectStatus || '').toLowerCase();
+        const projectName = (p.projectName || '').toLowerCase();
+
         // Check SOW/PO status
-        if (p.sowStatus.toLowerCase() !== 'received') {
+        if (sowStatus !== 'received') {
             health = 'Amber';
             reasons.push('SOW pending');
         }
-        if (p.poStatus.toLowerCase() !== 'received' && p.poStatus.toLowerCase() !== 'ytr') {
+        if (poStatus !== 'received' && poStatus !== 'ytr') {
             health = 'Amber';
             reasons.push('PO pending');
         }
 
         // Check risks
-        if (govData) {
+        if (govData && Array.isArray(govData.risks)) {
             const projectRisks = govData.risks.filter(r =>
-                r.project.toLowerCase() === p.projectName.toLowerCase() &&
-                r.status.toLowerCase() === 'ongoing'
+                (r.project || '').toLowerCase() === projectName &&
+                (r.status || '').toLowerCase() === 'ongoing'
             );
             if (projectRisks.length > 0) {
-                health = projectRisks.some(r => r.impact.toLowerCase().includes('loss')) ? 'Red' : 'Amber';
+                health = projectRisks.some(r => (r.impact || '').toLowerCase().includes('loss')) ? 'Red' : 'Amber';
                 reasons.push(`${projectRisks.length} active risk(s)`);
             }
         }
 
         // Check project status
-        if (p.projectStatus.toLowerCase() === 'yet to start') {
+        if (projectStatus === 'yet to start') {
             health = 'Amber';
             reasons.push('Not yet started');
         }
@@ -443,13 +448,13 @@ function computeSummary() {
     const gov = cache.governance;
 
     return {
-        teamSize: team ? team.totalHeadcount : 0,
-        activeProjects: sow ? sow.summary.activeProjects : 0,
-        totalSOWValue: sow ? sow.summary.totalSOWValue : 0,
-        kpiMetRate: kpi ? kpi.summary.metRate : 0,
-        ftrAvgRating: ftr ? ftr.summary.avgRating : 0,
-        onLeaveToday: leave && leave.currentMonth ? leave.currentMonth.onLeaveToday.length : 0,
-        activeRisks: gov ? gov.summary.activeRisks : 0,
+        teamSize: team?.totalHeadcount || 0,
+        activeProjects: sow?.summary?.activeProjects || 0,
+        totalSOWValue: sow?.summary?.totalSOWValue || 0,
+        kpiMetRate: kpi?.summary?.metRate || 0,
+        ftrAvgRating: ftr?.summary?.avgRating || 0,
+        onLeaveToday: leave?.currentMonth?.onLeaveToday?.length || 0,
+        activeRisks: gov?.summary?.activeRisks || 0,
         lastRefresh: cache.lastRefresh,
     };
 }
