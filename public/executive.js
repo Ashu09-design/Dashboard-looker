@@ -1,18 +1,26 @@
 /* ═══════════════════════════════════════════════════════════════
    Manager Dashboard — Tabbed Curated Views (executive.js)
+   Embedded inside the Daily Standup page (index.html).
+   Wrapped in an IIFE so nothing collides with app.js globals.
+   Exposes: window.ManagerDash = { open, close }
    ═══════════════════════════════════════════════════════════════ */
+
+(function () {
+'use strict';
 
 const TOKEN_KEY = 'exec_token';
 const REFRESH_MS = 5 * 60 * 1000;
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
 
-// ── Global state ──────────────────────────────────────────────────
+// ── Module state ──────────────────────────────────────────────────
 const state = {
-    data: {},          // summary, kpi, sow, gov, leave, ftr, health, team, poc
+    data: {},
     activeTab: 'overview',
-    filters: {},       // per-tab filter values
-    charts: {},        // live Chart.js instances
+    filters: {},
+    charts: {},
+    bound: false,
+    intervalId: null,
 };
 
 const TABS = [
@@ -28,42 +36,36 @@ const TABS = [
 ];
 
 // ══════════════════════════════════════════════════════════════════
-//  INIT
+//  PUBLIC API
 // ══════════════════════════════════════════════════════════════════
 
-document.addEventListener('DOMContentLoaded', () => {
-    checkAuth();
-    bindUI();
+function open() {
+    if (!state.bound) { bindUI(); state.bound = true; }
     renderTabNav();
     fetchAllExecData();
-    setInterval(fetchAllExecData, REFRESH_MS);
-});
+    if (!state.intervalId) state.intervalId = setInterval(fetchAllExecData, REFRESH_MS);
+}
+
+function close() {
+    if (state.intervalId) { clearInterval(state.intervalId); state.intervalId = null; }
+    destroyCharts();
+}
+
+window.ManagerDash = { open, close };
 
 // ══════════════════════════════════════════════════════════════════
-//  AUTH
+//  AUTH HELPERS
 // ══════════════════════════════════════════════════════════════════
 
 function getToken() { return sessionStorage.getItem(TOKEN_KEY); }
-
-async function checkAuth() {
-    const token = getToken();
-    if (!token) { window.location.href = '/login.html'; return; }
-    try {
-        const res = await fetch('/api/auth/verify', { headers: { Authorization: 'Bearer ' + token } });
-        if (!res.ok) throw new Error('Unauthorized');
-    } catch {
-        sessionStorage.removeItem(TOKEN_KEY);
-        window.location.href = '/login.html';
-    }
-}
 
 function authHeaders() {
     return { Authorization: 'Bearer ' + getToken(), 'Content-Type': 'application/json' };
 }
 
-function logout() {
-    sessionStorage.removeItem(TOKEN_KEY);
-    window.location.href = '/login.html';
+function onUnauthorized() {
+    close();
+    document.getElementById('btnExecLogout')?.click();
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -95,19 +97,19 @@ async function fetchAllExecData() {
         renderTab();
     } catch (err) {
         console.error('Manager dashboard fetch error:', err);
-        if (err.message && err.message.includes('401')) logout();
+        if (err.message && err.message.includes('401')) { onUnauthorized(); return; }
     }
     showLoading(false);
 }
 
 function showLoading(show) {
-    const el = $('#loadingOverlay');
+    const el = $('#mdLoading');
     if (!el) return;
     el.classList.toggle('hidden', !show);
 }
 
 function updateTimestamp() {
-    const el = $('#execLastUpdated');
+    const el = $('#mdUpdated');
     if (el) el.textContent = 'Updated: ' + new Date().toLocaleTimeString();
 }
 
@@ -117,6 +119,7 @@ function updateTimestamp() {
 
 function renderTabNav() {
     const nav = $('#tabNav');
+    if (!nav) return;
     nav.innerHTML = TABS.map(t =>
         `<button class="tab-link ${t.id === state.activeTab ? 'active' : ''}" data-tab="${t.id}">
             <span class="tab-ico">${t.icon}</span>${esc(t.label)}
@@ -126,7 +129,7 @@ function renderTabNav() {
             state.activeTab = btn.dataset.tab;
             renderTabNav();
             renderTab();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            $('#execSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
 }
@@ -135,7 +138,6 @@ function renderTabNav() {
 //  FILTER BAR
 // ══════════════════════════════════════════════════════════════════
 
-// Which filters apply to each tab
 const TAB_FILTERS = {
     team: ['office', 'role'],
     projects: ['project'],
@@ -188,6 +190,7 @@ const FILTER_LABELS = {
 
 function renderFilterBar() {
     const bar = $('#filterBar');
+    if (!bar) return;
     const keys = TAB_FILTERS[state.activeTab] || [];
     if (keys.length === 0) { bar.innerHTML = ''; bar.classList.add('hidden'); return; }
     bar.classList.remove('hidden');
@@ -231,6 +234,7 @@ function renderTab() {
     renderFilterBar();
     destroyCharts();
     const el = $('#tabContent');
+    if (!el) return;
     el.innerHTML = '';
     const fn = {
         overview: tabOverview, team: tabTeam, projects: tabProjects, sow: tabSow,
@@ -250,10 +254,6 @@ function destroyCharts() {
 
 function section(title, sub) {
     return `<div class="sec-head"><h2>${title}</h2>${sub ? `<span class="sec-sub">${esc(sub)}</span>` : ''}</div>`;
-}
-
-function card(inner, cls) {
-    return `<div class="m-card ${cls || ''}">${inner}</div>`;
 }
 
 function statCard(icon, value, label, cls) {
@@ -308,7 +308,7 @@ function chartCanvas(id) { return `<canvas id="${id}"></canvas>`; }
 
 function makeChart(id, config) {
     const ctx = document.getElementById(id);
-    if (!ctx) return;
+    if (!ctx || typeof Chart === 'undefined') return;
     state.charts[id] = new Chart(ctx, config);
 }
 
@@ -350,7 +350,7 @@ function tabOverview(el) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  TAB: TEAM DETAILS  (roster + office mapping; no project widgets)
+//  TAB: TEAM DETAILS
 // ══════════════════════════════════════════════════════════════════
 
 function tabTeam(el) {
@@ -517,7 +517,7 @@ function tabKpis(el) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  TAB: FTR  (FTR details only — client & month wise)
+//  TAB: FTR
 // ══════════════════════════════════════════════════════════════════
 
 function tabFtr(el) {
@@ -561,7 +561,7 @@ function tabFtr(el) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  TAB: LEAVE  (leave details only — month wise)
+//  TAB: LEAVE
 // ══════════════════════════════════════════════════════════════════
 
 function tabLeave(el) {
@@ -594,17 +594,15 @@ function tabLeave(el) {
         { empty: 'No leave records for the current month.' }
     );
 
-    let months = leave.months || [];
-    const mf = getFilter('month');
     $('#lvMonths').innerHTML = dataTable(
         ['Month Sheet', 'Year'],
-        months.map(m => [esc(m.sheet), esc(m.year)]),
+        (leave.months || []).map(m => [esc(m.sheet), esc(m.year)]),
         { empty: 'No month sheets found.', note: 'Leave file is tracked per monthly sheet; per-person detail is available for the current month above.' }
     );
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  TAB: ACTIVE RISKS  (risk details only — client & month wise)
+//  TAB: ACTIVE RISKS
 // ══════════════════════════════════════════════════════════════════
 
 function tabRisks(el) {
@@ -618,10 +616,8 @@ function tabRisks(el) {
         <div class="m-card">${section('📊 Risks — Project-wise & Monthly', 'Count of risk records')}<div id="rkPivot"></div></div>
         <div class="m-card">${section('⚠️ Risk Details')}<div id="rkList"></div></div>`;
 
-    // pivot project x month
-    let rks = risks;
     const proj = getFilter('project'), month = getFilter('month');
-    let pv = rks;
+    let pv = risks;
     if (proj) pv = pv.filter(r => r.project === proj);
     if (month) pv = pv.filter(r => r.month === month);
     const rowKeys = uniqueSorted(pv.map(r => r.project || 'Unknown'));
@@ -751,9 +747,9 @@ function widgetLowlights(el, limit, project) {
 function widgetUtilTrendChart(canvasId) {
     const trend = state.data.gov?.fteTrend || [];
     if (!trend.length) {
-        document.getElementById(canvasId)?.closest('.m-card')
-            ?.querySelector('canvas')?.replaceWith(Object.assign(document.createElement('div'),
-                { className: 'empty-note', textContent: 'No FTE trend data.' }));
+        const c = document.getElementById(canvasId);
+        if (c) c.replaceWith(Object.assign(document.createElement('div'),
+            { className: 'empty-note', textContent: 'No FTE trend data.' }));
         return;
     }
     lineChart(canvasId, trend.map(t => t.month), trend.map(t => t.totalFTE), 'Total FTE');
@@ -833,7 +829,6 @@ function widgetKpiUtilPivot(el) {
 function widgetFtrReport(el) {
     const qa = state.data.ftr?.qaMetrics || [];
     const accounts = (state.data.ftr?.accounts || []).map(a => a.account);
-    // map each qa record to a client by substring match
     function clientOf(project) {
         const lp = (project || '').toLowerCase();
         const hit = accounts.find(a => a && lp.includes(a.toLowerCase()));
@@ -934,42 +929,31 @@ function doughnutChart(id, labels, data) {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  UI BINDINGS
+//  UI BINDINGS — manager toolbar + data-source modal
 // ══════════════════════════════════════════════════════════════════
 
 function bindUI() {
-    $('#btnExecRefresh').addEventListener('click', () => {
-        const btn = $('#btnExecRefresh');
+    $('#mdRefresh')?.addEventListener('click', () => {
+        const btn = $('#mdRefresh');
         btn.classList.add('refreshing');
         fetchAllExecData().then(() => setTimeout(() => btn.classList.remove('refreshing'), 800));
     });
-    $('#btnLogout').addEventListener('click', logout);
-    $('#btnExecPresent').addEventListener('click', () => togglePresent(true));
-    $('#exitExecPresent').addEventListener('click', () => togglePresent(false));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') togglePresent(false); });
-    $('#btnExecPrint').addEventListener('click', () => window.print());
-    $('#btnExecSources').addEventListener('click', () => $('#execSourceModal').classList.remove('hidden'));
-    $('#closeExecModal').addEventListener('click', () => $('#execSourceModal').classList.add('hidden'));
-    $('#execSourceModal').addEventListener('click', e => {
-        if (e.target === $('#execSourceModal')) $('#execSourceModal').classList.add('hidden');
+    $('#mdPrint')?.addEventListener('click', () => window.print());
+    $('#mdSources')?.addEventListener('click', () => $('#mdSourceModal')?.classList.remove('hidden'));
+    $('#mdCloseModal')?.addEventListener('click', () => $('#mdSourceModal')?.classList.add('hidden'));
+    $('#mdSourceModal')?.addEventListener('click', e => {
+        if (e.target === $('#mdSourceModal')) $('#mdSourceModal').classList.add('hidden');
     });
-    $$('.tab-btn').forEach(btn => {
+    $$('#mdSourceModal .tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            $$('.tab-btn').forEach(b => b.classList.remove('active'));
-            $$('.exec-modal .tab-content').forEach(c => c.classList.remove('active'));
+            $$('#mdSourceModal .tab-btn').forEach(b => b.classList.remove('active'));
+            $$('#mdSourceModal .tab-content').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
-            $(`#tab${capitalize(btn.dataset.tab)}`).classList.add('active');
+            $(`#tab${capitalize(btn.dataset.tab)}`)?.classList.add('active');
         });
     });
-    $('#btnUploadAll').addEventListener('click', uploadFiles);
-    $('#btnConnectUrls').addEventListener('click', connectUrls);
-}
-
-function togglePresent(on) {
-    document.body.classList.toggle('exec-present-mode', on);
-    $('#execPresentBar').classList.toggle('hidden', !on);
-    if (on) document.documentElement.requestFullscreen?.().catch(() => {});
-    else if (document.fullscreenElement) document.exitFullscreen?.();
+    $('#mdUploadAll')?.addEventListener('click', uploadFiles);
+    $('#mdConnectUrls')?.addEventListener('click', connectUrls);
 }
 
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -1003,7 +987,7 @@ async function uploadFiles() {
         if (data.success) {
             statusEl.className = 'source-status-box success';
             statusEl.textContent = '✓ ' + data.message;
-            setTimeout(() => { fetchAllExecData(); $('#execSourceModal').classList.add('hidden'); }, 1200);
+            setTimeout(() => { fetchAllExecData(); $('#mdSourceModal').classList.add('hidden'); }, 1200);
         } else {
             statusEl.className = 'source-status-box error';
             statusEl.textContent = '✗ ' + (data.error || 'Upload failed');
@@ -1041,7 +1025,7 @@ async function connectUrls() {
         if (data.success) {
             statusEl.className = 'source-status-box success';
             statusEl.textContent = '✓ ' + data.message;
-            setTimeout(() => { fetchAllExecData(); $('#execSourceModal').classList.add('hidden'); }, 1200);
+            setTimeout(() => { fetchAllExecData(); $('#mdSourceModal').classList.add('hidden'); }, 1200);
         } else {
             statusEl.className = 'source-status-box error';
             statusEl.textContent = '✗ ' + (data.error || 'Connection failed');
@@ -1063,11 +1047,6 @@ function esc(str) {
     return d.innerHTML;
 }
 
-function truncate(str, len) {
-    if (!str) return '';
-    return str.length > len ? str.slice(0, len) + '…' : str;
-}
-
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function monthLabel(dateStr) {
@@ -1078,3 +1057,5 @@ function monthLabel(dateStr) {
     if (!isNaN(d.getTime())) return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
     return 'Unknown';
 }
+
+})();

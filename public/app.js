@@ -604,6 +604,7 @@ function execLogout() {
     document.getElementById('main-footer').style.display = '';
     document.querySelectorAll('.phase1-only').forEach(el => el.style.display = '');
     document.querySelector('#main-header h1').textContent = 'Digital Enablement Team - Daily Standup Updates';
+    if (window.ManagerDash) window.ManagerDash.close();
 }
 
 function showExecDashboard() {
@@ -611,12 +612,12 @@ function showExecDashboard() {
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('main-footer').style.display = 'none';
     document.querySelectorAll('.phase1-only').forEach(el => el.style.display = 'none');
-    // Show exec
+    // Show the merged manager dashboard
     document.getElementById('execSection').style.display = 'block';
     document.getElementById('btnManagerLogin').style.display = 'none';
     document.getElementById('btnExecLogout').style.display = '';
-    document.querySelector('#main-header h1').textContent = 'Executive Dashboard — Strategic Overview';
-    fetchExecData();
+    document.querySelector('#main-header h1').textContent = 'Manager Dashboard — Strategic Overview';
+    if (window.ManagerDash) window.ManagerDash.open();
 }
 
 // ── Fetch all executive data ─────────────────────────────────────

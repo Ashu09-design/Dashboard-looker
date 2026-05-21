@@ -11,7 +11,10 @@
     padding: 0;
 }
 
-:root {
+/* Manager-dashboard CSS variables — scoped so they never leak into the
+   standup page (styles.css owns the global :root / body). */
+#execSection,
+.exec-modal-overlay {
     --bg: #0f172a;
     --bg-card: #1e293b;
     --bg-card-hover: #253449;
@@ -32,11 +35,7 @@
     --sidebar-w: 260px;
 }
 
-html {
-    font-size: 13px;
-}
-
-body {
+#execSection {
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
@@ -1468,4 +1467,51 @@ canvas {
         padding-left: 12px;
         padding-right: 12px;
     }
+}
+
+/* ── Manager dashboard toolbar (embedded in standup page) ── */
+.md-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #0c1524, #14213a);
+    border-bottom: 1px solid var(--border);
+}
+
+.md-toolbar-left h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.md-toolbar-left .md-sub {
+    font-size: .74rem;
+    color: var(--text-sec);
+}
+
+.md-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#mdUpdated {
+    font-size: .72rem;
+    color: var(--text-sec);
+}
+
+#mdLoading {
+    padding: 40px;
+    text-align: center;
+    color: var(--text-sec);
+    font-size: .9rem;
+}
+
+/* Tab nav is not sticky when embedded under the standup header */
+#execSection .tab-nav {
+    position: static;
 }

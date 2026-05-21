@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="executive.css" />
 </head>
 
 <body>
@@ -123,7 +124,7 @@
     </div>
   </div>
 
-  <!-- ════════ MAIN GRID ════════ -->
+  <!-- ════════ MAIN GRID (Daily Standup) ════════ -->
   <main id="dashboard">
 
     <!-- ── LEFT SIDEBAR ── -->
@@ -229,7 +230,7 @@
   <!-- ════════ FOOTER ════════ -->
   <footer id="main-footer">
     <div class="footer-left">
-      <span>Digital Enablement Team Dashboard &copy; 2025</span>
+      <span>Digital Enablement Team Dashboard &copy; 2026</span>
     </div>
     <div class="footer-right">
       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Indegene_Logo.png/220px-Indegene_Logo.png"
@@ -247,7 +248,7 @@
             <path d="M7 11V7a5 5 0 0110 0v4" />
           </svg>
         </div>
-        <h2>Executive Dashboard</h2>
+        <h2>Manager Dashboard</h2>
         <p>Manager-level access required</p>
       </div>
       <div class="login-modal-body">
@@ -264,275 +265,86 @@
     </div>
   </div>
 
-  <!-- ════════ EXECUTIVE DASHBOARD SECTION ════════ -->
+  <!-- ════════ MANAGER DASHBOARD (merged, shown after login) ════════ -->
   <section id="execSection" style="display:none">
-    <div class="exec-divider">
-      <div class="exec-divider-left">
-        <span class="exec-divider-icon">📊</span>
-        <div>
-          <div class="exec-divider-title">Executive Strategic Overview</div>
-          <div class="exec-divider-sub">Real-time insights · <span id="execLastRefresh">—</span></div>
-        </div>
+    <div class="md-toolbar">
+      <div class="md-toolbar-left">
+        <h2>📊 Manager Dashboard</h2>
+        <span class="md-sub">Digital Enablement Team — Strategic Overview</span>
       </div>
-      <div class="exec-divider-actions">
-        <button id="btnExecRefresh" class="exec-action-btn">🔄 Refresh</button>
-        <button id="btnExecSources" class="exec-action-btn">📤 Upload Files</button>
-        <button id="btnExecPrint" class="exec-action-btn">📄 PDF</button>
+      <div class="md-toolbar-right">
+        <button id="mdRefresh" class="exec-btn" title="Refresh data">🔄 Refresh</button>
+        <button id="mdSources" class="exec-btn" title="Configure data sources">📁 Data Sources</button>
+        <button id="mdPrint" class="exec-btn" title="Export as PDF">📄 Export PDF</button>
+        <span id="mdUpdated" class="exec-updated"></span>
       </div>
     </div>
-    <div class="exec-kpi-row">
-      <div class="exec-kpi exec-kpi-cyan" data-kpi="team">
-        <div class="exec-kpi-icon">👥</div>
-        <div class="exec-kpi-info">
-          <div class="exec-kpi-val" id="valTeamSize">—</div>
-          <div class="exec-kpi-lbl">Team Size</div>
-        </div>
-      </div>
-      <div class="exec-kpi exec-kpi-purple" data-kpi="projects">
-        <div class="exec-kpi-icon">📂</div>
-        <div class="exec-kpi-info">
-          <div class="exec-kpi-val" id="valActiveProjects">—</div>
-          <div class="exec-kpi-lbl">Active Projects</div>
-        </div>
-      </div>
-      <div class="exec-kpi exec-kpi-green" data-kpi="sow">
-        <div class="exec-kpi-icon">💰</div>
-        <div class="exec-kpi-info">
-          <div class="exec-kpi-val" id="valSOWValue">—</div>
-          <div class="exec-kpi-lbl">SOW Value</div>
-        </div>
-      </div>
-      <div class="exec-kpi exec-kpi-blue" data-kpi="kpi">
-        <div class="exec-kpi-icon">🎯</div>
-        <div class="exec-kpi-info">
-          <div class="exec-kpi-val" id="valKPIMetRate">—</div>
-          <div class="exec-kpi-lbl">KPI Met Rate</div>
-        </div>
-      </div>
-      <div class="exec-kpi exec-kpi-teal" data-kpi="ftr">
-        <div class="exec-kpi-icon">✅</div>
-        <div class="exec-kpi-info">
-          <div class="exec-kpi-val" id="valFTRRating">—</div>
-          <div class="exec-kpi-lbl">FTR Rating</div>
-        </div>
-      </div>
-      <div class="exec-kpi exec-kpi-amber" data-kpi="leave">
-        <div class="exec-kpi-icon">🏖️</div>
-        <div class="exec-kpi-info">
-          <div class="exec-kpi-val" id="valOnLeave">—</div>
-          <div class="exec-kpi-lbl">On Leave Today</div>
-        </div>
-      </div>
-      <div class="exec-kpi exec-kpi-red" data-kpi="risks">
-        <div class="exec-kpi-icon">⚠️</div>
-        <div class="exec-kpi-info">
-          <div class="exec-kpi-val" id="valActiveRisks">—</div>
-          <div class="exec-kpi-lbl">Active Risks</div>
-        </div>
-      </div>
-      <div class="exec-kpi exec-kpi-pink" data-kpi="highlights">
-        <div class="exec-kpi-icon">📋</div>
-        <div class="exec-kpi-info">
-          <div class="exec-kpi-val" id="valSOWReceived">—</div>
-          <div class="exec-kpi-lbl">SOW Received</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- KPI Detail Panel -->
-    <div id="kpiDetailPanel" class="kpi-detail-panel" style="display:none">
-      <div class="kpi-detail-header">
-        <span id="kpiDetailTitle" class="kpi-detail-title">Detail</span>
-        <button id="kpiDetailClose" class="kpi-detail-close">&times;</button>
-      </div>
-      <div class="kpi-detail-body">
-        <div class="kpi-detail-chart"><canvas id="kpiDetailChart"></canvas></div>
-        <div id="kpiDetailTable" class="kpi-detail-table"></div>
-      </div>
-    </div>
-
-    <div class="exec-charts-grid">
-      <div class="exec-chart-card exec-chart-wide">
-        <div class="exec-chart-hdr"><span>📈 FTE Utilization Trend</span><span
-            class="exec-chart-badge">Governance</span></div><canvas id="chartFTETrend"></canvas>
-      </div>
-      <div class="exec-chart-card">
-        <div class="exec-chart-hdr"><span>🎯 KPI — Target vs Actual</span><span class="exec-chart-badge">KPI</span>
-        </div><canvas id="chartKPI"></canvas>
-      </div>
-    </div>
-    <div class="exec-charts-grid exec-charts-4col">
-      <div class="exec-chart-card">
-        <div class="exec-chart-hdr"><span>📋 SOW/PO Status</span><span class="exec-chart-badge">SOW</span></div><canvas
-          id="chartSOW"></canvas>
-      </div>
-      <div class="exec-chart-card">
-        <div class="exec-chart-hdr"><span>👥 Role Distribution</span><span class="exec-chart-badge">Team</span></div>
-        <canvas id="chartRoles"></canvas>
-      </div>
-      <div class="exec-chart-card">
-        <div class="exec-chart-hdr"><span>✅ QA Rating by Project</span><span class="exec-chart-badge">FTR</span></div>
-        <canvas id="chartQA"></canvas>
-      </div>
-      <div class="exec-chart-card">
-        <div class="exec-chart-hdr"><span>🏖️ Top Leave Takers</span><span class="exec-chart-badge">Leave</span></div>
-        <canvas id="chartLeave"></canvas>
-      </div>
-    </div>
-    <div class="exec-panels-row">
-      <div class="exec-panel">
-        <div class="exec-panel-title">⚠️ Governance & Risk Alerts <span id="riskCount" class="exec-badge-count">0</span>
-        </div>
-        <div id="riskPanelBody" class="exec-panel-body">Loading…</div>
-      </div>
-      <div class="exec-panel">
-        <div class="exec-panel-title">🏖️ Leave Impact — Today & This Month</div>
-        <div id="leavePanelBody" class="exec-panel-body">Loading…</div>
-      </div>
-    </div>
-    <div class="exec-health-section">
-      <div class="exec-health-header">
-        <h3>🏥 Project Health Status</h3>
-        <div class="exec-rag-legend"><span class="exec-rag-g">● Green</span><span class="exec-rag-a">● Amber</span><span
-            class="exec-rag-r">● Red</span></div>
-      </div>
-      <div class="exec-health-wrap">
-        <table class="exec-health-tbl">
-          <thead>
-            <tr>
-              <th>Project</th>
-              <th>Client</th>
-              <th>PM</th>
-              <th>Status</th>
-              <th>SOW</th>
-              <th>PO</th>
-              <th>Health</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody id="healthTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ── TRACKER LINKS ── -->
-    <div class="exec-trackers">
-      <div class="exec-trackers-hdr">
-        <h3>🔗 Tracker Links</h3>
-        <button id="btnAddTracker" class="exec-action-btn">+ Add Tracker</button>
-      </div>
-      <div id="trackerLinksGrid" class="exec-trackers-grid">
-        <a class="exec-tracker-card" href="#" data-key="ftr" target="_blank">
-          <span class="exec-tc-icon">📊</span><span class="exec-tc-name">FTR Tracker</span><span
-            class="exec-tc-url">Click to set link</span>
-        </a>
-        <a class="exec-tracker-card" href="#" data-key="team" target="_blank">
-          <span class="exec-tc-icon">👥</span><span class="exec-tc-name">Team Details</span><span
-            class="exec-tc-url">Click to set link</span>
-        </a>
-        <a class="exec-tracker-card" href="#" data-key="sow" target="_blank">
-          <span class="exec-tc-icon">💰</span><span class="exec-tc-name">SOW & PO Tracker</span><span
-            class="exec-tc-url">Click to set link</span>
-        </a>
-        <a class="exec-tracker-card" href="#" data-key="governance" target="_blank">
-          <span class="exec-tc-icon">📋</span><span class="exec-tc-name">Governance</span><span
-            class="exec-tc-url">Click to set link</span>
-        </a>
-        <a class="exec-tracker-card" href="#" data-key="leave" target="_blank">
-          <span class="exec-tc-icon">🏖️</span><span class="exec-tc-name">Leave Tracker</span><span
-            class="exec-tc-url">Click to set link</span>
-        </a>
-        <a class="exec-tracker-card" href="#" data-key="kpi" target="_blank">
-          <span class="exec-tc-icon">🎯</span><span class="exec-tc-name">KPI Tracker</span><span
-            class="exec-tc-url">Click to set link</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- ── TRACKER EDIT MODAL ── -->
-    <div id="trackerEditModal" class="modal-overlay" style="display:none">
-      <div class="login-modal-card" style="width:420px">
-        <div class="login-modal-header" style="padding:16px 20px 12px">
-          <h2 id="trackerEditTitle">Edit Tracker Link</h2>
-          <p>Set the name and URL for this tracker</p>
-        </div>
-        <div class="login-modal-body">
-          <div class="login-field"><label>Tracker Name</label><input id="trackerEditName" type="text"
-              placeholder="e.g. FTR Tracker" /></div>
-          <div class="login-field"><label>Tracker URL</label><input id="trackerEditUrl" type="url"
-              placeholder="https://sharepoint.com/..." /></div>
-          <button id="trackerEditSave" class="login-submit-btn">Save Link</button>
-        </div>
-        <div class="login-modal-footer"><button id="trackerEditCancel" class="login-cancel-btn">Cancel</button></div>
-      </div>
-    </div>
-
-    <!-- ══════ EXCEL DATA BROWSER ══════ -->
-    <div class="exec-data-browser">
-      <div class="exec-data-browser-hdr">
-        <h3>📂 Excel Data Browser — View All Tabs</h3>
-        <span id="excelBrowserStatus" style="font-size:.75rem;color:#999">Loading…</span>
-      </div>
-      <div class="exec-data-browser-body">
-        <!-- Sidebar: parent/child nav -->
-        <div id="excelNav" class="excel-nav">
-          <!-- dynamically populated -->
-        </div>
-        <!-- Table view -->
-        <div id="excelTableArea" class="excel-table-area">
-          <div class="excel-table-placeholder">← Select a tab from any Excel file to view its data</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="exec-hl-row">
-      <div class="exec-panel">
-        <div class="exec-panel-title">🌟 Recent Highlights</div>
-        <div id="highlightsList" class="exec-panel-body">Loading…</div>
-      </div>
-      <div class="exec-panel">
-        <div class="exec-panel-title">⬇️ Recent Lowlights</div>
-        <div id="lowlightsList" class="exec-panel-body">Loading…</div>
-      </div>
-    </div>
+    <nav id="tabNav" class="tab-nav"></nav>
+    <div id="filterBar" class="filter-bar"></div>
+    <div id="mdLoading" class="hidden">Loading manager data…</div>
+    <div id="tabContent" class="tab-content-area"></div>
   </section>
 
-  <!-- ════════ UPLOAD MODAL ════════ -->
-  <div id="execSourceModal" class="modal-overlay" style="display:none">
-    <div class="exec-upload-modal">
-      <div class="exec-upload-modal-hdr">
-        <h3>📤 Upload Executive Data Files</h3><button id="closeExecSrcModal" class="modal-close-x">&times;</button>
+  <!-- ════════ MANAGER DATA SOURCE MODAL ════════ -->
+  <div id="mdSourceModal" class="exec-modal-overlay hidden">
+    <div class="exec-modal">
+      <div class="exec-modal-header">
+        <h2>📁 Configure Data Sources</h2>
+        <button id="mdCloseModal" class="modal-close-btn">&times;</button>
       </div>
-      <div class="exec-upload-modal-body">
-        <p class="exec-upload-desc">Drop your 6 Excel files below. Only upload the ones you want to update.</p>
-        <form id="uploadForm" class="exec-upload-cards">
-          <label class="exec-upload-card"><span class="exec-uc-icon">📊</span><span class="exec-uc-name">FTR
-              Tracker</span><input type="file" name="ftr" accept=".xlsx,.xlsb,.xls" hidden /><span
-              class="exec-uc-file">No file</span></label>
-          <label class="exec-upload-card"><span class="exec-uc-icon">👥</span><span class="exec-uc-name">Team
-              Details</span><input type="file" name="team" accept=".xlsx,.xlsb,.xls" hidden /><span
-              class="exec-uc-file">No file</span></label>
-          <label class="exec-upload-card"><span class="exec-uc-icon">💰</span><span class="exec-uc-name">SOW &
-              PO</span><input type="file" name="sow" accept=".xlsx,.xlsb,.xls" hidden /><span class="exec-uc-file">No
-              file</span></label>
-          <label class="exec-upload-card"><span class="exec-uc-icon">📋</span><span
-              class="exec-uc-name">Governance</span><input type="file" name="governance" accept=".xlsx,.xlsb,.xls"
-              hidden /><span class="exec-uc-file">No file</span></label>
-          <label class="exec-upload-card"><span class="exec-uc-icon">🏖️</span><span class="exec-uc-name">Leave
-              Tracker</span><input type="file" name="leave" accept=".xlsx,.xlsb,.xls" hidden /><span
-              class="exec-uc-file">No file</span></label>
-          <label class="exec-upload-card"><span class="exec-uc-icon">🎯</span><span
-              class="exec-uc-name">KPI</span><input type="file" name="kpi" accept=".xlsx,.xlsb,.xls" hidden /><span
-              class="exec-uc-file">No file</span></label>
-        </form>
-        <button id="btnUploadAll" class="login-submit-btn" style="width:100%;margin-top:14px">📤 Upload & Refresh All
-          Data</button>
-        <div id="execSrcStatus" class="exec-src-status" style="display:none"></div>
+      <div class="exec-modal-body">
+        <div class="source-tabs">
+          <button class="tab-btn active" data-tab="upload">📤 Upload Files</button>
+          <button class="tab-btn" data-tab="urls">🔗 SharePoint URLs</button>
+        </div>
+        <div id="tabUpload" class="tab-content active">
+          <p class="tab-desc">Upload Excel files for each data source. Supported: .xlsx, .xlsb</p>
+          <form id="uploadForm" class="upload-grid">
+            <div class="upload-field"><label>FTR Tracker</label><input type="file" name="ftr"
+                accept=".xlsx,.xlsb,.xls" /></div>
+            <div class="upload-field"><label>Team Details</label><input type="file" name="team"
+                accept=".xlsx,.xlsb,.xls" /></div>
+            <div class="upload-field"><label>SOW &amp; PO Tracker</label><input type="file" name="sow"
+                accept=".xlsx,.xlsb,.xls" /></div>
+            <div class="upload-field"><label>Governance</label><input type="file" name="governance"
+                accept=".xlsx,.xlsb,.xls" /></div>
+            <div class="upload-field"><label>Leave Tracker</label><input type="file" name="leave"
+                accept=".xlsx,.xlsb,.xls" /></div>
+            <div class="upload-field"><label>KPI</label><input type="file" name="kpi"
+                accept=".xlsx,.xlsb,.xls" /></div>
+            <div class="upload-field"><label>POV / POC Tracker</label><input type="file" name="poc"
+                accept=".xlsx,.xlsb,.xls" /></div>
+          </form>
+          <button id="mdUploadAll" class="exec-btn exec-btn-primary">Upload &amp; Refresh Data</button>
+        </div>
+        <div id="tabUrls" class="tab-content">
+          <p class="tab-desc">Paste SharePoint or OneDrive direct links to each Excel file.</p>
+          <div class="url-grid">
+            <div class="url-field"><label>FTR Tracker</label><input id="urlFtr" type="url"
+                placeholder="https://..." /></div>
+            <div class="url-field"><label>Team Details</label><input id="urlTeam" type="url"
+                placeholder="https://..." /></div>
+            <div class="url-field"><label>SOW &amp; PO Tracker</label><input id="urlSow" type="url"
+                placeholder="https://..." /></div>
+            <div class="url-field"><label>Governance</label><input id="urlGovernance" type="url"
+                placeholder="https://..." /></div>
+            <div class="url-field"><label>Leave Tracker</label><input id="urlLeave" type="url"
+                placeholder="https://..." /></div>
+            <div class="url-field"><label>KPI</label><input id="urlKpi" type="url"
+                placeholder="https://..." /></div>
+            <div class="url-field"><label>POV / POC Tracker</label><input id="urlPoc" type="url"
+                placeholder="https://..." /></div>
+          </div>
+          <button id="mdConnectUrls" class="exec-btn exec-btn-primary">Connect &amp; Refresh Data</button>
+        </div>
+        <div id="execSourceStatus" class="source-status-box hidden"></div>
       </div>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-    <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <script src="executive.js"></script>
 </body>
 
 </html>
