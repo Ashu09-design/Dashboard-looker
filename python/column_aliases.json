@@ -11,6 +11,7 @@
     "phone": ["Phone No:", "Phone No", "Phone", "Mobile", "Contact No", "Phone Number", "Mobile No"],
     "birthday": ["Birthday (Month/date)", "Birthday", "DOB", "Date of Birth", "Birth Date"],
     "location": ["Current residing Location", "Location", "City", "Office Location", "Base Location"],
+    "manager": ["Manager", "Reporting Manager", "RM", "Line Manager", "Reports To"],
     "last_working_day": ["Last Working Day", "LWD", "Exit Date", "Relieving Date", "End Date"]
   },
 

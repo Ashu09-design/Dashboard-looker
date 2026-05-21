@@ -139,14 +139,15 @@ function renderTabNav() {
 // ══════════════════════════════════════════════════════════════════
 
 const TAB_FILTERS = {
-    team: ['office', 'designation'],
-    projects: ['project'],
-    sow: ['client'],
-    kpis: ['client', 'month'],
-    ftr: ['client', 'month'],
-    leave: ['month'],
+    overview: ['rm', 'month', 'project'],
+    team: ['office', 'designation', 'rm', 'project'],
+    projects: ['project', 'month'],
+    sow: ['project', 'startDate', 'endDate'],
+    kpis: ['project', 'kpiMetric'],
+    ftr: ['client', 'month', 'project'],
+    leave: ['rm', 'project'],
     risks: ['project', 'month'],
-    poc: ['pocStatus', 'manager'],
+    poc: ['pocStatus', 'manager', 'spoc'],
 };
 
 function uniqueSorted(arr) {
@@ -162,8 +163,14 @@ function filterOptions(key) {
             return uniqueSorted((d.team?.activeMembers || []).map(m => m.role));
         case 'designation':
             return uniqueSorted((d.team?.activeMembers || []).map(m => m.designation));
+        case 'rm':
+            return uniqueSorted((d.team?.activeMembers || []).map(m => m.manager).filter(Boolean));
         case 'project':
-            return uniqueSorted((d.health || []).map(p => p.projectName));
+            return uniqueSorted([
+                ...(d.health || []).map(p => p.projectName),
+                ...(d.sow?.projects || []).map(p => p.projectName),
+                ...(d.kpi?.scorecardProjects || []).map(p => p.project),
+            ]);
         case 'client':
             return uniqueSorted([
                 ...(d.sow?.projects || []).map(p => p.client),
@@ -173,21 +180,29 @@ function filterOptions(key) {
         case 'month':
             return uniqueSorted([
                 ...(d.kpi?.metrics || []).map(m => m.month),
+                ...(d.kpi?.scorecardProjects || []).map(p => p.month),
                 ...(d.gov?.risks || []).map(r => r.month),
                 ...(d.ftr?.qaMetrics || []).map(q => monthLabel(q.qaDate)),
             ]);
+        case 'kpiMetric':
+            return uniqueSorted(['Timeliness (SLA%)', 'Utilization (Effort %)', 'Quality (FTR %)', 'CSAT (Frequency)', 'CSAT (Rating)', 'Client Training %']);
         case 'pocStatus':
             return uniqueSorted((d.poc?.pocs || []).map(p => p.status));
         case 'manager':
             return uniqueSorted((d.poc?.pocs || []).map(p => p.manager));
+        case 'spoc':
+            return uniqueSorted((d.poc?.pocs || []).map(p => p.spoc).filter(Boolean));
         default:
             return [];
     }
 }
 
 const FILTER_LABELS = {
-    office: '🏢 Office', role: '👤 Role', designation: '👤 Designation', project: '📂 Project', client: '🏷️ Client',
-    month: '📅 Month', pocStatus: '🚦 Status', manager: '👔 Manager',
+    office: '🏢 Office', role: '👤 Role', designation: '👤 Designation', rm: '👔 RM',
+    project: '📂 Project', client: '🏷️ Client',
+    month: '📅 Month', kpiMetric: '📊 KPI Metric',
+    pocStatus: '🚦 Status', manager: '👔 Manager', spoc: '👤 SPOC',
+    startDate: '📅 Start Date', endDate: '📅 End Date',
 };
 
 function renderFilterBar() {
@@ -202,12 +217,17 @@ function renderFilterBar() {
 
     let html = '<span class="filter-bar-label">🔎 Filters:</span>';
     keys.forEach(key => {
-        const opts = filterOptions(key);
-        html += `<label class="filter-ctrl">${FILTER_LABELS[key] || key}
-            <select data-filter="${key}">
-                <option value="">All</option>
-                ${opts.map(o => `<option value="${esc(o)}" ${cur[key] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}
-            </select></label>`;
+        if (key === 'startDate' || key === 'endDate') {
+            html += `<label class="filter-ctrl">${FILTER_LABELS[key] || key}
+                <input type="date" data-filter="${key}" value="${cur[key] || ''}" /></label>`;
+        } else {
+            const opts = filterOptions(key);
+            html += `<label class="filter-ctrl">${FILTER_LABELS[key] || key}
+                <select data-filter="${key}">
+                    <option value="">All</option>
+                    ${opts.map(o => `<option value="${esc(o)}" ${cur[key] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+                </select></label>`;
+        }
     });
     html += '<button class="filter-clear" id="btnClearFilters">Clear</button>';
     bar.innerHTML = html;
@@ -215,6 +235,12 @@ function renderFilterBar() {
     bar.querySelectorAll('select[data-filter]').forEach(sel => {
         sel.addEventListener('change', () => {
             cur[sel.dataset.filter] = sel.value;
+            renderTab();
+        });
+    });
+    bar.querySelectorAll('input[data-filter]').forEach(inp => {
+        inp.addEventListener('change', () => {
+            cur[inp.dataset.filter] = inp.value;
             renderTab();
         });
     });
@@ -327,6 +353,7 @@ const CHART_LEGEND = { labels: { color: '#94a3b8', font: { size: 11 } } };
 function tabOverview(el) {
     const s = state.data.summary || {};
     const poc = state.data.poc?.summary || {};
+    const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project');
     el.innerHTML = `
         <div class="kpi-row">
             ${statCard('👥', s.teamSize || 0, 'Team Size')}
@@ -345,10 +372,12 @@ function tabOverview(el) {
             <div class="m-card">${section('🌟 Recent Highlights')}<div id="ovHL"></div></div>
             <div class="m-card">${section('⬇️ Recent Lowlights')}<div id="ovLL"></div></div>
         </div>`;
-    widgetProjectHealth($('#ovHealth'), {}, 6);
-    widgetRiskList($('#ovRisks'), {}, 6);
-    widgetHighlights($('#ovHL'), 6);
-    widgetLowlights($('#ovLL'), 6);
+    const pf = proj ? { project: proj } : {};
+    if (month) pf.month = month;
+    widgetProjectHealth($('#ovHealth'), pf, 6);
+    widgetRiskList($('#ovRisks'), pf, 6);
+    widgetHighlights($('#ovHL'), 6, proj);
+    widgetLowlights($('#ovLL'), 6, proj);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -359,8 +388,18 @@ function tabTeam(el) {
     const t = state.data.team || {};
     let members = t.activeMembers || [];
     const office = getFilter('office'), designation = getFilter('designation');
+    const rm = getFilter('rm'), proj = getFilter('project');
     if (office) members = members.filter(m => m.location === office);
     if (designation) members = members.filter(m => m.designation === designation);
+    if (rm) members = members.filter(m => m.manager === rm);
+    if (proj) {
+        // Cross-reference with SOW projects: find PMs for that project, show their team
+        const sowProjects = state.data.sow?.projects || [];
+        const pmNames = uniqueSorted(sowProjects.filter(p => p.projectName === proj).map(p => p.pm));
+        if (pmNames.length) {
+            members = members.filter(m => pmNames.some(pm => m.name.toLowerCase().includes(pm.toLowerCase()) || pm.toLowerCase().includes(m.name.split(' ')[0].toLowerCase())));
+        }
+    }
 
     const desigDist = {};
     members.forEach(m => { desigDist[m.designation || 'Unknown'] = (desigDist[m.designation || 'Unknown'] || 0) + 1; });
@@ -386,9 +425,9 @@ function tabTeam(el) {
         </div>`;
 
     $('#teamRoster').innerHTML = dataTable(
-        ['Name', 'Role', 'Designation', 'Emp ID', 'Office / Location', 'Email', 'Date of Joining'],
+        ['Name', 'Role', 'Designation', 'Manager (RM)', 'Emp ID', 'Office / Location', 'Email', 'Date of Joining'],
         members.map(m => [
-            `<strong>${esc(m.name)}</strong>`, esc(m.role), esc(m.designation),
+            `<strong>${esc(m.name)}</strong>`, esc(m.role), esc(m.designation), esc(m.manager || ''),
             esc(m.empId), badge(m.location || 'Unmapped', m.location ? 'b-blue' : 'b-grey'),
             esc(m.email), esc(m.doj),
         ]),
@@ -405,6 +444,7 @@ function tabTeam(el) {
 
 function tabProjects(el) {
     const proj = getFilter('project');
+    const monthF = getFilter('month');
     el.innerHTML = `
         <div class="m-card">${section('🏥 Project Health Status')}<div id="pjHealth"></div></div>
         <div class="grid-2">
@@ -422,6 +462,8 @@ function tabProjects(el) {
         </div>`;
 
     const pf = proj ? { project: proj } : {};
+    const month = getFilter('month');
+    if (month) pf.month = month;
     widgetProjectHealth($('#pjHealth'), pf);
     widgetHighlights($('#pjHL'), 10, proj);
     widgetLowlights($('#pjLL'), 10, proj);
@@ -438,8 +480,10 @@ function tabProjects(el) {
 
 function tabSow(el) {
     let projects = state.data.sow?.projects || [];
-    const client = getFilter('client');
-    if (client) projects = projects.filter(p => p.client === client);
+    const proj = getFilter('project'), startD = getFilter('startDate'), endD = getFilter('endDate');
+    if (proj) projects = projects.filter(p => p.projectName === proj);
+    if (startD) projects = projects.filter(p => p.startDate >= startD);
+    if (endD) projects = projects.filter(p => p.endDate <= endD);
 
     const statusCount = {};
     projects.forEach(p => {
@@ -495,12 +539,16 @@ function tabSow(el) {
 function tabKpis(el) {
     const kpi = state.data.kpi || {};
     const sm = kpi.summary || {};
+    const proj = getFilter('project'), kpiMetric = getFilter('kpiMetric');
+
     el.innerHTML = `
         <div class="kpi-row">
             ${statCard('🎯', sm.metRate != null ? sm.metRate + '%' : '—', 'KPI Met Rate')}
             ${statCard('📊', sm.totalMetrics || 0, 'Total Metrics')}
             ${statCard('✅', sm.metCount || 0, 'Targets Met')}
+            ${statCard('📂', (kpi.scorecardProjects || []).length, 'Scorecard Entries')}
         </div>
+        <div class="m-card">${section('📊 Project-wise Monthly KPI Breakdown', 'Timeliness, Utilization, Quality, CSAT, Client Training')}<div id="kpiBreakdown"></div></div>
         <div class="m-card">${section('🎯 KPI Scorecard', 'Target vs Actual')}<div id="kpiScore"></div></div>
         <div class="m-card">${section('🏷️ KPI — Client-wise & Monthly View', 'Avg score across all projects')}<div id="kpiPivot"></div></div>
         <div class="grid-2">
@@ -510,12 +558,50 @@ function tabKpis(el) {
         <div class="m-card">${section('✅ FTR Report', 'Client-wise & monthly')}<div id="kpiFtr"></div></div>
         <div class="m-card">${section('🏥 Project Health Status')}<div id="kpiHealth"></div></div>`;
 
+    // ── Project-wise monthly KPI breakdown table ──
+    let scRows = kpi.scorecardProjects || [];
+    if (proj) scRows = scRows.filter(r => r.project === proj);
+
+    // Build a mapping of which columns to show based on kpiMetric filter
+    const kpiCols = [
+        { key: 'timeliness', label: 'Timeliness (SLA%)', match: 'Timeliness' },
+        { key: 'utilization', label: 'Utilization (Effort %)', match: 'Utilization' },
+        { key: 'quality', label: 'Quality (FTR %)', match: 'Quality' },
+        { key: 'csatFrequency', label: 'CSAT (Frequency)', match: 'CSAT (Frequency)' },
+        { key: 'csatRating', label: 'CSAT (Rating)', match: 'CSAT (Rating)' },
+        { key: 'clientTraining', label: 'Client Training %', match: 'Client Training' },
+    ];
+    const visibleKpiCols = kpiMetric
+        ? kpiCols.filter(c => c.match.toLowerCase().includes(kpiMetric.split('(')[0].trim().toLowerCase()) || kpiMetric.toLowerCase().includes(c.match.split('(')[0].trim().toLowerCase()))
+        : kpiCols;
+
+    const breakdownHeaders = ['Client', 'Project', 'PM', 'Month', ...visibleKpiCols.map(c => c.label)];
+    const breakdownRows = scRows.map(r => [
+        esc(r.client), `<strong>${esc(r.project)}</strong>`, esc(r.pm), esc(r.month),
+        ...visibleKpiCols.map(c => {
+            const val = r[c.key];
+            if (!val) return '<span class="muted">—</span>';
+            // Color code percentage values
+            if (val.endsWith('%')) {
+                const n = parseFloat(val);
+                const cls = n >= 95 ? 'b-green' : n >= 85 ? 'b-amber' : n > 0 ? 'b-red' : 'b-grey';
+                return `<span class="badge ${cls}">${esc(val)}</span>`;
+            }
+            return esc(val);
+        }),
+    ]);
+    $('#kpiBreakdown').innerHTML = dataTable(breakdownHeaders, breakdownRows, {
+        empty: 'No KPI scorecard data available. Upload a KPI file with a "Web Analytics KPI Summary" sheet.',
+        note: 'Data from Web Analytics KPI Summary sheet.',
+    });
+
     widgetKpiScorecard($('#kpiScore'));
     widgetKpiPivot($('#kpiPivot'));
     widgetKpiUtilPivot($('#kpiUtil'));
-    widgetRiskList($('#kpiRisks'), {}, 10);
+    const pf = proj ? { project: proj } : {};
+    widgetRiskList($('#kpiRisks'), pf, 10);
     widgetFtrReport($('#kpiFtr'));
-    widgetProjectHealth($('#kpiHealth'), {});
+    widgetProjectHealth($('#kpiHealth'), pf);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -537,7 +623,7 @@ function tabFtr(el) {
     widgetFtrReport($('#ftrReport'));
 
     let accounts = ftr.accounts || [];
-    const client = getFilter('client');
+    const client = getFilter('client'), proj = getFilter('project');
     if (client) accounts = accounts.filter(a => a.account === client);
     $('#ftrAccounts').innerHTML = dataTable(
         ['Account', 'QA Tracking', 'Expected Projects', 'Web Team', 'Avg Rating', 'FTR Pass'],
@@ -552,6 +638,7 @@ function tabFtr(el) {
     const month = getFilter('month');
     if (month) qa = qa.filter(q => monthLabel(q.qaDate) === month);
     if (client) qa = qa.filter(q => (q.project || '').toLowerCase().includes(client.toLowerCase()));
+    if (proj) qa = qa.filter(q => (q.project || '').toLowerCase().includes(proj.toLowerCase()));
     $('#ftrQa').innerHTML = dataTable(
         ['Project', 'QA Date', 'Month', 'Total Tags', 'Failed', 'Pass Rate'],
         qa.map(q => [
@@ -569,9 +656,23 @@ function tabFtr(el) {
 function tabLeave(el) {
     const leave = state.data.leave || {};
     const cm = leave.currentMonth || {};
+    const rm = getFilter('rm'), proj = getFilter('project');
+
+    // Get team members filtered by RM for filtering leave data
+    let teamMembers = state.data.team?.activeMembers || [];
+    if (rm) teamMembers = teamMembers.filter(m => m.manager === rm);
+    const teamNameSet = rm ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
+
+    let onToday = cm.onLeaveToday || [];
+    if (teamNameSet) onToday = onToday.filter(p => teamNameSet.has(p.name.toLowerCase()));
+
+    let byPerson = Object.entries(cm.byPerson || {})
+        .filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
+    if (teamNameSet) byPerson = byPerson.filter(([n]) => teamNameSet.has(n.toLowerCase()));
+
     el.innerHTML = `
         <div class="kpi-row">
-            ${statCard('🏖️', (cm.onLeaveToday || []).length, 'On Leave Today', 'kpi-card-alert')}
+            ${statCard('🏖️', onToday.length, 'On Leave Today', 'kpi-card-alert')}
             ${statCard('📅', cm.totalLeaves || 0, 'Leaves This Month')}
             ${statCard('🗓️', (leave.months || []).length, 'Months Tracked')}
         </div>
@@ -581,15 +682,12 @@ function tabLeave(el) {
         </div>
         <div class="m-card">${section('🗓️ Leave Tracker — Months Available')}<div id="lvMonths"></div></div>`;
 
-    const onToday = cm.onLeaveToday || [];
     $('#lvToday').innerHTML = dataTable(
         ['Member', 'Leave Type'],
         onToday.map(p => [`<strong>${esc(p.name)}</strong>`, esc(p.type)]),
         { empty: 'Nobody is on leave today. ✅' }
     );
 
-    const byPerson = Object.entries(cm.byPerson || {})
-        .filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
     $('#lvTop').innerHTML = dataTable(
         ['Member', 'Leave Days'],
         byPerson.slice(0, 20).map(([n, c]) => [`<strong>${esc(n)}</strong>`, badge(c + ' day(s)', 'b-amber')]),
@@ -648,9 +746,10 @@ function tabPoc(el) {
     const poc = state.data.poc || {};
     let pocs = poc.pocs || [];
     const sm = poc.summary || {};
-    const st = getFilter('pocStatus'), mgr = getFilter('manager');
+    const st = getFilter('pocStatus'), mgr = getFilter('manager'), spoc = getFilter('spoc');
     if (st) pocs = pocs.filter(p => p.status === st);
     if (mgr) pocs = pocs.filter(p => p.manager === mgr);
+    if (spoc) pocs = pocs.filter(p => p.spoc === spoc);
 
     el.innerHTML = `
         <div class="kpi-row">
@@ -781,9 +880,10 @@ function widgetLeaveImpact(el) {
 
 function widgetKpiScorecard(el) {
     let metrics = state.data.kpi?.metrics || [];
-    const client = getFilter('client'), month = getFilter('month');
+    const client = getFilter('client'), month = getFilter('month'), proj = getFilter('project');
     if (client) metrics = metrics.filter(m => m.account === client);
     if (month) metrics = metrics.filter(m => m.month === month);
+    if (proj) metrics = metrics.filter(m => (m.project || '').toLowerCase().includes(proj.toLowerCase()));
     el.innerHTML = dataTable(
         ['Client', 'Project', 'Metric', 'Month', 'Target', 'Actual', 'Status'],
         metrics.map(m => [
@@ -797,9 +897,10 @@ function widgetKpiScorecard(el) {
 
 function widgetKpiPivot(el) {
     let metrics = state.data.kpi?.metrics || [];
-    const client = getFilter('client'), month = getFilter('month');
+    const client = getFilter('client'), month = getFilter('month'), proj = getFilter('project');
     if (client) metrics = metrics.filter(m => m.account === client);
     if (month) metrics = metrics.filter(m => m.month === month);
+    if (proj) metrics = metrics.filter(m => (m.project || '').toLowerCase().includes(proj.toLowerCase()));
     const rowKeys = uniqueSorted(metrics.map(m => m.account));
     const colKeys = uniqueSorted(metrics.map(m => m.month));
     el.innerHTML = pivotTable(rowKeys, colKeys, (rk, ck) => {
@@ -815,9 +916,10 @@ function widgetKpiPivot(el) {
 
 function widgetKpiUtilPivot(el) {
     let metrics = (state.data.kpi?.metrics || []).filter(m => /utiliz/i.test(m.name));
-    const client = getFilter('client'), month = getFilter('month');
+    const client = getFilter('client'), month = getFilter('month'), proj = getFilter('project');
     if (client) metrics = metrics.filter(m => m.account === client);
     if (month) metrics = metrics.filter(m => m.month === month);
+    if (proj) metrics = metrics.filter(m => (m.project || '').toLowerCase().includes(proj.toLowerCase()));
     const rowKeys = uniqueSorted(metrics.map(m => m.account));
     const colKeys = uniqueSorted(metrics.map(m => m.month));
     el.innerHTML = pivotTable(rowKeys, colKeys, (rk, ck) => {

@@ -277,7 +277,7 @@ def normalize_team(file_path):
     diagnostics = {'sheets_found': list(sheets.keys()), 'sections': {}}
 
     # 1. Current team — "Team details 2026" (fallback to 2024, 2023)
-    team_aliases = {k: v for k, v in aliases.items() if k in ['name', 'role', 'designation', 'emp_id', 'email', 'doj', 'phone', 'birthday', 'location']}
+    team_aliases = {k: v for k, v in aliases.items() if k in ['name', 'role', 'designation', 'emp_id', 'email', 'doj', 'phone', 'birthday', 'location', 'manager']}
 
     for sheet_name_pattern in ['Team details 2026', 'Team details 2025', 'Team details 2024', 'Team details 2023', 'Team details']:
         sn, df = find_sheet(sheets, [sheet_name_pattern])
@@ -307,6 +307,7 @@ def normalize_team(file_path):
                 'phone': safe_str(r.get('phone')),
                 'birthday': excel_date_to_str(r.get('birthday')),
                 'location': safe_str(r.get('location')),
+                'manager': safe_str(r.get('manager')),
             })
 
             d_key = designation or 'Unspecified'
@@ -575,6 +576,7 @@ def normalize_kpi(file_path):
         'metrics': [],
         'kpis': [],
         'projects': [],
+        'scorecardProjects': [],
         'summary': {'metRate': 0, 'totalMetrics': 0, 'metCount': 0},
         'highlights': [],
         'lowlights': [],
@@ -621,6 +623,15 @@ def normalize_kpi(file_path):
         ci_project = col('project name', 'project')
         ci_pm = col('pm', 'project manager')
         ci_date = col('start date', 'measurement start', 'period')
+
+        # Trim target_df to exclude 1M+ empty rows (Excel used range bug)
+        if ci_client is not None or ci_project is not None:
+            client_col = target_df.iloc[:, ci_client] if ci_client is not None else pd.Series([None]*len(target_df))
+            proj_col = target_df.iloc[:, ci_project] if ci_project is not None else pd.Series([None]*len(target_df))
+            has_client = client_col.notna() & (client_col.astype(str).str.strip() != '')
+            has_proj = proj_col.notna() & (proj_col.astype(str).str.strip() != '')
+            mask = (target_df.index <= hdr_idx) | has_client | has_proj
+            target_df = target_df[mask]
 
         kpi_cols, seen = [], set()
         for sub, label, thr in KPI_DEFS:
@@ -703,6 +714,98 @@ def normalize_kpi(file_path):
         result['summary']['totalMetrics'] = total
         result['summary']['metCount'] = met
         result['summary']['metRate'] = round(met / total * 100) if total else 0
+
+    # ── Build scorecardProjects from the Web Analytics KPI Summary sheet ──
+    sc_df, sc_name = None, None
+    for sn, df in sheets.items():
+        blob = ' '.join(safe_str(c).lower() for c in df.head(8).values.flatten())
+        if 'timeliness' in blob and 'quality' in blob and ('client' in blob or 'project' in blob):
+            sc_df, sc_name = df, sn
+            break
+
+    if sc_df is not None:
+        # Trim empty rows using mask on client/project columns
+        sc_hdr_idx = 0
+        for i in range(min(10, len(sc_df))):
+            blob = ' '.join(safe_str(c).lower() for c in sc_df.iloc[i].tolist())
+            if 'client' in blob and 'project' in blob:
+                sc_hdr_idx = i
+                break
+
+        sc_headers = [safe_str(c).lower() for c in sc_df.iloc[sc_hdr_idx].tolist()]
+
+        def sc_col(*subs):
+            for idx, h in enumerate(sc_headers):
+                if any(s in h for s in subs):
+                    return idx
+            return None
+
+        sci_client = sc_col('client')
+        sci_project = sc_col('project name', 'project')
+        sci_pm = sc_col('pm', 'project manager')
+        sci_date = sc_col('start date', 'measurement start', 'period')
+        sci_timeliness = sc_col('timeliness')
+        sci_utilization = sc_col('utli', 'utili')
+        sci_quality = sc_col('quality')
+        sci_csat_freq = sc_col('csat ( frequency', 'csat (frequency', 'csat frequency')
+        sci_csat_rating = sc_col('csat ( rating', 'csat (rating', 'csat rating')
+        sci_client_training = sc_col('client training')
+        sci_comments = sc_col('comments')
+
+        # Trim rows
+        if sci_client is not None or sci_project is not None:
+            cc = sc_df.iloc[:, sci_client] if sci_client is not None else pd.Series([None]*len(sc_df))
+            pc = sc_df.iloc[:, sci_project] if sci_project is not None else pd.Series([None]*len(sc_df))
+            hc = cc.notna() & (cc.astype(str).str.strip() != '')
+            hp = pc.notna() & (pc.astype(str).str.strip() != '')
+            mask = (sc_df.index <= sc_hdr_idx) | hc | hp
+            sc_df = sc_df[mask]
+
+        def sc_cell(row, idx):
+            return row[idx] if idx is not None and idx < len(row) else None
+
+        def fmt_pct(val):
+            v = _kpi_num(val)
+            if v is None:
+                return ''
+            return f'{round(v * 100, 1)}%'
+
+        for i in range(sc_hdr_idx + 1, len(sc_df)):
+            row = sc_df.iloc[i].tolist()
+            client = safe_str(sc_cell(row, sci_client))
+            project = ' '.join(safe_str(sc_cell(row, sci_project)).split())
+            if not client and not project:
+                continue
+            pm = safe_str(sc_cell(row, sci_pm))
+
+            month = ''
+            dval = sc_cell(row, sci_date)
+            if dval is not None:
+                try:
+                    dt = pd.to_datetime(dval, errors='coerce')
+                    if pd.notna(dt):
+                        month = dt.strftime('%b %Y')
+                except Exception:
+                    month = ''
+
+            result['scorecardProjects'].append({
+                'client': client,
+                'project': project,
+                'pm': pm,
+                'month': month,
+                'timeliness': fmt_pct(sc_cell(row, sci_timeliness)),
+                'utilization': fmt_pct(sc_cell(row, sci_utilization)),
+                'quality': fmt_pct(sc_cell(row, sci_quality)),
+                'csatFrequency': safe_str(sc_cell(row, sci_csat_freq)),
+                'csatRating': safe_str(sc_cell(row, sci_csat_rating)),
+                'clientTraining': fmt_pct(sc_cell(row, sci_client_training)),
+                'comments': safe_str(sc_cell(row, sci_comments)),
+            })
+
+        diagnostics['sections']['scorecard_projects'] = {
+            'sheet': sc_name, 'header_row': sc_hdr_idx,
+            'count': len(result['scorecardProjects']),
+        }
 
     return result, diagnostics
 
