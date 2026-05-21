@@ -616,7 +616,7 @@ function showExecDashboard() {
     document.getElementById('execSection').style.display = 'block';
     document.getElementById('btnManagerLogin').style.display = 'none';
     document.getElementById('btnExecLogout').style.display = '';
-    document.querySelector('#main-header h1').textContent = 'Manager Dashboard — Strategic Overview';
+    document.querySelector('#main-header h1').textContent = 'Executive Overview';
     if (window.ManagerDash) window.ManagerDash.open();
 }
 
