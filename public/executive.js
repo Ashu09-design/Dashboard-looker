@@ -139,7 +139,7 @@ function renderTabNav() {
 // ══════════════════════════════════════════════════════════════════
 
 const TAB_FILTERS = {
-    team: ['office', 'role'],
+    team: ['office', 'designation'],
     projects: ['project'],
     sow: ['client'],
     kpis: ['client', 'month'],
@@ -160,6 +160,8 @@ function filterOptions(key) {
             return uniqueSorted((d.team?.activeMembers || []).map(m => m.location));
         case 'role':
             return uniqueSorted((d.team?.activeMembers || []).map(m => m.role));
+        case 'designation':
+            return uniqueSorted((d.team?.activeMembers || []).map(m => m.designation));
         case 'project':
             return uniqueSorted((d.health || []).map(p => p.projectName));
         case 'client':
@@ -184,7 +186,7 @@ function filterOptions(key) {
 }
 
 const FILTER_LABELS = {
-    office: '🏢 Office', role: '👤 Role', project: '📂 Project', client: '🏷️ Client',
+    office: '🏢 Office', role: '👤 Role', designation: '👤 Designation', project: '📂 Project', client: '🏷️ Client',
     month: '📅 Month', pocStatus: '🚦 Status', manager: '👔 Manager',
 };
 
@@ -356,12 +358,12 @@ function tabOverview(el) {
 function tabTeam(el) {
     const t = state.data.team || {};
     let members = t.activeMembers || [];
-    const office = getFilter('office'), role = getFilter('role');
+    const office = getFilter('office'), designation = getFilter('designation');
     if (office) members = members.filter(m => m.location === office);
-    if (role) members = members.filter(m => m.role === role);
+    if (designation) members = members.filter(m => m.designation === designation);
 
-    const roleDist = {};
-    members.forEach(m => { roleDist[m.role || 'Unknown'] = (roleDist[m.role || 'Unknown'] || 0) + 1; });
+    const desigDist = {};
+    members.forEach(m => { desigDist[m.designation || 'Unknown'] = (desigDist[m.designation || 'Unknown'] || 0) + 1; });
     const officeDist = {};
     members.forEach(m => {
         const o = m.location || 'Unmapped';
@@ -372,11 +374,11 @@ function tabTeam(el) {
         <div class="kpi-row">
             ${statCard('👥', members.length, 'Members Shown')}
             ${statCard('🏢', Object.keys(officeDist).length, 'Offices')}
-            ${statCard('👤', Object.keys(roleDist).length, 'Distinct Roles')}
+            ${statCard('👤', Object.keys(desigDist).length, 'Distinct Designations')}
         </div>
         <div class="grid-2">
             <div class="m-card">${section('🏢 Members by Office')}${chartCanvas('chTeamOffice')}</div>
-            <div class="m-card">${section('👤 Members by Role')}${chartCanvas('chTeamRole')}</div>
+            <div class="m-card">${section('👤 Members by Designation')}${chartCanvas('chTeamRole')}</div>
         </div>
         <div class="m-card">
             ${section('👥 Team Roster', 'Office mapping per member')}
@@ -394,7 +396,7 @@ function tabTeam(el) {
     );
 
     barChart('chTeamOffice', Object.keys(officeDist), Object.values(officeDist), 'Members', '#06b6d4');
-    barChart('chTeamRole', Object.keys(roleDist), Object.values(roleDist), 'Members', '#a855f7');
+    barChart('chTeamRole', Object.keys(desigDist), Object.values(desigDist), 'Members', '#a855f7');
 }
 
 // ══════════════════════════════════════════════════════════════════
