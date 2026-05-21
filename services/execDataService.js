@@ -108,7 +108,7 @@ function pythonParse(key) {
         // Call Python normalizer
         const cmd = `${pythonCmd} "${PYTHON_SCRIPT}" --source ${key} --input "${filePath}" --output "${outputPath}"`;
         const stdout = execSync(cmd, {
-            timeout: 60000, // 60 seconds max per file
+            timeout: 180000, // 180 seconds max per file
             encoding: 'utf-8',
             stdio: ['pipe', 'pipe', 'pipe'],
         });

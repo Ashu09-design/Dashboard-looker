@@ -4,830 +4,1583 @@
   "data": {
     "metrics": [
       {
-        "account": "AZ",
-        "metric": "Quality",
-        "name": "Service Quality",
-        "description": "A measure of the delivery error",
-        "formula": "Total Tasks Closed – Tasks with Errors/Total Tasks Closed",
-        "target": 0.98,
-        "actual": 1,
-        "targetRaw": "0.98",
-        "actualRaw": "1",
-        "status": ""
-      },
-      {
-        "account": "AZ",
-        "metric": "Timeliness",
-        "name": "On time delivery of projects",
-        "description": "Was the deliverable completed within agreed SLA",
-        "formula": "Total # of Tasks closed within SLA /Total # of Tasks closed",
+        "account": "AbbVie",
+        "metric": "Google Analytics Support 2026 — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Andrew Manickam",
+        "project": "Google Analytics Support 2026",
         "target": 0.95,
-        "actual": 1,
-        "targetRaw": "0.95",
-        "actualRaw": "1",
-        "status": ""
+        "actual": 0.9412,
+        "targetRaw": "95%",
+        "actualRaw": "94.1%",
+        "status": "Not Met"
       },
       {
-        "account": "AZ",
-        "metric": "Utilization",
-        "name": "Utilisation (FTE)",
-        "description": "The amount of an employee's available time that's used for productive, billable work",
-        "formula": "Total # of Actual working hours / Total # of Available Hours (7 hours per day*actual working days)",
-        "target": 0,
-        "actual": 0.94,
-        "targetRaw": "85% - 95%",
-        "actualRaw": "0.94",
-        "status": ""
-      },
-      {
-        "account": "AZ",
-        "metric": "Process Adherence & Compliance",
-        "name": "Mandatory Trainings",
-        "description": "A measure of completion of mandatory training before due date",
-        "formula": "Complete all assigned mandatory trainings before due date",
-        "target": 1,
-        "actual": 1,
-        "targetRaw": "1",
-        "actualRaw": "1",
-        "status": ""
-      },
-      {
-        "account": "AZ",
-        "metric": "Work Load",
-        "name": "Volume - No of active projects",
-        "description": "Total number of Tasks Active in the month",
-        "formula": "Absolute number",
-        "target": 0,
-        "actual": 16,
-        "targetRaw": "",
-        "actualRaw": "16",
-        "status": ""
-      },
-      {
-        "account": "GSK",
-        "metric": "Utilization",
-        "name": "Utilisation (FTE)",
-        "description": "Employee's available time that's utilized for billable work",
-        "formula": "(Utilized hours / Total available hours) X 100%",
-        "target": 0.9,
-        "actual": 0,
-        "targetRaw": "0.9",
-        "actualRaw": "0",
-        "status": ""
-      },
-      {
-        "account": "GSK",
-        "metric": "Process Adherence & Compliance",
-        "name": "Mandatory Trainings",
-        "description": "A measure of completion of mandatory training before due date",
-        "formula": "Complete all assigned mandatory trainings before due date",
-        "target": 0.9,
-        "actual": 1,
-        "targetRaw": "0.9",
-        "actualRaw": "1",
-        "status": ""
-      },
-      {
-        "account": "GSK",
-        "metric": "Quality",
-        "name": "Service Quality",
-        "description": "A measure of the delivery error",
+        "account": "AbbVie",
+        "metric": "Google Analytics Support 2026 — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
         "formula": "",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
+        "pm": "Andrew Manickam",
+        "project": "Google Analytics Support 2026",
+        "target": 0.9,
+        "actual": 0.8879,
+        "targetRaw": "90%",
+        "actualRaw": "88.8%",
+        "status": "Not Met"
       },
       {
-        "account": "GSK",
-        "metric": "Process Adherence & Compliance",
-        "name": "No of Escalations",
-        "description": "No of Escalations",
-        "formula": "No. of Escalation Reported",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
-      },
-      {
-        "account": "Incyte",
-        "metric": "Work Load",
-        "name": "Volume - No of active projects",
-        "description": "Total number of projects Active in the month",
-        "formula": "Absolute number",
-        "target": 0,
-        "actual": 15,
-        "targetRaw": "",
-        "actualRaw": "15",
-        "status": ""
-      },
-      {
-        "account": "Incyte",
-        "metric": "Timeliness",
-        "name": "On time delivery of projects",
-        "description": "(Total no. of projects closed within SLA /Total no. of Projects closed) *100",
-        "formula": "(Total no. of projects closed within SLA /Total no. of Projects closed) *100",
-        "target": 1,
-        "actual": 1,
-        "targetRaw": "1",
-        "actualRaw": "1",
-        "status": ""
-      },
-      {
-        "account": "Incyte",
-        "metric": "Quality",
-        "name": "Service Quality",
-        "description": "A measure of the delivery error",
+        "account": "AbbVie",
+        "metric": "Google Analytics Support 2026 — Quality (FTR %)",
+        "name": "Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "description": "",
         "formula": "",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
+        "pm": "Andrew Manickam",
+        "project": "Google Analytics Support 2026",
+        "target": 0.95,
+        "actual": 0.9676,
+        "targetRaw": "95%",
+        "actualRaw": "96.8%",
+        "status": "Met"
       },
       {
-        "account": "Incyte",
-        "metric": "Process Adherence & Compliance",
-        "name": "No of Escalations",
-        "description": "No of Escalations",
-        "formula": "No. of Escalation Reported",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
+        "account": "AbbVie",
+        "metric": "Google Analytics Support 2026 — Client Training %",
+        "name": "Client Training %",
+        "metricName": "Client Training %",
+        "description": "",
+        "formula": "",
+        "pm": "Andrew Manickam",
+        "project": "Google Analytics Support 2026",
+        "target": 1.0,
+        "actual": 1.0,
+        "targetRaw": "100%",
+        "actualRaw": "100.0%",
+        "status": "Met"
       },
       {
-        "account": "Takeda",
-        "metric": "Work Load",
-        "name": "Volume - No of active projects",
-        "description": "Total number of projects Active in the month",
-        "formula": "Absolute number",
-        "target": 0,
-        "actual": 28,
-        "targetRaw": "N",
-        "actualRaw": "28",
-        "status": ""
+        "account": "Alnylam",
+        "metric": "GA4 Implementation & Reporting — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "GA4 Implementation & Reporting",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
+        "status": "Met"
       },
       {
-        "account": "Takeda",
-        "metric": "Utilization",
-        "name": "Resource Utilization Rate",
-        "description": "Employee's available time that's utilized for billable work",
-        "formula": "(Utilized hours / Total available hours) X 100%",
-        "target": 0.85,
-        "actual": 0.81,
-        "targetRaw": "0.85",
-        "actualRaw": "0.81",
-        "status": ""
+        "account": "Alnylam",
+        "metric": "GA4 Implementation & Reporting — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "GA4 Implementation & Reporting",
+        "target": 0.9,
+        "actual": 0.8095,
+        "targetRaw": "90%",
+        "actualRaw": "81.0%",
+        "status": "Not Met"
       },
       {
-        "account": "Takeda",
-        "metric": "Timeliness",
-        "name": "On time delivery of projects",
-        "description": "(Total no. of projects closed within SLA /Total no. of Projects closed) *100",
-        "formula": "(Total no. of projects closed within SLA /Total no. of Projects closed) *100",
-        "target": 1,
-        "actual": 1,
-        "targetRaw": "1",
-        "actualRaw": "1",
-        "status": ""
+        "account": "Amgen",
+        "metric": "Amgen Q1 2026 — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Prithvi Raj",
+        "project": "Amgen Q1 2026",
+        "target": 0.95,
+        "actual": 0.9744,
+        "targetRaw": "95%",
+        "actualRaw": "97.4%",
+        "status": "Met"
       },
       {
-        "account": "Takeda",
-        "metric": "Quality",
-        "name": "Service Quality",
-        "description": "A measure of the delivery error",
-        "formula": "No of quality issues reported",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
+        "account": "Amgen",
+        "metric": "Amgen Q1 2026 — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Prithvi Raj",
+        "project": "Amgen Q1 2026",
+        "target": 0.9,
+        "actual": 1.0,
+        "targetRaw": "90%",
+        "actualRaw": "100.0%",
+        "status": "Met"
       },
       {
-        "account": "Takeda",
-        "metric": "Process Adherence & Compliance",
-        "name": "No of Escalations",
-        "description": "No of Escalations",
-        "formula": "No. of Escalation Reported",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
+        "account": "Amgen",
+        "metric": "Amgen Q1 2026 — Quality (FTR %)",
+        "name": "Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "description": "",
+        "formula": "",
+        "pm": "Prithvi Raj",
+        "project": "Amgen Q1 2026",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
+        "status": "Met"
       },
       {
-        "account": "Fresenius",
-        "metric": "Utilization",
-        "name": "Utilisation (FTE)",
-        "description": "Employee's available time that's utilized for billable work",
-        "formula": "(Utilized hours / Total available hours) X 100%",
-        "target": 0.85,
-        "actual": 0.95,
-        "targetRaw": "0.85",
-        "actualRaw": "0.95",
+        "account": "Amgen",
+        "metric": "Amgen Q1 2026 — Client Training %",
+        "name": "Client Training %",
+        "metricName": "Client Training %",
+        "description": "",
+        "formula": "",
+        "pm": "Prithvi Raj",
+        "project": "Amgen Q1 2026",
+        "target": 1.0,
+        "actual": 1.0,
+        "targetRaw": "100%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Bayer",
+        "metric": "Google Analytics Tagging Update — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "Google Analytics Tagging Update",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Bayer",
+        "metric": "Google Analytics Tagging Update — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "Google Analytics Tagging Update",
+        "target": 0.9,
+        "actual": 0.8929,
+        "targetRaw": "90%",
+        "actualRaw": "89.3%",
+        "status": "Not Met"
+      },
+      {
+        "account": "Bayer",
+        "metric": "Google Analytics Tagging Update — Quality (FTR %)",
+        "name": "Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "Google Analytics Tagging Update",
+        "target": 0.95,
+        "actual": 0.92,
+        "targetRaw": "95%",
+        "actualRaw": "92.0%",
+        "status": "Not Met"
+      },
+      {
+        "account": "Bayer",
+        "metric": "Google Analytics Tagging Update — Client Training %",
+        "name": "Client Training %",
+        "metricName": "Client Training %",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "Google Analytics Tagging Update",
+        "target": 1.0,
+        "actual": 1.0,
+        "targetRaw": "100%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "BioMarin",
+        "metric": "GA4 & GTM Tagging & Reporting — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Siddharth Vadlamudi",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "BioMarin",
+        "metric": "GA4 & GTM Tagging & Reporting — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Siddharth Vadlamudi",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "target": 0.9,
+        "actual": 1.0508,
+        "targetRaw": "90%",
+        "actualRaw": "105.1%",
+        "status": "Met"
+      },
+      {
+        "account": "BioMarin",
+        "metric": "GA4 & GTM Tagging & Reporting — Client Training %",
+        "name": "Client Training %",
+        "metricName": "Client Training %",
+        "description": "",
+        "formula": "",
+        "pm": "Siddharth Vadlamudi",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "target": 1.0,
+        "actual": 1.0,
+        "targetRaw": "100%",
+        "actualRaw": "100.0%",
         "status": "Met"
       },
       {
         "account": "Fresenius",
-        "metric": "Quality",
-        "name": "Service Quality",
-        "description": "A measure of the delivery error",
+        "metric": "Adobe Analytics and Tealium Data Enablement Services - 2026 — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
         "formula": "",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
-      },
-      {
-        "account": "Fresenius",
-        "metric": "Process Adherence & Compliance",
-        "name": "No of Escalations",
-        "description": "No of Escalations",
-        "formula": "No. of Escalation Reported",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
-      },
-      {
-        "account": "Abbvie",
-        "metric": "Utilization",
-        "name": "Utilisation (FTE)",
-        "description": "Employee's available time that's utilized for billable work",
-        "formula": "(Utilized hours / Total available hours) X 100%",
-        "target": 0.85,
-        "actual": 0.99,
-        "targetRaw": "0.85",
-        "actualRaw": "0.99",
+        "pm": "Andrew Manickam",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
         "status": "Met"
       },
       {
-        "account": "Abbvie",
-        "metric": "Quality",
-        "name": "Service Quality",
-        "description": "A measure of the delivery error",
+        "account": "Fresenius",
+        "metric": "Adobe Analytics and Tealium Data Enablement Services - 2026 — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
         "formula": "",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
+        "pm": "Andrew Manickam",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "target": 0.9,
+        "actual": 1.0072,
+        "targetRaw": "90%",
+        "actualRaw": "100.7%",
+        "status": "Met"
       },
       {
-        "account": "Abbvie",
-        "metric": "Process Adherence & Compliance",
-        "name": "No of Escalations",
-        "description": "No of Escalations",
-        "formula": "No. of Escalation Reported",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": ""
+        "account": "GSK",
+        "metric": "GSK - CD&TECH - Strategy and Operations — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Joshua Samuel",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "target": 0.95,
+        "actual": 0.979,
+        "targetRaw": "95%",
+        "actualRaw": "97.9%",
+        "status": "Met"
+      },
+      {
+        "account": "GSK",
+        "metric": "GSK - CD&TECH - Strategy and Operations — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Joshua Samuel",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "target": 0.9,
+        "actual": 1.0088,
+        "targetRaw": "90%",
+        "actualRaw": "100.9%",
+        "status": "Met"
+      },
+      {
+        "account": "GSK",
+        "metric": "GSK - CD&TECH - Strategy and Operations — Quality (FTR %)",
+        "name": "Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "description": "",
+        "formula": "",
+        "pm": "Joshua Samuel",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "target": 0.95,
+        "actual": 0.836,
+        "targetRaw": "95%",
+        "actualRaw": "83.6%",
+        "status": "Not Met"
+      },
+      {
+        "account": "GSK",
+        "metric": "GSK - CD&TECH - Strategy and Operations — Client Training %",
+        "name": "Client Training %",
+        "metricName": "Client Training %",
+        "description": "",
+        "formula": "",
+        "pm": "Joshua Samuel",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "target": 1.0,
+        "actual": 1.0,
+        "targetRaw": "100%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Incyte",
+        "metric": "Incyte Web Studio — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Shreya Rao",
+        "project": "Incyte Web Studio",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Incyte",
+        "metric": "Incyte Web Studio — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Shreya Rao",
+        "project": "Incyte Web Studio",
+        "target": 0.9,
+        "actual": 1.0634,
+        "targetRaw": "90%",
+        "actualRaw": "106.3%",
+        "status": "Met"
+      },
+      {
+        "account": "Incyte",
+        "metric": "Incyte Web Studio — Quality (FTR %)",
+        "name": "Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "description": "",
+        "formula": "",
+        "pm": "Shreya Rao",
+        "project": "Incyte Web Studio",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Ipsen",
+        "metric": "Ipsen CCC — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Nataraj Selvaraj",
+        "project": "Ipsen CCC",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Ipsen",
+        "metric": "Ipsen CCC — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Nataraj Selvaraj",
+        "project": "Ipsen CCC",
+        "target": 0.9,
+        "actual": 0.96,
+        "targetRaw": "90%",
+        "actualRaw": "96.0%",
+        "status": "Met"
       },
       {
         "account": "Regeneron",
-        "metric": "Quality",
-        "name": "Service Quality",
-        "description": "A measure of the delivery error",
+        "metric": "Regeneron GA Operations Y3 — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
         "formula": "",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
+        "pm": "Prithvi Raj",
+        "project": "Regeneron GA Operations Y3",
+        "target": 0.95,
+        "actual": 0.9753,
+        "targetRaw": "95%",
+        "actualRaw": "97.5%",
         "status": "Met"
       },
       {
         "account": "Regeneron",
-        "metric": "Process Adherence & Compliance",
-        "name": "No of Escalations",
-        "description": "No of Escalations",
-        "formula": "No. of Escalation Reported",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": "Met"
-      },
-      {
-        "account": "Amgen",
-        "metric": "Quality",
-        "name": "Service Quality",
-        "description": "A measure of the delivery error",
+        "metric": "Regeneron GA Operations Y3 — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
         "formula": "",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": "Met"
-      },
-      {
-        "account": "Amgen",
-        "metric": "Process Adherence & Compliance",
-        "name": "No of Escalations",
-        "description": "No of Escalations",
-        "formula": "No. of Escalation Reported",
-        "target": 0,
-        "actual": 0,
-        "targetRaw": "0",
-        "actualRaw": "0",
-        "status": "Met"
-      },
-      {
-        "account": "Amgen",
-        "metric": "Utilization",
-        "name": "Utilisation (FTE)",
-        "description": "Employee's available time that's utilized for billable work",
-        "formula": "(Utilized hours / Total available hours) X 100%",
+        "pm": "Prithvi Raj",
+        "project": "Regeneron GA Operations Y3",
         "target": 0.9,
-        "actual": 0.98,
-        "targetRaw": "0.9",
-        "actualRaw": "0.98",
+        "actual": 1.0272,
+        "targetRaw": "90%",
+        "actualRaw": "102.7%",
+        "status": "Met"
+      },
+      {
+        "account": "Regeneron",
+        "metric": "Regeneron GA Operations Y3 — Quality (FTR %)",
+        "name": "Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "description": "",
+        "formula": "",
+        "pm": "Prithvi Raj",
+        "project": "Regeneron GA Operations Y3",
+        "target": 0.95,
+        "actual": 0.977,
+        "targetRaw": "95%",
+        "actualRaw": "97.7%",
+        "status": "Met"
+      },
+      {
+        "account": "Regeneron",
+        "metric": "Regeneron GA Operations Y3 — Client Training %",
+        "name": "Client Training %",
+        "metricName": "Client Training %",
+        "description": "",
+        "formula": "",
+        "pm": "Prithvi Raj",
+        "project": "Regeneron GA Operations Y3",
+        "target": 1.0,
+        "actual": 1.0,
+        "targetRaw": "100%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Takeda",
+        "metric": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "target": 0.95,
+        "actual": 1.0,
+        "targetRaw": "95%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Takeda",
+        "metric": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "target": 0.9,
+        "actual": 0.8433,
+        "targetRaw": "90%",
+        "actualRaw": "84.3%",
+        "status": "Not Met"
+      },
+      {
+        "account": "Takeda",
+        "metric": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region — Client Training %",
+        "name": "Client Training %",
+        "metricName": "Client Training %",
+        "description": "",
+        "formula": "",
+        "pm": "Sanket Agrawal",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "target": 1.0,
+        "actual": 1.0,
+        "targetRaw": "100%",
+        "actualRaw": "100.0%",
+        "status": "Met"
+      },
+      {
+        "account": "Vertex",
+        "metric": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations — Timeliness (SLA %)",
+        "name": "Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "description": "",
+        "formula": "",
+        "pm": "Joshua Samuel",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "target": 0.95,
+        "actual": 0.9362,
+        "targetRaw": "95%",
+        "actualRaw": "93.6%",
+        "status": "Not Met"
+      },
+      {
+        "account": "Vertex",
+        "metric": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations — Utilization (Effort %)",
+        "name": "Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "description": "",
+        "formula": "",
+        "pm": "Joshua Samuel",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "target": 0.9,
+        "actual": 0.8,
+        "targetRaw": "90%",
+        "actualRaw": "80.0%",
+        "status": "Not Met"
+      },
+      {
+        "account": "Vertex",
+        "metric": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations — Quality (FTR %)",
+        "name": "Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "description": "",
+        "formula": "",
+        "pm": "Joshua Samuel",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "target": 0.95,
+        "actual": 0.983,
+        "targetRaw": "95%",
+        "actualRaw": "98.3%",
+        "status": "Met"
+      },
+      {
+        "account": "Vertex",
+        "metric": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations — Client Training %",
+        "name": "Client Training %",
+        "metricName": "Client Training %",
+        "description": "",
+        "formula": "",
+        "pm": "Joshua Samuel",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "target": 1.0,
+        "actual": 1.0,
+        "targetRaw": "100%",
+        "actualRaw": "100.0%",
         "status": "Met"
       }
     ],
     "kpis": [
       {
-        "account": "AZ",
-        "metric": "Service Quality",
-        "target": 0.98,
-        "actual": 1,
-        "status": ""
-      },
-      {
-        "account": "AZ",
-        "metric": "On time delivery of projects",
+        "account": "AbbVie",
+        "metric": "Google Analytics Support 2026 — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
         "target": 0.95,
-        "actual": 1,
-        "status": ""
+        "actual": 0.9412,
+        "status": "Not Met"
       },
       {
-        "account": "AZ",
-        "metric": "Utilisation (FTE)",
-        "target": 0,
-        "actual": 0.94,
-        "status": ""
-      },
-      {
-        "account": "AZ",
-        "metric": "Mandatory Trainings",
-        "target": 1,
-        "actual": 1,
-        "status": ""
-      },
-      {
-        "account": "AZ",
-        "metric": "Volume - No of active projects",
-        "target": 0,
-        "actual": 16,
-        "status": ""
-      },
-      {
-        "account": "GSK",
-        "metric": "Utilisation (FTE)",
+        "account": "AbbVie",
+        "metric": "Google Analytics Support 2026 — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
         "target": 0.9,
-        "actual": 0,
-        "status": ""
+        "actual": 0.8879,
+        "status": "Not Met"
       },
       {
-        "account": "GSK",
-        "metric": "Mandatory Trainings",
+        "account": "AbbVie",
+        "metric": "Google Analytics Support 2026 — Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "target": 0.95,
+        "actual": 0.9676,
+        "status": "Met"
+      },
+      {
+        "account": "AbbVie",
+        "metric": "Google Analytics Support 2026 — Client Training %",
+        "metricName": "Client Training %",
+        "target": 1.0,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Alnylam",
+        "metric": "GA4 Implementation & Reporting — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Alnylam",
+        "metric": "GA4 Implementation & Reporting — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
         "target": 0.9,
-        "actual": 1,
-        "status": ""
+        "actual": 0.8095,
+        "status": "Not Met"
       },
       {
-        "account": "GSK",
-        "metric": "Service Quality",
-        "target": 0,
-        "actual": 0,
-        "status": ""
+        "account": "Amgen",
+        "metric": "Amgen Q1 2026 — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 0.9744,
+        "status": "Met"
       },
       {
-        "account": "GSK",
-        "metric": "No of Escalations",
-        "target": 0,
-        "actual": 0,
-        "status": ""
+        "account": "Amgen",
+        "metric": "Amgen Q1 2026 — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 1.0,
+        "status": "Met"
       },
       {
-        "account": "Incyte",
-        "metric": "Volume - No of active projects",
-        "target": 0,
-        "actual": 15,
-        "status": ""
+        "account": "Amgen",
+        "metric": "Amgen Q1 2026 — Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "target": 0.95,
+        "actual": 1.0,
+        "status": "Met"
       },
       {
-        "account": "Incyte",
-        "metric": "On time delivery of projects",
-        "target": 1,
-        "actual": 1,
-        "status": ""
+        "account": "Amgen",
+        "metric": "Amgen Q1 2026 — Client Training %",
+        "metricName": "Client Training %",
+        "target": 1.0,
+        "actual": 1.0,
+        "status": "Met"
       },
       {
-        "account": "Incyte",
-        "metric": "Service Quality",
-        "target": 0,
-        "actual": 0,
-        "status": ""
+        "account": "Bayer",
+        "metric": "Google Analytics Tagging Update — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 1.0,
+        "status": "Met"
       },
       {
-        "account": "Incyte",
-        "metric": "No of Escalations",
-        "target": 0,
-        "actual": 0,
-        "status": ""
+        "account": "Bayer",
+        "metric": "Google Analytics Tagging Update — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 0.8929,
+        "status": "Not Met"
       },
       {
-        "account": "Takeda",
-        "metric": "Volume - No of active projects",
-        "target": 0,
-        "actual": 28,
-        "status": ""
+        "account": "Bayer",
+        "metric": "Google Analytics Tagging Update — Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "target": 0.95,
+        "actual": 0.92,
+        "status": "Not Met"
       },
       {
-        "account": "Takeda",
-        "metric": "Resource Utilization Rate",
-        "target": 0.85,
-        "actual": 0.81,
-        "status": ""
+        "account": "Bayer",
+        "metric": "Google Analytics Tagging Update — Client Training %",
+        "metricName": "Client Training %",
+        "target": 1.0,
+        "actual": 1.0,
+        "status": "Met"
       },
       {
-        "account": "Takeda",
-        "metric": "On time delivery of projects",
-        "target": 1,
-        "actual": 1,
-        "status": ""
+        "account": "BioMarin",
+        "metric": "GA4 & GTM Tagging & Reporting — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 1.0,
+        "status": "Met"
       },
       {
-        "account": "Takeda",
-        "metric": "Service Quality",
-        "target": 0,
-        "actual": 0,
-        "status": ""
+        "account": "BioMarin",
+        "metric": "GA4 & GTM Tagging & Reporting — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 1.0508,
+        "status": "Met"
       },
       {
-        "account": "Takeda",
-        "metric": "No of Escalations",
-        "target": 0,
-        "actual": 0,
-        "status": ""
-      },
-      {
-        "account": "Fresenius",
-        "metric": "Utilisation (FTE)",
-        "target": 0.85,
-        "actual": 0.95,
+        "account": "BioMarin",
+        "metric": "GA4 & GTM Tagging & Reporting — Client Training %",
+        "metricName": "Client Training %",
+        "target": 1.0,
+        "actual": 1.0,
         "status": "Met"
       },
       {
         "account": "Fresenius",
-        "metric": "Service Quality",
-        "target": 0,
-        "actual": 0,
-        "status": ""
-      },
-      {
-        "account": "Fresenius",
-        "metric": "No of Escalations",
-        "target": 0,
-        "actual": 0,
-        "status": ""
-      },
-      {
-        "account": "Abbvie",
-        "metric": "Utilisation (FTE)",
-        "target": 0.85,
-        "actual": 0.99,
+        "metric": "Adobe Analytics and Tealium Data Enablement Services - 2026 — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 1.0,
         "status": "Met"
       },
       {
-        "account": "Abbvie",
-        "metric": "Service Quality",
-        "target": 0,
-        "actual": 0,
-        "status": ""
+        "account": "Fresenius",
+        "metric": "Adobe Analytics and Tealium Data Enablement Services - 2026 — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 1.0072,
+        "status": "Met"
       },
       {
-        "account": "Abbvie",
-        "metric": "No of Escalations",
-        "target": 0,
-        "actual": 0,
-        "status": ""
+        "account": "GSK",
+        "metric": "GSK - CD&TECH - Strategy and Operations — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 0.979,
+        "status": "Met"
+      },
+      {
+        "account": "GSK",
+        "metric": "GSK - CD&TECH - Strategy and Operations — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 1.0088,
+        "status": "Met"
+      },
+      {
+        "account": "GSK",
+        "metric": "GSK - CD&TECH - Strategy and Operations — Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "target": 0.95,
+        "actual": 0.836,
+        "status": "Not Met"
+      },
+      {
+        "account": "GSK",
+        "metric": "GSK - CD&TECH - Strategy and Operations — Client Training %",
+        "metricName": "Client Training %",
+        "target": 1.0,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Incyte",
+        "metric": "Incyte Web Studio — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Incyte",
+        "metric": "Incyte Web Studio — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 1.0634,
+        "status": "Met"
+      },
+      {
+        "account": "Incyte",
+        "metric": "Incyte Web Studio — Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "target": 0.95,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Ipsen",
+        "metric": "Ipsen CCC — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Ipsen",
+        "metric": "Ipsen CCC — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 0.96,
+        "status": "Met"
       },
       {
         "account": "Regeneron",
-        "metric": "Service Quality",
-        "target": 0,
-        "actual": 0,
+        "metric": "Regeneron GA Operations Y3 — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 0.9753,
         "status": "Met"
       },
       {
         "account": "Regeneron",
-        "metric": "No of Escalations",
-        "target": 0,
-        "actual": 0,
-        "status": "Met"
-      },
-      {
-        "account": "Amgen",
-        "metric": "Service Quality",
-        "target": 0,
-        "actual": 0,
-        "status": "Met"
-      },
-      {
-        "account": "Amgen",
-        "metric": "No of Escalations",
-        "target": 0,
-        "actual": 0,
-        "status": "Met"
-      },
-      {
-        "account": "Amgen",
-        "metric": "Utilisation (FTE)",
+        "metric": "Regeneron GA Operations Y3 — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
         "target": 0.9,
-        "actual": 0.98,
+        "actual": 1.0272,
         "status": "Met"
+      },
+      {
+        "account": "Regeneron",
+        "metric": "Regeneron GA Operations Y3 — Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "target": 0.95,
+        "actual": 0.977,
+        "status": "Met"
+      },
+      {
+        "account": "Regeneron",
+        "metric": "Regeneron GA Operations Y3 — Client Training %",
+        "metricName": "Client Training %",
+        "target": 1.0,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Takeda",
+        "metric": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Takeda",
+        "metric": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 0.8433,
+        "status": "Not Met"
+      },
+      {
+        "account": "Takeda",
+        "metric": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region — Client Training %",
+        "metricName": "Client Training %",
+        "target": 1.0,
+        "actual": 1.0,
+        "status": "Met"
+      },
+      {
+        "account": "Vertex",
+        "metric": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations — Timeliness (SLA %)",
+        "metricName": "Timeliness (SLA %)",
+        "target": 0.95,
+        "actual": 0.9362,
+        "status": "Not Met"
+      },
+      {
+        "account": "Vertex",
+        "metric": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations — Utilization (Effort %)",
+        "metricName": "Utilization (Effort %)",
+        "target": 0.9,
+        "actual": 0.8,
+        "status": "Not Met"
+      },
+      {
+        "account": "Vertex",
+        "metric": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations — Quality (FTR %)",
+        "metricName": "Quality (FTR %)",
+        "target": 0.95,
+        "actual": 0.983,
+        "status": "Met"
+      },
+      {
+        "account": "Vertex",
+        "metric": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations — Client Training %",
+        "metricName": "Client Training %",
+        "target": 1.0,
+        "actual": 1.0,
+        "status": "Met"
+      }
+    ],
+    "projects": [
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 4
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 2
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 4
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 4
+      },
+      {
+        "client": "BioMarin",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 3
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 2
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 4
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 3
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 2
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 4
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 3
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 4
+      },
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "BioMarin",
+        "project": "GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 0
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 0
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 0
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "BioMarin",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 0
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 0
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 0
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "BioMarin",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 0
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 0
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 0
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "BioMarin",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 0
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 0
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 0
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "BioMarin",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 0
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 0
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 0
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "BioMarin",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 0
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 0
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 0
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "BioMarin",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 0
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 0
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 0
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "AbbVie",
+        "project": "Google Analytics Support 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "Alnylam",
+        "project": "GA4 Implementation & Reporting",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Amgen",
+        "project": "Amgen Q1 2026",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Bayer",
+        "project": "Google Analytics Tagging Update",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "BioMarin",
+        "project": "GA4 & GTM Tagging & Reporting",
+        "pm": "Siddharth Vadlamudi",
+        "metricCount": 0
+      },
+      {
+        "client": "Fresenius",
+        "project": "Adobe Analytics and Tealium Data Enablement Services - 2026",
+        "pm": "Andrew Manickam",
+        "metricCount": 0
+      },
+      {
+        "client": "GSK",
+        "project": "GSK - CD&TECH - Strategy and Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
+      },
+      {
+        "client": "Incyte",
+        "project": "Incyte Web Studio",
+        "pm": "Shreya Rao",
+        "metricCount": 0
+      },
+      {
+        "client": "Ipsen",
+        "project": "Ipsen CCC",
+        "pm": "Nataraj Selvaraj",
+        "metricCount": 0
+      },
+      {
+        "client": "Regeneron",
+        "project": "Regeneron GA Operations Y3",
+        "pm": "Prithvi Raj",
+        "metricCount": 0
+      },
+      {
+        "client": "Takeda",
+        "project": "Matomo implementation and Dashboarding for Takeda EUCAN & GEM region",
+        "pm": "Sanket Agrawal",
+        "metricCount": 0
+      },
+      {
+        "client": "Vertex",
+        "project": "Vertex Tagging & Taxonomy Pain BU - 2026 Governance & Operations",
+        "pm": "Joshua Samuel",
+        "metricCount": 0
       }
     ],
     "summary": {
-      "metRate": 45,
-      "totalMetrics": 29,
-      "metCount": 13
+      "metRate": 77,
+      "totalMetrics": 39,
+      "metCount": 30
     },
-    "highlights": [
-      {
-        "pm": "Joshua Samuel",
-        "project": "Vertex",
-        "month": "January",
-        "highlight": "• Conducted a working session with DTE and Web Development teams to review and align on the Q1 2026 web updates roadmap, ensuring clear direction for"
-      },
-      {
-        "pm": "Joshua Samuel",
-        "project": "Vertex",
-        "month": "January",
-        "highlight": "upcoming HCP and DTC initiatives"
-      },
-      {
-        "pm": "Joshua Samuel",
-        "project": "Vertex",
-        "month": "January",
-        "highlight": "• Phase 2 Retrospective Campaign Taxonomy has been delivered on January 20th, 2026"
-      },
-      {
-        "pm": "Shreya Rao",
-        "project": "Incyte",
-        "month": "January",
-        "highlight": "Received client communication on Qualtrics thereby creating an opportunity for having qualtrics functional"
-      },
-      {
-        "pm": "Shreya Rao",
-        "project": "Incyte",
-        "month": "January",
-        "highlight": "Drupal update go live on all 37 websites and we performed live QA with no major issues found"
-      },
-      {
-        "pm": "Shreya Rao",
-        "project": "Incyte",
-        "month": "January",
-        "highlight": "Accessibe go live on 8 unbranded sites"
-      },
-      {
-        "pm": "Shreya Rao",
-        "project": "Incyte",
-        "month": "January",
-        "highlight": "More opportunites to engage with the clients through 1:1 connects"
-      },
-      {
-        "pm": "Nataraj Selvaraj",
-        "project": "Ipsen",
-        "month": "January",
-        "highlight": "Value added: Configuring Key Events for all Ipsen websites"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "> Completed GA4 basic + custom tracking QA on DEV JP website https://dev.speakerslide.amgenpro.jp/"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "> Completed GA4 basic + custom tracking QA on DEV DK website https://dev.mitkolesterol.dk/"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "> Successfully completed GA4 basic tracking setup on Live FR website https://www.amgen.fr/"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "> Delivered regular monthly and weekly reports for Japan (6 brands)"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "https://evenity.jp, https://blincyto.jp, https://repatha.jp, https://lumakras.jp, https://aimovig.jp, https://otezla-japan.jp"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "> Fulfilled GA4 tracking setup on Cloud (Amgen landing page) pages. Example landing page:>"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "https://cloud.amgeninfo.com/BR_Video_Dr_Carmelo"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "https://cloud.amgeninfo.com/instructions_for_the_pre-filled_pen-video"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "https://cloud.amgeninfo.com/cardiomedicalaffairs"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "https://cloud.amgeninfo.com/immunoMIND"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "https://cloud.amgeninfo.com/bfm_video_pt-BR"
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Amgen",
-        "month": "January",
-        "highlight": "> Fulfilled campaign tracking (UTM/Newsletter) requests for redamgen.com websites."
-      },
-      {
-        "pm": "Prithvi Raj",
-        "project": "Regeneron",
-        "month": "January",
-        "highlight": ">"
-      },
-      {
-        "pm": "Samanvey Gupta",
-        "project": "GSK 3rd Party tagging",
-        "month": "January",
-        "highlight": "1. Tag Implementation - 115 tags were implemented/re-implemented in January"
-      },
-      {
-        "pm": "Samanvey Gupta",
-        "project": "GSK 3rd Party tagging",
-        "month": "January",
-        "highlight": "2. Tag Expiration Process: 6623 tags sent for 11 agency confirmations, 1747 to be retain and 4876 to be pause."
-      },
-      {
-        "pm": "Samanvey Gupta",
-        "project": "GSK 3rd Party tagging",
-        "month": "January",
-        "highlight": "a. Among 1747, we have put active labels in tealium on 1380 tags till now"
-      },
-      {
-        "pm": "Samanvey Gupta",
-        "project": "GSK 3rd Party tagging",
-        "month": "January",
-        "highlight": "b. For 4876 tags to pause: CMI completed (912/1057), pulsepoint completed (10/10) and Aim (1/22) tags have been put on Pause and their QA is WIP"
-      },
-      {
-        "pm": "Samanvey Gupta",
-        "project": "GSK 3rd Party tagging",
-        "month": "January",
-        "highlight": "3. Tag Hawk:"
-      },
-      {
-        "pm": "Samanvey Gupta",
-        "project": "GSK 3rd Party tagging",
-        "month": "January",
-        "highlight": "a. Tool Development - Team is validating 500+ tags (either pausing the tags or fixing) for which data is not flowing to Tag Hawk and its WIP"
-      },
-      {
-        "pm": "Samanvey Gupta",
-        "project": "GSK 3rd Party tagging",
-        "month": "January",
-        "highlight": "b. Master Table -  Started updated Master table also from 2021-2023 implemented tickets. (~4400 tags to update)"
-      },
-      {
-        "pm": "Samanvey Gupta",
-        "project": "GSK 3rd Party tagging",
-        "month": "January",
-        "highlight": "4. Cookie Consent - Continued working on the required fix for all 85 websites across 11 profiles, 9 profiles are completed"
-      },
-      {
-        "pm": "Vatsala Mishra",
-        "project": "Gilead",
-        "month": "January",
-        "highlight": "1. End of the year deck for 2025 presented to client"
-      },
-      {
-        "pm": "Vatsala Mishra",
-        "project": "Gilead",
-        "month": "January",
-        "highlight": "2. Dashboard delivered for trodelvy DTP"
-      },
-      {
-        "pm": "Vatsala Mishra",
-        "project": "Gilead",
-        "month": "January",
-        "highlight": "3. Work started for migration of first site on EDS Kitemedinfo"
-      },
-      {
-        "pm": "Vatsala Mishra",
-        "project": "Gilead",
-        "month": "January",
-        "highlight": "4.2025 analytics report for careers pages"
-      },
-      {
-        "pm": "Vatsala Mishra",
-        "project": "Gilead",
-        "month": "January",
-        "highlight": "5. Go live of HIVclinicalinsights, where team worked on PST shift and delivered on time"
-      },
-      {
-        "pm": "Vatsala Mishra",
-        "project": "Gilead",
-        "month": "January",
-        "highlight": "6. OT exception work completed for gileadpro websites"
-      }
-    ],
-    "lowlights": [
-      {
-        "pm": "Joshua Samuel",
-        "project": "Vertex",
-        "month": "January",
-        "lowlight": "Awaiting the final signed SOW and PO"
-      },
-      {
-        "pm": "Shreya Rao",
-        "project": "Incyte",
-        "month": "January",
-        "lowlight": "Awaiting signed SOW and PO"
-      }
-    ]
+    "highlights": [],
+    "lowlights": []
   },
   "diagnostics": {
     "sheets_found": [
+      "Web Analytics KPI Summary",
       "KPI",
-      "Sheet2"
+      "Base Sheet",
+      "KPI Master"
     ],
     "sections": {
       "kpi_main": {
+        "sheet": "Web Analytics KPI Summary",
         "header_row": 0,
-        "columns_found": [
-          "account_name",
-          "metric_name",
-          "kpi_name",
-          "description",
-          "formula",
-          "target",
-          "actual",
-          "status"
-        ],
-        "columns_missing": [],
-        "total_expected": 8,
-        "total_found": 8,
-        "sheet": "KPI"
-      },
-      "highlights_lowlights": {
-        "header_row": 0,
-        "columns_found": [
-          "project_manager",
-          "project",
-          "month",
-          "highlight",
-          "lowlight"
-        ],
-        "columns_missing": [],
-        "total_expected": 5,
-        "total_found": 5,
-        "sheet": "Sheet2"
+        "kpi_columns": [
+          "Timeliness (SLA %)",
+          "Utilization (Effort %)",
+          "Quality (FTR %)",
+          "Client Training %"
+        ]
       }
     }
   },
-  "timestamp": "2026-05-05T19:40:55.860249",
-  "input_file": "C:\\Users\\KIIT\\Downloads\\Dashboard-looker-main\\Dashboard-looker-main\\uploads\\kpi.xlsx"
+  "timestamp": "2026-05-21T09:04:01.945117",
+  "input_file": "C:\\Users\\KIIT\\Downloads\\Dashboard-looker-main\\Dashboard-looker-main\\.claude\\worktrees\\heuristic-montalcini-908142\\uploads\\kpi.xlsx"
 }

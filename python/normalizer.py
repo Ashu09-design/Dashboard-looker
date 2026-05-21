@@ -551,97 +551,143 @@ def normalize_ftr(file_path):
     return result, diagnostics
 
 
+def _kpi_num(val):
+    """Return a float if val is numeric, else None (distinguishes NA from 0)."""
+    if val is None:
+        return None
+    if isinstance(val, (int, float)):
+        if isinstance(val, float) and math.isnan(val):
+            return None
+        return float(val)
+    s = str(val).replace('%', '').replace(',', '').strip()
+    if not s or s.upper() in ('NA', 'N/A', 'NONE', '-', 'TBD', 'YET TO BE SHARED'):
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
 def normalize_kpi(file_path):
-    """Parse KPI Excel file."""
+    """Parse the Web Analytics KPI Summary Excel file (per-project scorecard)."""
     sheets = read_excel_sheets(file_path)
-    aliases = ALIASES.get('kpi', {})
     result = {
         'metrics': [],
         'kpis': [],
+        'projects': [],
         'summary': {'metRate': 0, 'totalMetrics': 0, 'metCount': 0},
         'highlights': [],
         'lowlights': [],
     }
     diagnostics = {'sheets_found': list(sheets.keys()), 'sections': {}}
 
-    # Main KPI sheet (first sheet)
-    sheet_names = list(sheets.keys())
-    if sheet_names:
-        first_df = sheets[sheet_names[0]]
-        kpi_aliases = {k: v for k, v in aliases.items() if k in [
-            'account_name', 'metric_name', 'kpi_name', 'description',
-            'formula', 'target', 'actual', 'status'
-        ]}
-        rows, _, diag = extract_table(first_df, kpi_aliases)
-        diagnostics['sections']['kpi_main'] = {**diag, 'sheet': sheet_names[0]}
+    # Find the scorecard sheet — the one carrying Timeliness/Quality columns.
+    target_df, target_name = None, None
+    for sn, df in sheets.items():
+        blob = ' '.join(safe_str(c).lower() for c in df.head(8).values.flatten())
+        if 'timeliness' in blob and 'quality' in blob:
+            target_df, target_name = df, sn
+            break
+    if target_df is None and sheets:
+        target_name = list(sheets.keys())[0]
+        target_df = sheets[target_name]
 
-        for r in rows:
-            account = safe_str(r.get('account_name'))
-            metric = safe_str(r.get('metric_name'))
-            if not account and not metric:
+    # (header substring, display label, target threshold)
+    KPI_DEFS = [
+        ('timeliness', 'Timeliness (SLA %)', 0.95),
+        ('utli', 'Utilization (Effort %)', 0.90),
+        ('utili', 'Utilization (Effort %)', 0.90),
+        ('quality', 'Quality (FTR %)', 0.95),
+        ('client training', 'Client Training %', 1.0),
+    ]
+
+    if target_df is not None:
+        hdr_idx = 0
+        for i in range(min(10, len(target_df))):
+            blob = ' '.join(safe_str(c).lower() for c in target_df.iloc[i].tolist())
+            if 'client' in blob and 'project' in blob:
+                hdr_idx = i
+                break
+
+        headers = [safe_str(c).lower() for c in target_df.iloc[hdr_idx].tolist()]
+
+        def col(*subs):
+            for idx, h in enumerate(headers):
+                if any(s in h for s in subs):
+                    return idx
+            return None
+
+        ci_client = col('client')
+        ci_project = col('project name', 'project')
+        ci_pm = col('pm', 'project manager')
+
+        kpi_cols, seen = [], set()
+        for sub, label, thr in KPI_DEFS:
+            if label in seen:
                 continue
+            idx = col(sub)
+            if idx is not None:
+                kpi_cols.append((idx, label, thr))
+                seen.add(label)
 
-            target = safe_num(r.get('target'))
-            actual = safe_num(r.get('actual'))
-            status = safe_str(r.get('status'))
-            kpi_name = safe_str(r.get('kpi_name')) or metric
+        diagnostics['sections']['kpi_main'] = {
+            'sheet': target_name, 'header_row': hdr_idx,
+            'kpi_columns': [l for _, l, _ in kpi_cols],
+        }
 
-            result['metrics'].append({
-                'account': account,
-                'metric': metric,
-                'name': kpi_name,
-                'description': safe_str(r.get('description')),
-                'formula': safe_str(r.get('formula')),
-                'target': target,
-                'actual': actual,
-                'targetRaw': safe_str(r.get('target')),
-                'actualRaw': safe_str(r.get('actual')),
-                'status': status,
+        def cell(row, idx):
+            return row[idx] if idx is not None and idx < len(row) else None
+
+        for i in range(hdr_idx + 1, len(target_df)):
+            row = target_df.iloc[i].tolist()
+            client = safe_str(cell(row, ci_client))
+            project = ' '.join(safe_str(cell(row, ci_project)).split())
+            if not client and not project:
+                continue
+            pm = safe_str(cell(row, ci_pm))
+
+            proj_metrics = 0
+            for idx, label, thr in kpi_cols:
+                val = _kpi_num(cell(row, idx))
+                if val is None:
+                    continue
+                met = val >= thr
+                metric = {
+                    'account': client,
+                    'metric': f'{project} — {label}' if project else label,
+                    'name': label,
+                    'metricName': label,
+                    'description': '',
+                    'formula': '',
+                    'pm': pm,
+                    'project': project,
+                    'target': thr,
+                    'actual': round(val, 4),
+                    'targetRaw': f'{int(thr * 100)}%',
+                    'actualRaw': f'{round(val * 100, 1)}%',
+                    'status': 'Met' if met else 'Not Met',
+                }
+                result['metrics'].append(metric)
+                result['kpis'].append({
+                    'account': client,
+                    'metric': metric['metric'],
+                    'metricName': label,
+                    'target': thr,
+                    'actual': metric['actual'],
+                    'status': metric['status'],
+                })
+                proj_metrics += 1
+
+            result['projects'].append({
+                'client': client, 'project': project,
+                'pm': pm, 'metricCount': proj_metrics,
             })
-            result['kpis'].append({
-                'account': account,
-                'metric': kpi_name or metric,
-                'target': target,
-                'actual': actual,
-                'status': status,
-            })
 
-        # Summary
-        result['summary']['totalMetrics'] = len(result['metrics'])
-        result['summary']['metCount'] = sum(1 for m in result['metrics']
-            if any(kw in m['status'].lower() for kw in ['met', 'achieved', 'green'])
-            or (m['actual'] >= m['target'] and m['target'] > 0))
-        result['summary']['metRate'] = round(
-            result['summary']['metCount'] / result['summary']['totalMetrics'] * 100
-        ) if result['summary']['totalMetrics'] > 0 else 0
-
-    # Sheet2: Highlights/Lowlights
-    if len(sheet_names) > 1:
-        second_df = sheets[sheet_names[1]]
-        hl_aliases = {k: v for k, v in aliases.items() if k in ['project_manager', 'project', 'month', 'highlight', 'lowlight']}
-        rows, _, diag = extract_table(second_df, hl_aliases)
-        diagnostics['sections']['highlights_lowlights'] = {**diag, 'sheet': sheet_names[1]}
-
-        current_pm = ''
-        current_project = ''
-        current_month = ''
-        for r in rows:
-            pm = safe_str(r.get('project_manager'))
-            if pm:
-                current_pm = pm
-            proj = safe_str(r.get('project'))
-            if proj:
-                current_project = proj
-            month = safe_str(r.get('month'))
-            if month:
-                current_month = month
-
-            hl = safe_str(r.get('highlight'))
-            ll = safe_str(r.get('lowlight'))
-            if hl:
-                result['highlights'].append({'pm': current_pm, 'project': current_project, 'month': current_month, 'highlight': hl})
-            if ll:
-                result['lowlights'].append({'pm': current_pm, 'project': current_project, 'month': current_month, 'lowlight': ll})
+        total = len(result['metrics'])
+        met = sum(1 for m in result['metrics'] if m['status'] == 'Met')
+        result['summary']['totalMetrics'] = total
+        result['summary']['metCount'] = met
+        result['summary']['metRate'] = round(met / total * 100) if total else 0
 
     return result, diagnostics
 
