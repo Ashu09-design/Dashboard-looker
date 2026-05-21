@@ -620,6 +620,7 @@ def normalize_kpi(file_path):
         ci_client = col('client')
         ci_project = col('project name', 'project')
         ci_pm = col('pm', 'project manager')
+        ci_date = col('start date', 'measurement start', 'period')
 
         kpi_cols, seen = [], set()
         for sub, label, thr in KPI_DEFS:
@@ -646,6 +647,16 @@ def normalize_kpi(file_path):
                 continue
             pm = safe_str(cell(row, ci_pm))
 
+            month = ''
+            dval = cell(row, ci_date)
+            if dval is not None:
+                try:
+                    dt = pd.to_datetime(dval, errors='coerce')
+                    if pd.notna(dt):
+                        month = dt.strftime('%b %Y')
+                except Exception:
+                    month = ''
+
             proj_metrics = 0
             for idx, label, thr in kpi_cols:
                 val = _kpi_num(cell(row, idx))
@@ -661,6 +672,7 @@ def normalize_kpi(file_path):
                     'formula': '',
                     'pm': pm,
                     'project': project,
+                    'month': month,
                     'target': thr,
                     'actual': round(val, 4),
                     'targetRaw': f'{int(thr * 100)}%',
@@ -672,6 +684,9 @@ def normalize_kpi(file_path):
                     'account': client,
                     'metric': metric['metric'],
                     'metricName': label,
+                    'project': project,
+                    'pm': pm,
+                    'month': month,
                     'target': thr,
                     'actual': metric['actual'],
                     'status': metric['status'],
@@ -1023,6 +1038,131 @@ def normalize_governance(file_path):
 #  MAIN CLI
 # ══════════════════════════════════════════════════════════════════
 
+def _clean_status(val):
+    """Strip emoji/symbols from a status string, keep the words."""
+    s = safe_str(val)
+    out = ''.join(ch for ch in s if ch.isalnum() or ch in ' /-&').strip()
+    return out or s
+
+
+def normalize_poc(file_path):
+    """Parse the Existing PoC Details workbook (Use Case Details + AI Usecase)."""
+    sheets = read_excel_sheets(file_path)
+    result = {
+        'pocs': [],
+        'aiUsecases': [],
+        'summary': {'total': 0, 'byStatus': {}, 'completed': 0, 'inProgress': 0},
+    }
+    diagnostics = {'sheets_found': list(sheets.keys()), 'sections': {}}
+
+    # ── Use Case Details (the PoC tracker) ──
+    _, uc_df = find_sheet(sheets, ['Use Case Details', 'PoC Details', 'Use Case'])
+    if uc_df is not None:
+        hdr_idx = 0
+        for i in range(min(8, len(uc_df))):
+            blob = ' '.join(safe_str(c).lower() for c in uc_df.iloc[i].tolist())
+            if 'title' in blob or 'poc' in blob:
+                hdr_idx = i
+                break
+        headers = [safe_str(c).lower() for c in uc_df.iloc[hdr_idx].tolist()]
+
+        def col(*subs):
+            for idx, h in enumerate(headers):
+                if any(s in h for s in subs):
+                    return idx
+            return None
+
+        cmap = {
+            'sno': col('s. no', 's.no', 'sno'),
+            'manager': col('reporting manager', 'manager'),
+            'title': col('title'),
+            'description': col('description'),
+            'spoc': col('spoc'),
+            'team': col('team details', 'team'),
+            'status': col('status'),
+            'lastWorked': col('last worked', 'date'),
+            'expectedCompletion': col('expected completion', 'completion'),
+            'artifacts': col('artifacts'),
+            'comments': col('comments', 'links'),
+        }
+
+        def cell(row, idx):
+            return row[idx] if idx is not None and idx < len(row) else None
+
+        for i in range(hdr_idx + 1, len(uc_df)):
+            row = uc_df.iloc[i].tolist()
+            title = safe_str(cell(row, cmap['title']))
+            manager = safe_str(cell(row, cmap['manager']))
+            if not title and not manager:
+                continue
+            status_raw = safe_str(cell(row, cmap['status']))
+            status = _clean_status(status_raw)
+            result['pocs'].append({
+                'sno': safe_str(cell(row, cmap['sno'])),
+                'manager': manager,
+                'title': title,
+                'description': safe_str(cell(row, cmap['description'])),
+                'spoc': safe_str(cell(row, cmap['spoc'])),
+                'team': safe_str(cell(row, cmap['team'])),
+                'status': status,
+                'statusRaw': status_raw,
+                'lastWorked': safe_str(cell(row, cmap['lastWorked']))[:10],
+                'expectedCompletion': safe_str(cell(row, cmap['expectedCompletion']))[:10],
+                'artifacts': safe_str(cell(row, cmap['artifacts'])),
+                'comments': safe_str(cell(row, cmap['comments'])),
+            })
+        diagnostics['sections']['use_case_details'] = {'header_row': hdr_idx, 'count': len(result['pocs'])}
+
+    # ── AI Usecase backlog ──
+    _, ai_df = find_sheet(sheets, ['AI Usecase', 'AI Use Case', 'AI'])
+    if ai_df is not None:
+        headers = [safe_str(c).lower() for c in ai_df.iloc[0].tolist()]
+
+        def acol(*subs):
+            for idx, h in enumerate(headers):
+                if any(s in h for s in subs):
+                    return idx
+            return None
+
+        amap = {
+            'ideaId': acol('idea id', 'id'),
+            'businessFunction': acol('business function', 'function'),
+            'currentProcess': acol('current process', 'process'),
+            'painPoint': acol('pain point', 'obstacle'),
+            'effortLevel': acol('manual effort', 'effort'),
+            'frequency': acol('frequency'),
+            'solution': acol('proposed ai', 'solution'),
+            'benefit': acol('expected benefit', 'benefit'),
+            'tools': acol('tools', 'systems'),
+            'priority': acol('priority'),
+            'impact': acol('estimated impact', 'impact'),
+            'ideaBy': acol('idea given by', 'given by'),
+        }
+        for i in range(1, len(ai_df)):
+            row = ai_df.iloc[i].tolist()
+            vals = {k: safe_str(row[v]) if v is not None and v < len(row) else ''
+                    for k, v in amap.items()}
+            if not any(vals.values()):
+                continue
+            result['aiUsecases'].append(vals)
+        diagnostics['sections']['ai_usecase'] = {'count': len(result['aiUsecases'])}
+
+    # ── Summary ──
+    by_status = {}
+    for p in result['pocs']:
+        s = p['status'] or 'Unknown'
+        by_status[s] = by_status.get(s, 0) + 1
+    result['summary']['total'] = len(result['pocs'])
+    result['summary']['byStatus'] = by_status
+    result['summary']['completed'] = sum(
+        v for k, v in by_status.items() if 'complete' in k.lower())
+    result['summary']['inProgress'] = sum(
+        v for k, v in by_status.items()
+        if any(w in k.lower() for w in ['progress', 'wip', 'ongoing']))
+
+    return result, diagnostics
+
+
 NORMALIZERS = {
     'team': normalize_team,
     'ftr': normalize_ftr,
@@ -1030,6 +1170,7 @@ NORMALIZERS = {
     'leave': normalize_leave,
     'sow': normalize_sow,
     'governance': normalize_governance,
+    'poc': normalize_poc,
 }
 
 
@@ -1138,6 +1279,8 @@ def main():
                 summary['counts'] = {'projects': len(data.get('projects', []))}
             elif args.source == 'governance':
                 summary['counts'] = {'risks': len(data.get('risks', [])), 'audits': len(data.get('audits', []))}
+            elif args.source == 'poc':
+                summary['counts'] = {'pocs': len(data.get('pocs', [])), 'aiUsecases': len(data.get('aiUsecases', []))}
 
         print(json.dumps(summary))
 

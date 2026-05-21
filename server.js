@@ -463,6 +463,15 @@ app.get('/api/exec/project-health', verifyToken, (req, res) => {
   }
 });
 
+app.get('/api/exec/poc', verifyToken, (req, res) => {
+  try {
+    const poc = execData.getData('poc');
+    res.json(poc || { pocs: [], aiUsecases: [], summary: {} });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── ALL SHEETS — Parent/Child tab data ────────────────────
 
 /**
@@ -560,6 +569,7 @@ app.get('/api/exec/all-sheets', verifyToken, (req, res) => {
       governance: { name: 'Governance', icon: '🏛️' },
       leave: { name: 'Leave Tracker', icon: '🏖️' },
       kpi: { name: 'KPI Metrics', icon: '🎯' },
+      poc: { name: 'POV / POC Tracker', icon: '🧪' },
     };
 
     const files = fs.readdirSync(uploadsDir).filter(f => /\.(xlsx|xlsb|xls)$/i.test(f));
@@ -639,7 +649,7 @@ app.get('/api/exec/all-sheets', verifyToken, (req, res) => {
     }
 
     // Sort by predefined order
-    const order = ['ftr', 'team', 'sow', 'governance', 'leave', 'kpi'];
+    const order = ['ftr', 'team', 'sow', 'governance', 'leave', 'kpi', 'poc'];
     sources.sort((a, b) => (order.indexOf(a.key) - order.indexOf(b.key)));
     res.json({ sources });
   } catch (err) {
@@ -655,6 +665,7 @@ const execUploadFields = upload.fields([
   { name: 'governance', maxCount: 1 },
   { name: 'leave', maxCount: 1 },
   { name: 'kpi', maxCount: 1 },
+  { name: 'poc', maxCount: 1 },
 ]);
 
 app.post('/api/exec/upload-sources', verifyToken, (req, res) => {

@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   Executive Dashboard — Client Logic (executive.js)
-   Redesigned: Parent/Child Excel Tab Navigation
+   Manager Dashboard — Tabbed Curated Views (executive.js)
    ═══════════════════════════════════════════════════════════════ */
 
 const TOKEN_KEY = 'exec_token';
@@ -8,10 +7,25 @@ const REFRESH_MS = 5 * 60 * 1000;
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
 
-let chartFTE = null;
-let chartKPI = null;
-let chartSOW = null;
-let allSheetsData = null; // cached sheet data
+// ── Global state ──────────────────────────────────────────────────
+const state = {
+    data: {},          // summary, kpi, sow, gov, leave, ftr, health, team, poc
+    activeTab: 'overview',
+    filters: {},       // per-tab filter values
+    charts: {},        // live Chart.js instances
+};
+
+const TABS = [
+    { id: 'overview', label: 'Overview', icon: '🏠' },
+    { id: 'team', label: 'Team Details', icon: '👥' },
+    { id: 'projects', label: 'Projects', icon: '📂' },
+    { id: 'sow', label: 'SOW & PO', icon: '💰' },
+    { id: 'kpis', label: 'KPIs', icon: '🎯' },
+    { id: 'ftr', label: 'FTR', icon: '✅' },
+    { id: 'leave', label: 'Leave', icon: '🏖️' },
+    { id: 'risks', label: 'Active Risks', icon: '⚠️' },
+    { id: 'poc', label: 'POV / POC', icon: '🧪' },
+];
 
 // ══════════════════════════════════════════════════════════════════
 //  INIT
@@ -20,8 +34,8 @@ let allSheetsData = null; // cached sheet data
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     bindUI();
+    renderTabNav();
     fetchAllExecData();
-    fetchAllSheets();
     setInterval(fetchAllExecData, REFRESH_MS);
 });
 
@@ -35,9 +49,7 @@ async function checkAuth() {
     const token = getToken();
     if (!token) { window.location.href = '/login.html'; return; }
     try {
-        const res = await fetch('/api/auth/verify', {
-            headers: { Authorization: 'Bearer ' + token },
-        });
+        const res = await fetch('/api/auth/verify', { headers: { Authorization: 'Bearer ' + token } });
         if (!res.ok) throw new Error('Unauthorized');
     } catch {
         sessionStorage.removeItem(TOKEN_KEY);
@@ -58,10 +70,16 @@ function logout() {
 //  DATA FETCHING
 // ══════════════════════════════════════════════════════════════════
 
+async function apiFetch(url) {
+    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + getToken() } });
+    if (res.status === 401) throw new Error('401');
+    return res.json();
+}
+
 async function fetchAllExecData() {
     showLoading(true);
     try {
-        const [summary, kpi, sow, gov, leave, ftr, health] = await Promise.all([
+        const [summary, kpi, sow, gov, leave, ftr, health, team, poc] = await Promise.all([
             apiFetch('/api/exec/summary'),
             apiFetch('/api/exec/kpi-scorecards'),
             apiFetch('/api/exec/sow-financial'),
@@ -69,44 +87,23 @@ async function fetchAllExecData() {
             apiFetch('/api/exec/leave-impact'),
             apiFetch('/api/exec/ftr-metrics'),
             apiFetch('/api/exec/project-health'),
+            apiFetch('/api/exec/team-capacity'),
+            apiFetch('/api/exec/poc'),
         ]);
-
-        renderKPICards(summary);
-        renderFTETrendChart(gov);
-        renderKPIChart(kpi);
-        renderSOWChart(sow);
-        renderRiskPanel(gov);
-        renderLeavePanel(leave);
-        renderProjectHealthTable(health);
-        renderHighlightsLowlights(gov);
+        state.data = { summary, kpi, sow, gov, leave, ftr, health, team, poc };
         updateTimestamp();
+        renderTab();
     } catch (err) {
-        console.error('Executive fetch error:', err);
+        console.error('Manager dashboard fetch error:', err);
         if (err.message && err.message.includes('401')) logout();
     }
     showLoading(false);
 }
 
-async function fetchAllSheets() {
-    try {
-        const data = await apiFetch('/api/exec/all-sheets');
-        allSheetsData = data;
-        buildSidebar(data.sources || []);
-    } catch (err) {
-        console.error('All-sheets fetch error:', err);
-    }
-}
-
-async function apiFetch(url) {
-    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + getToken() } });
-    if (res.status === 401) throw new Error('401');
-    return res.json();
-}
-
 function showLoading(show) {
     const el = $('#loadingOverlay');
-    if (show) el.classList.remove('hidden');
-    else el.classList.add('hidden');
+    if (!el) return;
+    el.classList.toggle('hidden', !show);
 }
 
 function updateTimestamp() {
@@ -115,125 +112,825 @@ function updateTimestamp() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  SIDEBAR — Build Parent/Child Navigation
+//  TAB NAVIGATION
 // ══════════════════════════════════════════════════════════════════
 
-function buildSidebar(sources) {
-    const nav = $('#sidebarNav');
-    // Keep the overview link, remove old dynamic items
-    const existing = nav.querySelectorAll('.nav-parent-group');
-    existing.forEach(el => el.remove());
-
-    sources.forEach(source => {
-        const group = document.createElement('div');
-        group.className = 'nav-parent-group';
-
-        // Parent item
-        const parent = document.createElement('div');
-        parent.className = 'nav-item nav-parent';
-        parent.innerHTML = `
-            <span class="nav-icon">${source.icon}</span>
-            <span class="nav-label">${esc(source.name)}</span>
-            <span class="nav-badge">${source.sheets.length}</span>
-            <span class="nav-chevron">▸</span>
-        `;
-        parent.addEventListener('click', () => {
-            group.classList.toggle('expanded');
+function renderTabNav() {
+    const nav = $('#tabNav');
+    nav.innerHTML = TABS.map(t =>
+        `<button class="tab-link ${t.id === state.activeTab ? 'active' : ''}" data-tab="${t.id}">
+            <span class="tab-ico">${t.icon}</span>${esc(t.label)}
+        </button>`).join('');
+    nav.querySelectorAll('.tab-link').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.activeTab = btn.dataset.tab;
+            renderTabNav();
+            renderTab();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-
-        // Child items
-        const children = document.createElement('div');
-        children.className = 'nav-children';
-        source.sheets.forEach((sheet, idx) => {
-            const child = document.createElement('div');
-            child.className = 'nav-item nav-child';
-            child.innerHTML = `
-                <span class="nav-dot"></span>
-                <span class="nav-label">${esc(sheet.name)}</span>
-                <span class="nav-row-count">${sheet.totalRows}r</span>
-            `;
-            child.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showSheet(source, sheet);
-                // Active state
-                $$('.nav-item').forEach(n => n.classList.remove('active'));
-                child.classList.add('active');
-            });
-            children.appendChild(child);
-        });
-
-        group.appendChild(parent);
-        group.appendChild(children);
-        nav.appendChild(group);
     });
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  VIEW SWITCHING
+//  FILTER BAR
 // ══════════════════════════════════════════════════════════════════
 
-function showOverview() {
-    $$('.content-view').forEach(v => v.classList.remove('active'));
-    $('#viewOverview').classList.add('active');
-    $$('.nav-item').forEach(n => n.classList.remove('active'));
-    $('.nav-overview').classList.add('active');
+// Which filters apply to each tab
+const TAB_FILTERS = {
+    team: ['office', 'role'],
+    projects: ['project'],
+    sow: ['client'],
+    kpis: ['client', 'month'],
+    ftr: ['client', 'month'],
+    leave: ['month'],
+    risks: ['project', 'month'],
+    poc: ['pocStatus', 'manager'],
+};
+
+function uniqueSorted(arr) {
+    return [...new Set(arr.filter(v => v != null && String(v).trim() !== ''))].sort();
 }
 
-function showSheet(source, sheet) {
-    $$('.content-view').forEach(v => v.classList.remove('active'));
-    $('#viewSheet').classList.add('active');
+function filterOptions(key) {
+    const d = state.data;
+    switch (key) {
+        case 'office':
+            return uniqueSorted((d.team?.activeMembers || []).map(m => m.location));
+        case 'role':
+            return uniqueSorted((d.team?.activeMembers || []).map(m => m.role));
+        case 'project':
+            return uniqueSorted((d.health || []).map(p => p.projectName));
+        case 'client':
+            return uniqueSorted([
+                ...(d.sow?.projects || []).map(p => p.client),
+                ...(d.kpi?.metrics || []).map(m => m.account),
+                ...(d.ftr?.accounts || []).map(a => a.account),
+            ]);
+        case 'month':
+            return uniqueSorted([
+                ...(d.kpi?.metrics || []).map(m => m.month),
+                ...(d.gov?.risks || []).map(r => r.month),
+                ...(d.ftr?.qaMetrics || []).map(q => monthLabel(q.qaDate)),
+            ]);
+        case 'pocStatus':
+            return uniqueSorted((d.poc?.pocs || []).map(p => p.status));
+        case 'manager':
+            return uniqueSorted((d.poc?.pocs || []).map(p => p.manager));
+        default:
+            return [];
+    }
+}
 
-    // Update breadcrumb
-    $('#sheetParentName').textContent = `${source.icon} ${source.name}`;
-    $('#sheetChildName').textContent = sheet.name;
-    $('#sheetRowCount').textContent = `${sheet.totalRows} rows`;
-    $('#sheetColCount').textContent = `${sheet.headers.length} columns`;
+const FILTER_LABELS = {
+    office: '🏢 Office', role: '👤 Role', project: '📂 Project', client: '🏷️ Client',
+    month: '📅 Month', pocStatus: '🚦 Status', manager: '👔 Manager',
+};
 
-    // Render the table
-    renderSheetTable(sheet);
+function renderFilterBar() {
+    const bar = $('#filterBar');
+    const keys = TAB_FILTERS[state.activeTab] || [];
+    if (keys.length === 0) { bar.innerHTML = ''; bar.classList.add('hidden'); return; }
+    bar.classList.remove('hidden');
 
-    // Bind search
-    const searchEl = $('#sheetSearch');
-    searchEl.value = '';
-    searchEl.oninput = () => {
-        const q = searchEl.value.toLowerCase();
-        const rows = $$('#sheetTableWrap tbody tr');
-        rows.forEach(row => {
-            row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    state.filters[state.activeTab] = state.filters[state.activeTab] || {};
+    const cur = state.filters[state.activeTab];
+
+    let html = '<span class="filter-bar-label">🔎 Filters:</span>';
+    keys.forEach(key => {
+        const opts = filterOptions(key);
+        html += `<label class="filter-ctrl">${FILTER_LABELS[key] || key}
+            <select data-filter="${key}">
+                <option value="">All</option>
+                ${opts.map(o => `<option value="${esc(o)}" ${cur[key] === o ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+            </select></label>`;
+    });
+    html += '<button class="filter-clear" id="btnClearFilters">Clear</button>';
+    bar.innerHTML = html;
+
+    bar.querySelectorAll('select[data-filter]').forEach(sel => {
+        sel.addEventListener('change', () => {
+            cur[sel.dataset.filter] = sel.value;
+            renderTab();
         });
-    };
+    });
+    $('#btnClearFilters').addEventListener('click', () => {
+        state.filters[state.activeTab] = {};
+        renderTab();
+    });
 }
 
-function renderSheetTable(sheet) {
-    const wrap = $('#sheetTableWrap');
-    if (!sheet.headers.length || !sheet.rows.length) {
-        wrap.innerHTML = '<div class="sheet-empty">No data in this sheet.</div>';
+function getFilter(key) {
+    return (state.filters[state.activeTab] || {})[key] || '';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB DISPATCH
+// ══════════════════════════════════════════════════════════════════
+
+function renderTab() {
+    renderFilterBar();
+    destroyCharts();
+    const el = $('#tabContent');
+    el.innerHTML = '';
+    const fn = {
+        overview: tabOverview, team: tabTeam, projects: tabProjects, sow: tabSow,
+        kpis: tabKpis, ftr: tabFtr, leave: tabLeave, risks: tabRisks, poc: tabPoc,
+    }[state.activeTab];
+    if (fn) fn(el);
+}
+
+function destroyCharts() {
+    Object.values(state.charts).forEach(c => { try { c.destroy(); } catch (_) {} });
+    state.charts = {};
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  DOM / RENDER HELPERS
+// ══════════════════════════════════════════════════════════════════
+
+function section(title, sub) {
+    return `<div class="sec-head"><h2>${title}</h2>${sub ? `<span class="sec-sub">${esc(sub)}</span>` : ''}</div>`;
+}
+
+function card(inner, cls) {
+    return `<div class="m-card ${cls || ''}">${inner}</div>`;
+}
+
+function statCard(icon, value, label, cls) {
+    return `<div class="kpi-card ${cls || ''}">
+        <div class="kpi-icon">${icon}</div>
+        <div class="kpi-content">
+            <div class="kpi-value">${value}</div>
+            <div class="kpi-label">${esc(label)}</div>
+        </div></div>`;
+}
+
+function dataTable(headers, rows, opts) {
+    opts = opts || {};
+    if (!rows.length) return `<div class="empty-note">${esc(opts.empty || 'No data available.')}</div>`;
+    let h = `<div class="tbl-wrap"><table class="m-table"><thead><tr>`;
+    headers.forEach(hd => { h += `<th>${esc(hd)}</th>`; });
+    h += `</tr></thead><tbody>`;
+    rows.forEach(r => {
+        h += '<tr>';
+        r.forEach(c => { h += `<td>${c == null ? '' : c}</td>`; });
+        h += '</tr>';
+    });
+    h += `</tbody></table></div>`;
+    if (opts.note) h += `<div class="tbl-note">${esc(opts.note)}</div>`;
+    return h;
+}
+
+function pivotTable(rowKeys, colKeys, cellFn, opts) {
+    opts = opts || {};
+    if (!rowKeys.length || !colKeys.length) {
+        return `<div class="empty-note">${esc(opts.empty || 'Not enough data for this view.')}</div>`;
+    }
+    let h = `<div class="tbl-wrap"><table class="m-table pivot"><thead><tr><th>${esc(opts.corner || '')}</th>`;
+    colKeys.forEach(c => { h += `<th>${esc(c)}</th>`; });
+    h += `</tr></thead><tbody>`;
+    rowKeys.forEach(rk => {
+        h += `<tr><td class="pivot-row-h">${esc(rk)}</td>`;
+        colKeys.forEach(ck => {
+            const v = cellFn(rk, ck);
+            h += `<td>${v == null || v === '' ? '<span class="muted">—</span>' : v}</td>`;
+        });
+        h += '</tr>';
+    });
+    h += `</tbody></table></div>`;
+    if (opts.note) h += `<div class="tbl-note">${esc(opts.note)}</div>`;
+    return h;
+}
+
+function badge(text, cls) { return `<span class="badge ${cls || ''}">${esc(text)}</span>`; }
+
+function chartCanvas(id) { return `<canvas id="${id}"></canvas>`; }
+
+function makeChart(id, config) {
+    const ctx = document.getElementById(id);
+    if (!ctx) return;
+    state.charts[id] = new Chart(ctx, config);
+}
+
+const CHART_AXES = {
+    x: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(51,65,85,.25)' } },
+    y: { ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: 'rgba(51,65,85,.25)' }, beginAtZero: true },
+};
+const CHART_LEGEND = { labels: { color: '#94a3b8', font: { size: 11 } } };
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: OVERVIEW
+// ══════════════════════════════════════════════════════════════════
+
+function tabOverview(el) {
+    const s = state.data.summary || {};
+    const poc = state.data.poc?.summary || {};
+    el.innerHTML = `
+        <div class="kpi-row">
+            ${statCard('👥', s.teamSize || 0, 'Team Size')}
+            ${statCard('📂', s.activeProjects || 0, 'Active Projects')}
+            ${statCard('🎯', s.kpiMetRate ? s.kpiMetRate + '%' : '—', 'KPI Met Rate')}
+            ${statCard('✅', s.ftrAvgRating ? s.ftrAvgRating + '%' : '—', 'Avg FTR Rating')}
+            ${statCard('🏖️', s.onLeaveToday || 0, 'On Leave Today', 'kpi-card-alert')}
+            ${statCard('⚠️', s.activeRisks || 0, 'Active Risks', 'kpi-card-alert')}
+            ${statCard('🧪', poc.total || 0, 'PoC Use Cases')}
+        </div>
+        <div class="grid-2">
+            <div class="m-card">${section('🏥 Project Health Snapshot')}<div id="ovHealth"></div></div>
+            <div class="m-card">${section('⚠️ Active Risk Alerts')}<div id="ovRisks"></div></div>
+        </div>
+        <div class="grid-2">
+            <div class="m-card">${section('🌟 Recent Highlights')}<div id="ovHL"></div></div>
+            <div class="m-card">${section('⬇️ Recent Lowlights')}<div id="ovLL"></div></div>
+        </div>`;
+    widgetProjectHealth($('#ovHealth'), {}, 6);
+    widgetRiskList($('#ovRisks'), {}, 6);
+    widgetHighlights($('#ovHL'), 6);
+    widgetLowlights($('#ovLL'), 6);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: TEAM DETAILS  (roster + office mapping; no project widgets)
+// ══════════════════════════════════════════════════════════════════
+
+function tabTeam(el) {
+    const t = state.data.team || {};
+    let members = t.activeMembers || [];
+    const office = getFilter('office'), role = getFilter('role');
+    if (office) members = members.filter(m => m.location === office);
+    if (role) members = members.filter(m => m.role === role);
+
+    const roleDist = {};
+    members.forEach(m => { roleDist[m.role || 'Unknown'] = (roleDist[m.role || 'Unknown'] || 0) + 1; });
+    const officeDist = {};
+    members.forEach(m => {
+        const o = m.location || 'Unmapped';
+        officeDist[o] = (officeDist[o] || 0) + 1;
+    });
+
+    el.innerHTML = `
+        <div class="kpi-row">
+            ${statCard('👥', members.length, 'Members Shown')}
+            ${statCard('🏢', Object.keys(officeDist).length, 'Offices')}
+            ${statCard('👤', Object.keys(roleDist).length, 'Distinct Roles')}
+        </div>
+        <div class="grid-2">
+            <div class="m-card">${section('🏢 Members by Office')}${chartCanvas('chTeamOffice')}</div>
+            <div class="m-card">${section('👤 Members by Role')}${chartCanvas('chTeamRole')}</div>
+        </div>
+        <div class="m-card">
+            ${section('👥 Team Roster', 'Office mapping per member')}
+            <div id="teamRoster"></div>
+        </div>`;
+
+    $('#teamRoster').innerHTML = dataTable(
+        ['Name', 'Role', 'Designation', 'Emp ID', 'Office / Location', 'Email', 'Date of Joining'],
+        members.map(m => [
+            `<strong>${esc(m.name)}</strong>`, esc(m.role), esc(m.designation),
+            esc(m.empId), badge(m.location || 'Unmapped', m.location ? 'b-blue' : 'b-grey'),
+            esc(m.email), esc(m.doj),
+        ]),
+        { empty: 'No team members match the filters.' }
+    );
+
+    barChart('chTeamOffice', Object.keys(officeDist), Object.values(officeDist), 'Members', '#06b6d4');
+    barChart('chTeamRole', Object.keys(roleDist), Object.values(roleDist), 'Members', '#a855f7');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: PROJECTS
+// ══════════════════════════════════════════════════════════════════
+
+function tabProjects(el) {
+    const proj = getFilter('project');
+    el.innerHTML = `
+        <div class="m-card">${section('🏥 Project Health Status')}<div id="pjHealth"></div></div>
+        <div class="grid-2">
+            <div class="m-card">${section('🌟 Recent Highlights')}<div id="pjHL"></div></div>
+            <div class="m-card">${section('⬇️ Recent Lowlights')}<div id="pjLL"></div></div>
+        </div>
+        <div class="grid-2">
+            <div class="m-card">${section('📈 FTE Utilization Trend')}${chartCanvas('chPjUtil')}</div>
+            <div class="m-card">${section('⚠️ Project Risks')}<div id="pjRisks"></div></div>
+        </div>
+        <div class="m-card">${section('✅ FTR Report', 'Client-wise & monthly')}<div id="pjFtr"></div></div>
+        <div class="grid-2">
+            <div class="m-card">${section('🏆 Top Leave Takers')}<div id="pjLeaveTop"></div></div>
+            <div class="m-card">${section('🏖️ Leave Impact — Today & This Month')}<div id="pjLeaveImpact"></div></div>
+        </div>`;
+
+    const pf = proj ? { project: proj } : {};
+    widgetProjectHealth($('#pjHealth'), pf);
+    widgetHighlights($('#pjHL'), 10, proj);
+    widgetLowlights($('#pjLL'), 10, proj);
+    widgetUtilTrendChart('chPjUtil');
+    widgetRiskList($('#pjRisks'), pf, 10);
+    widgetFtrReport($('#pjFtr'));
+    widgetTopLeaveTakers($('#pjLeaveTop'));
+    widgetLeaveImpact($('#pjLeaveImpact'));
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: SOW & PO
+// ══════════════════════════════════════════════════════════════════
+
+function tabSow(el) {
+    let projects = state.data.sow?.projects || [];
+    const client = getFilter('client');
+    if (client) projects = projects.filter(p => p.client === client);
+
+    const statusCount = {};
+    projects.forEach(p => {
+        const k = `SOW ${p.sowStatus || '—'}`;
+        statusCount[k] = (statusCount[k] || 0) + 1;
+    });
+
+    el.innerHTML = `
+        <div class="kpi-row">
+            ${statCard('📂', projects.length, 'Projects')}
+            ${statCard('📄', projects.filter(p => /received/i.test(p.sowStatus)).length, 'SOW Received')}
+            ${statCard('🧾', projects.filter(p => /received/i.test(p.poStatus)).length, 'PO Received')}
+        </div>
+        <div class="m-card">
+            ${section('💰 SOW & PO Financial Details')}
+            <div id="sowFin"></div>
+        </div>
+        <div class="grid-2">
+            <div class="m-card">${section('📋 SOW / PO Status')}${chartCanvas('chSowStatus')}</div>
+            <div class="m-card">${section('🧾 Invoice Status', 'Derived from PO status')}<div id="sowInvoice"></div></div>
+        </div>`;
+
+    $('#sowFin').innerHTML = dataTable(
+        ['Project', 'Client', 'PM', 'SOW Value', 'DE Revenue Share', 'Start', 'End', 'SOW Status', 'PO Status', 'Project Status'],
+        projects.map(p => [
+            `<strong>${esc(p.projectName)}</strong>`, esc(p.client), esc(p.pm),
+            p.sowValue ? '$' + Number(p.sowValue).toLocaleString() : '<span class="muted">—</span>',
+            p.deRevenueShare ? '$' + Number(p.deRevenueShare).toLocaleString() : '<span class="muted">—</span>',
+            esc(p.startDate), esc(p.endDate),
+            statusBadge(p.sowStatus), statusBadge(p.poStatus), statusBadge(p.projectStatus),
+        ]),
+        { empty: 'No SOW projects match the filter.' }
+    );
+
+    $('#sowInvoice').innerHTML = dataTable(
+        ['Project', 'Client', 'PO Status', 'Invoice Status'],
+        projects.map(p => {
+            const inv = /received/i.test(p.poStatus) ? badge('Invoice Raised', 'b-green')
+                : /ytr/i.test(p.poStatus) ? badge('Yet To Raise', 'b-amber')
+                : badge('Pending', 'b-red');
+            return [esc(p.projectName), esc(p.client), statusBadge(p.poStatus), inv];
+        }),
+        { empty: 'No data.', note: 'Invoice status is derived from PO status (source file has no explicit invoice column).' }
+    );
+
+    doughnutChart('chSowStatus', Object.keys(statusCount), Object.values(statusCount));
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: KPIs
+// ══════════════════════════════════════════════════════════════════
+
+function tabKpis(el) {
+    const kpi = state.data.kpi || {};
+    const sm = kpi.summary || {};
+    el.innerHTML = `
+        <div class="kpi-row">
+            ${statCard('🎯', sm.metRate != null ? sm.metRate + '%' : '—', 'KPI Met Rate')}
+            ${statCard('📊', sm.totalMetrics || 0, 'Total Metrics')}
+            ${statCard('✅', sm.metCount || 0, 'Targets Met')}
+        </div>
+        <div class="m-card">${section('🎯 KPI Scorecard', 'Target vs Actual')}<div id="kpiScore"></div></div>
+        <div class="m-card">${section('🏷️ KPI — Client-wise & Monthly View', 'Avg score across all projects')}<div id="kpiPivot"></div></div>
+        <div class="grid-2">
+            <div class="m-card">${section('📈 FTE Utilization — Client-wise & Monthly')}<div id="kpiUtil"></div></div>
+            <div class="m-card">${section('⚠️ Project Risks')}<div id="kpiRisks"></div></div>
+        </div>
+        <div class="m-card">${section('✅ FTR Report', 'Client-wise & monthly')}<div id="kpiFtr"></div></div>
+        <div class="m-card">${section('🏥 Project Health Status')}<div id="kpiHealth"></div></div>`;
+
+    widgetKpiScorecard($('#kpiScore'));
+    widgetKpiPivot($('#kpiPivot'));
+    widgetKpiUtilPivot($('#kpiUtil'));
+    widgetRiskList($('#kpiRisks'), {}, 10);
+    widgetFtrReport($('#kpiFtr'));
+    widgetProjectHealth($('#kpiHealth'), {});
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: FTR  (FTR details only — client & month wise)
+// ══════════════════════════════════════════════════════════════════
+
+function tabFtr(el) {
+    const ftr = state.data.ftr || {};
+    el.innerHTML = `
+        <div class="kpi-row">
+            ${statCard('✅', ftr.summary?.avgRating ? ftr.summary.avgRating + '%' : '—', 'Avg FTR Rating')}
+            ${statCard('📂', (ftr.accounts || []).length, 'Accounts')}
+            ${statCard('🔍', (ftr.qaMetrics || []).length, 'QA Records')}
+        </div>
+        <div class="m-card">${section('✅ FTR Report — Client-wise & Monthly')}<div id="ftrReport"></div></div>
+        <div class="m-card">${section('🏷️ FTR by Account (Client-wise)')}<div id="ftrAccounts"></div></div>
+        <div class="m-card">${section('🔍 QA Metrics Detail')}<div id="ftrQa"></div></div>`;
+
+    widgetFtrReport($('#ftrReport'));
+
+    let accounts = ftr.accounts || [];
+    const client = getFilter('client');
+    if (client) accounts = accounts.filter(a => a.account === client);
+    $('#ftrAccounts').innerHTML = dataTable(
+        ['Account', 'QA Tracking', 'Expected Projects', 'Web Team', 'Avg Rating', 'FTR Pass'],
+        accounts.map(a => [
+            `<strong>${esc(a.account)}</strong>`, esc(a.qaTracking), esc(a.expectedProjects),
+            esc(a.webTeam), ratingCell(a.avgRating), esc(a.ftrPass),
+        ]),
+        { empty: 'No accounts match the filter.' }
+    );
+
+    let qa = ftr.qaMetrics || [];
+    const month = getFilter('month');
+    if (month) qa = qa.filter(q => monthLabel(q.qaDate) === month);
+    if (client) qa = qa.filter(q => (q.project || '').toLowerCase().includes(client.toLowerCase()));
+    $('#ftrQa').innerHTML = dataTable(
+        ['Project', 'QA Date', 'Month', 'Total Tags', 'Failed', 'Pass Rate'],
+        qa.map(q => [
+            esc(q.project), esc(q.qaDate), esc(monthLabel(q.qaDate)),
+            q.total, q.failed, ratingCell(q.passRate),
+        ]),
+        { empty: 'No QA records match the filters.' }
+    );
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: LEAVE  (leave details only — month wise)
+// ══════════════════════════════════════════════════════════════════
+
+function tabLeave(el) {
+    const leave = state.data.leave || {};
+    const cm = leave.currentMonth || {};
+    el.innerHTML = `
+        <div class="kpi-row">
+            ${statCard('🏖️', (cm.onLeaveToday || []).length, 'On Leave Today', 'kpi-card-alert')}
+            ${statCard('📅', cm.totalLeaves || 0, 'Leaves This Month')}
+            ${statCard('🗓️', (leave.months || []).length, 'Months Tracked')}
+        </div>
+        <div class="grid-2">
+            <div class="m-card">${section('🏖️ On Leave Today')}<div id="lvToday"></div></div>
+            <div class="m-card">${section('🏆 Top Leave Takers — This Month')}<div id="lvTop"></div></div>
+        </div>
+        <div class="m-card">${section('🗓️ Leave Tracker — Months Available')}<div id="lvMonths"></div></div>`;
+
+    const onToday = cm.onLeaveToday || [];
+    $('#lvToday').innerHTML = dataTable(
+        ['Member', 'Leave Type'],
+        onToday.map(p => [`<strong>${esc(p.name)}</strong>`, esc(p.type)]),
+        { empty: 'Nobody is on leave today. ✅' }
+    );
+
+    const byPerson = Object.entries(cm.byPerson || {})
+        .filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]);
+    $('#lvTop').innerHTML = dataTable(
+        ['Member', 'Leave Days'],
+        byPerson.slice(0, 20).map(([n, c]) => [`<strong>${esc(n)}</strong>`, badge(c + ' day(s)', 'b-amber')]),
+        { empty: 'No leave records for the current month.' }
+    );
+
+    let months = leave.months || [];
+    const mf = getFilter('month');
+    $('#lvMonths').innerHTML = dataTable(
+        ['Month Sheet', 'Year'],
+        months.map(m => [esc(m.sheet), esc(m.year)]),
+        { empty: 'No month sheets found.', note: 'Leave file is tracked per monthly sheet; per-person detail is available for the current month above.' }
+    );
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: ACTIVE RISKS  (risk details only — client & month wise)
+// ══════════════════════════════════════════════════════════════════
+
+function tabRisks(el) {
+    const risks = state.data.gov?.risks || [];
+    const active = risks.filter(r => (r.status || '').toLowerCase() === 'ongoing');
+    el.innerHTML = `
+        <div class="kpi-row">
+            ${statCard('⚠️', active.length, 'Active Risks', 'kpi-card-alert')}
+            ${statCard('📋', risks.length, 'Total Risk Records')}
+        </div>
+        <div class="m-card">${section('📊 Risks — Project-wise & Monthly', 'Count of risk records')}<div id="rkPivot"></div></div>
+        <div class="m-card">${section('⚠️ Risk Details')}<div id="rkList"></div></div>`;
+
+    // pivot project x month
+    let rks = risks;
+    const proj = getFilter('project'), month = getFilter('month');
+    let pv = rks;
+    if (proj) pv = pv.filter(r => r.project === proj);
+    if (month) pv = pv.filter(r => r.month === month);
+    const rowKeys = uniqueSorted(pv.map(r => r.project || 'Unknown'));
+    const colKeys = uniqueSorted(pv.map(r => r.month || 'Unknown'));
+    $('#rkPivot').innerHTML = pivotTable(rowKeys, colKeys, (rk, ck) => {
+        const n = pv.filter(r => (r.project || 'Unknown') === rk && (r.month || 'Unknown') === ck).length;
+        return n ? `<span class="badge b-red">${n}</span>` : '';
+    }, { corner: 'Project', empty: 'No risks match the filters.' });
+
+    $('#rkList').innerHTML = dataTable(
+        ['Project', 'Month', 'PM', 'Risk / Description', 'Impact', 'Mitigation', 'Status'],
+        pv.map(r => [
+            `<strong>${esc(r.project)}</strong>`, esc(r.month), esc(r.pm),
+            esc(r.description || r.risk || ''), impactBadge(r.impact),
+            esc(r.mitigation), statusBadge(r.status),
+        ]),
+        { empty: 'No risks match the filters.' }
+    );
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAB: POV / POC
+// ══════════════════════════════════════════════════════════════════
+
+function tabPoc(el) {
+    const poc = state.data.poc || {};
+    let pocs = poc.pocs || [];
+    const sm = poc.summary || {};
+    const st = getFilter('pocStatus'), mgr = getFilter('manager');
+    if (st) pocs = pocs.filter(p => p.status === st);
+    if (mgr) pocs = pocs.filter(p => p.manager === mgr);
+
+    el.innerHTML = `
+        <div class="kpi-row">
+            ${statCard('🧪', sm.total || 0, 'Total Use Cases')}
+            ${statCard('✅', sm.completed || 0, 'Completed')}
+            ${statCard('🔧', sm.inProgress || 0, 'In Progress')}
+            ${statCard('🤖', (poc.aiUsecases || []).length, 'AI Use Cases')}
+        </div>
+        <div class="grid-2">
+            <div class="m-card">${section('🚦 PoC Status Breakdown')}${chartCanvas('chPocStatus')}</div>
+            <div class="m-card">${section('👔 PoCs by Reporting Manager')}${chartCanvas('chPocMgr')}</div>
+        </div>
+        <div class="m-card">${section('🧪 PoC Use Case Details')}<div id="pocTable"></div></div>
+        <div class="m-card">${section('🤖 AI Use Case Backlog')}<div id="aiTable"></div></div>`;
+
+    $('#pocTable').innerHTML = dataTable(
+        ['#', 'PoC Title', 'Reporting Manager', 'SPOC', 'Team', 'Status', 'Last Worked', 'Comments / Links'],
+        pocs.map(p => [
+            esc(p.sno), `<strong>${esc(p.title)}</strong>`, esc(p.manager), esc(p.spoc),
+            esc(p.team), statusBadge(p.status), esc(p.lastWorked), esc(p.comments),
+        ]),
+        { empty: 'No PoC use cases match the filters.' }
+    );
+
+    $('#aiTable').innerHTML = dataTable(
+        ['Idea ID', 'Business Function', 'Pain Point', 'Proposed AI Solution', 'Priority', 'Impact', 'Idea By'],
+        (poc.aiUsecases || []).map(a => [
+            esc(a.ideaId), esc(a.businessFunction), esc(a.painPoint), esc(a.solution),
+            priorityBadge(a.priority), priorityBadge(a.impact), esc(a.ideaBy),
+        ]),
+        { empty: 'No AI use cases recorded.' }
+    );
+
+    doughnutChart('chPocStatus', Object.keys(sm.byStatus || {}), Object.values(sm.byStatus || {}));
+    const mgrCount = {};
+    (poc.pocs || []).forEach(p => { mgrCount[p.manager || 'Unknown'] = (mgrCount[p.manager || 'Unknown'] || 0) + 1; });
+    barChart('chPocMgr', Object.keys(mgrCount), Object.values(mgrCount), 'PoCs', '#06b6d4');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  REUSABLE WIDGETS
+// ══════════════════════════════════════════════════════════════════
+
+function widgetProjectHealth(el, filter, limit) {
+    let rows = state.data.health || [];
+    if (filter && filter.project) rows = rows.filter(p => p.projectName === filter.project);
+    if (limit) rows = rows.slice(0, limit);
+    el.innerHTML = dataTable(
+        ['Project', 'Client', 'PM', 'Status', 'SOW', 'PO', 'Health', 'Notes'],
+        rows.map(p => [
+            `<strong>${esc(p.projectName)}</strong>`, esc(p.client), esc(p.pm),
+            esc(p.status), statusBadge(p.sowStatus), statusBadge(p.poStatus),
+            healthBadge(p.health), `<span class="muted-sm">${esc(p.reasons)}</span>`,
+        ]),
+        { empty: 'No project health data.' }
+    );
+}
+
+function widgetRiskList(el, filter, limit) {
+    let risks = (state.data.gov?.risks || []).filter(r => (r.status || '').toLowerCase() === 'ongoing');
+    if (filter && filter.project) risks = risks.filter(r => r.project === filter.project);
+    if (filter && filter.month) risks = risks.filter(r => r.month === filter.month);
+    if (limit) risks = risks.slice(0, limit);
+    if (!risks.length) { el.innerHTML = '<div class="empty-note">No active risks. ✅</div>'; return; }
+    el.innerHTML = risks.map(r => `
+        <div class="risk-item">
+            <div class="risk-project">${esc(r.project)} <span class="muted">— ${esc(r.pm)}</span>
+                ${impactBadge(r.impact)}</div>
+            <div class="risk-text">${esc(r.description || r.risk || '')}</div>
+            ${r.mitigation ? `<div class="risk-mit">🛡️ ${esc(r.mitigation)}</div>` : ''}
+        </div>`).join('');
+}
+
+function widgetHighlights(el, limit, project) {
+    let items = (state.data.gov?.highlights || []).filter(h => h.highlight);
+    if (project) items = items.filter(h => h.project === project);
+    items = items.slice(0, limit || 10);
+    el.innerHTML = items.length ? items.map(h => `
+        <div class="hl-item">
+            <div class="hl-project">${esc(h.project)} <span class="muted">— ${esc(h.month)}</span></div>
+            <div class="hl-text">${esc(h.highlight)}</div>
+        </div>`).join('') : '<div class="empty-note">No highlights reported.</div>';
+}
+
+function widgetLowlights(el, limit, project) {
+    let items = (state.data.gov?.lowlights || []).filter(h => h.lowlight);
+    if (project) items = items.filter(h => h.project === project);
+    items = items.slice(0, limit || 10);
+    el.innerHTML = items.length ? items.map(h => `
+        <div class="hl-item ll-item">
+            <div class="hl-project">${esc(h.project)} <span class="muted">— ${esc(h.month)}</span></div>
+            <div class="hl-text">${esc(h.lowlight)}</div>
+        </div>`).join('') : '<div class="empty-note">No lowlights reported.</div>';
+}
+
+function widgetUtilTrendChart(canvasId) {
+    const trend = state.data.gov?.fteTrend || [];
+    if (!trend.length) {
+        document.getElementById(canvasId)?.closest('.m-card')
+            ?.querySelector('canvas')?.replaceWith(Object.assign(document.createElement('div'),
+                { className: 'empty-note', textContent: 'No FTE trend data.' }));
         return;
     }
+    lineChart(canvasId, trend.map(t => t.month), trend.map(t => t.totalFTE), 'Total FTE');
+}
 
-    const headers = sheet.headers;
-    let html = '<table class="sheet-table"><thead><tr>';
-    html += '<th class="row-num">#</th>';
-    headers.forEach(h => {
-        html += `<th>${esc(h)}</th>`;
-    });
-    html += '</tr></thead><tbody>';
+function widgetTopLeaveTakers(el) {
+    const byPerson = Object.entries(state.data.leave?.currentMonth?.byPerson || {})
+        .filter(([, c]) => c > 0).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    el.innerHTML = dataTable(
+        ['Member', 'Leave Days'],
+        byPerson.map(([n, c]) => [`<strong>${esc(n)}</strong>`, badge(c + ' day(s)', 'b-amber')]),
+        { empty: 'No leave records this month.' }
+    );
+}
 
-    sheet.rows.forEach((row, i) => {
-        html += '<tr>';
-        html += `<td class="row-num">${i + 1}</td>`;
-        headers.forEach(h => {
-            const val = row[h] || '';
-            html += `<td>${esc(val)}</td>`;
-        });
-        html += '</tr>';
-    });
+function widgetLeaveImpact(el) {
+    const cm = state.data.leave?.currentMonth || {};
+    const onToday = cm.onLeaveToday || [];
+    el.innerHTML = `
+        <div class="impact-row">
+            <div class="impact-stat"><span class="impact-num">${onToday.length}</span> on leave today</div>
+            <div class="impact-stat"><span class="impact-num">${cm.totalLeaves || 0}</span> leaves this month</div>
+        </div>
+        ${onToday.length ? dataTable(['Member', 'Type'],
+        onToday.map(p => [esc(p.name), esc(p.type)])) : '<div class="empty-note">Nobody on leave today. ✅</div>'}`;
+}
 
-    html += '</tbody></table>';
-    if (sheet.totalRows > 500) {
-        html += `<div class="sheet-truncated">Showing 500 of ${sheet.totalRows} rows</div>`;
+function widgetKpiScorecard(el) {
+    let metrics = state.data.kpi?.metrics || [];
+    const client = getFilter('client'), month = getFilter('month');
+    if (client) metrics = metrics.filter(m => m.account === client);
+    if (month) metrics = metrics.filter(m => m.month === month);
+    el.innerHTML = dataTable(
+        ['Client', 'Project', 'Metric', 'Month', 'Target', 'Actual', 'Status'],
+        metrics.map(m => [
+            esc(m.account), esc(m.project), esc(m.name), esc(m.month),
+            esc(m.targetRaw), esc(m.actualRaw),
+            m.status === 'Met' ? badge('Met', 'b-green') : badge('Not Met', 'b-red'),
+        ]),
+        { empty: 'No KPI metrics match the filters.' }
+    );
+}
+
+function widgetKpiPivot(el) {
+    let metrics = state.data.kpi?.metrics || [];
+    const client = getFilter('client'), month = getFilter('month');
+    if (client) metrics = metrics.filter(m => m.account === client);
+    if (month) metrics = metrics.filter(m => m.month === month);
+    const rowKeys = uniqueSorted(metrics.map(m => m.account));
+    const colKeys = uniqueSorted(metrics.map(m => m.month));
+    el.innerHTML = pivotTable(rowKeys, colKeys, (rk, ck) => {
+        const cell = metrics.filter(m => m.account === rk && m.month === ck);
+        if (!cell.length) return '';
+        const avg = cell.reduce((s, m) => s + m.actual, 0) / cell.length;
+        const pct = Math.round(avg * 100);
+        const cls = pct >= 95 ? 'b-green' : pct >= 85 ? 'b-amber' : 'b-red';
+        return `<span class="badge ${cls}">${pct}%</span>`;
+    }, { corner: 'Client', empty: 'No KPI data for this view.',
+         note: 'Cell = average KPI score across all of that client\'s projects for the month.' });
+}
+
+function widgetKpiUtilPivot(el) {
+    let metrics = (state.data.kpi?.metrics || []).filter(m => /utiliz/i.test(m.name));
+    const client = getFilter('client'), month = getFilter('month');
+    if (client) metrics = metrics.filter(m => m.account === client);
+    if (month) metrics = metrics.filter(m => m.month === month);
+    const rowKeys = uniqueSorted(metrics.map(m => m.account));
+    const colKeys = uniqueSorted(metrics.map(m => m.month));
+    el.innerHTML = pivotTable(rowKeys, colKeys, (rk, ck) => {
+        const cell = metrics.filter(m => m.account === rk && m.month === ck);
+        if (!cell.length) return '';
+        const avg = cell.reduce((s, m) => s + m.actual, 0) / cell.length;
+        return `<span class="badge b-blue">${Math.round(avg * 100)}%</span>`;
+    }, { corner: 'Client', empty: 'No FTE utilization data.' });
+}
+
+function widgetFtrReport(el) {
+    const qa = state.data.ftr?.qaMetrics || [];
+    const accounts = (state.data.ftr?.accounts || []).map(a => a.account);
+    // map each qa record to a client by substring match
+    function clientOf(project) {
+        const lp = (project || '').toLowerCase();
+        const hit = accounts.find(a => a && lp.includes(a.toLowerCase()));
+        return hit || 'Unmapped';
     }
-    wrap.innerHTML = html;
+    let recs = qa.map(q => ({ ...q, client: clientOf(q.project), month: monthLabel(q.qaDate) }));
+    const client = getFilter('client'), month = getFilter('month');
+    if (client) recs = recs.filter(r => r.client === client);
+    if (month) recs = recs.filter(r => r.month === month);
+    const rowKeys = uniqueSorted(recs.map(r => r.client));
+    const colKeys = uniqueSorted(recs.map(r => r.month));
+    el.innerHTML = pivotTable(rowKeys, colKeys, (rk, ck) => {
+        const cell = recs.filter(r => r.client === rk && r.month === ck);
+        if (!cell.length) return '';
+        const avg = cell.reduce((s, r) => s + (r.passRate || 0), 0) / cell.length;
+        const cls = avg >= 95 ? 'b-green' : avg >= 85 ? 'b-amber' : 'b-red';
+        return `<span class="badge ${cls}">${avg.toFixed(0)}%</span>`;
+    }, { corner: 'Client', empty: 'No FTR QA records for this view.',
+         note: 'Cell = average QA pass rate for that client in the month.' });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  BADGE / CELL HELPERS
+// ══════════════════════════════════════════════════════════════════
+
+function statusBadge(s) {
+    s = (s || '').toString().trim();
+    if (!s) return '<span class="muted">—</span>';
+    const l = s.toLowerCase();
+    let cls = 'b-grey';
+    if (/(received|complete|done|met|green|active)/.test(l)) cls = 'b-green';
+    else if (/(progress|ytr|yet to|pending|amber|hold|wip)/.test(l)) cls = 'b-amber';
+    else if (/(not |delay|red|miss|escalat|blocked|ideation)/.test(l)) cls = 'b-red';
+    return badge(s, cls);
+}
+
+function healthBadge(h) {
+    const cls = h === 'Green' ? 'b-green' : h === 'Red' ? 'b-red' : 'b-amber';
+    return badge(h || '—', cls);
+}
+
+function impactBadge(i) {
+    i = (i || '').toString();
+    const l = i.toLowerCase();
+    const cls = l.includes('loss') ? 'b-red' : l.includes('delay') ? 'b-amber' : 'b-grey';
+    return badge(i || 'Unknown', cls);
+}
+
+function priorityBadge(p) {
+    p = (p || '').toString();
+    const l = p.toLowerCase();
+    const cls = l === 'high' ? 'b-red' : l === 'medium' ? 'b-amber' : l === 'low' ? 'b-green' : 'b-grey';
+    return p ? badge(p, cls) : '<span class="muted">—</span>';
+}
+
+function ratingCell(v) {
+    if (v == null || v === '') return '<span class="muted">—</span>';
+    const n = Number(v);
+    const cls = n >= 95 ? 'b-green' : n >= 85 ? 'b-amber' : 'b-red';
+    return `<span class="badge ${cls}">${n.toFixed(1)}%</span>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CHART HELPERS
+// ══════════════════════════════════════════════════════════════════
+
+function barChart(id, labels, data, label, color) {
+    makeChart(id, {
+        type: 'bar',
+        data: { labels, datasets: [{ label, data, backgroundColor: color, borderRadius: 4 }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: CHART_AXES },
+    });
+}
+
+function lineChart(id, labels, data, label) {
+    makeChart(id, {
+        type: 'line',
+        data: {
+            labels, datasets: [{
+                label, data, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,.12)',
+                fill: true, tension: .4, pointRadius: 4, pointBackgroundColor: '#06b6d4',
+            }],
+        },
+        options: { responsive: true, plugins: { legend: CHART_LEGEND }, scales: CHART_AXES },
+    });
+}
+
+function doughnutChart(id, labels, data) {
+    const colors = ['#22c55e', '#f59e0b', '#06b6d4', '#a855f7', '#ef4444', '#ec4899', '#64748b'];
+    makeChart(id, {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }] },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 }, padding: 10 } } },
+        },
+    });
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -244,10 +941,8 @@ function bindUI() {
     $('#btnExecRefresh').addEventListener('click', () => {
         const btn = $('#btnExecRefresh');
         btn.classList.add('refreshing');
-        Promise.all([fetchAllExecData(), fetchAllSheets()])
-            .then(() => setTimeout(() => btn.classList.remove('refreshing'), 800));
+        fetchAllExecData().then(() => setTimeout(() => btn.classList.remove('refreshing'), 800));
     });
-
     $('#btnLogout').addEventListener('click', logout);
     $('#btnExecPresent').addEventListener('click', () => togglePresent(true));
     $('#exitExecPresent').addEventListener('click', () => togglePresent(false));
@@ -258,270 +953,26 @@ function bindUI() {
     $('#execSourceModal').addEventListener('click', e => {
         if (e.target === $('#execSourceModal')) $('#execSourceModal').classList.add('hidden');
     });
-
-    // Modal tabs
     $$('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             $$('.tab-btn').forEach(b => b.classList.remove('active'));
-            $$('.tab-content').forEach(c => c.classList.remove('active'));
+            $$('.exec-modal .tab-content').forEach(c => c.classList.remove('active'));
             btn.classList.add('active');
             $(`#tab${capitalize(btn.dataset.tab)}`).classList.add('active');
         });
     });
-
-    // Upload + Connect
     $('#btnUploadAll').addEventListener('click', uploadFiles);
     $('#btnConnectUrls').addEventListener('click', connectUrls);
-
-    // Overview nav
-    $('.nav-overview').addEventListener('click', showOverview);
 }
 
 function togglePresent(on) {
     document.body.classList.toggle('exec-present-mode', on);
     $('#execPresentBar').classList.toggle('hidden', !on);
-    if (on) document.documentElement.requestFullscreen?.().catch(() => { });
+    if (on) document.documentElement.requestFullscreen?.().catch(() => {});
     else if (document.fullscreenElement) document.exitFullscreen?.();
 }
 
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-
-// ══════════════════════════════════════════════════════════════════
-//  KPI CARDS
-// ══════════════════════════════════════════════════════════════════
-
-function renderKPICards(data) {
-    if (!data) return;
-    $('#valTeamSize').textContent = data.teamSize || 0;
-    $('#valActiveProjects').textContent = data.activeProjects || 0;
-    $('#valSOWValue').textContent = data.totalSOWValue ? formatCurrency(data.totalSOWValue) : '—';
-    $('#valKPIMetRate').textContent = data.kpiMetRate ? data.kpiMetRate + '%' : '—';
-    $('#valFTRRating').textContent = data.ftrAvgRating ? data.ftrAvgRating + '%' : '—';
-    $('#valOnLeave').textContent = data.onLeaveToday || 0;
-}
-
-function formatCurrency(val) {
-    if (val >= 1000000) return '$' + (val / 1000000).toFixed(1) + 'M';
-    if (val >= 1000) return '$' + (val / 1000).toFixed(0) + 'K';
-    return '$' + val.toFixed(0);
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  CHARTS
-// ══════════════════════════════════════════════════════════════════
-
-function renderFTETrendChart(govData) {
-    const ctx = $('#chartFTETrend');
-    if (!ctx) return;
-    const trend = govData?.fteTrend || [];
-    const labels = trend.map(t => t.month);
-    const values = trend.map(t => t.totalFTE);
-
-    if (chartFTE) chartFTE.destroy();
-    chartFTE = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Total FTE',
-                data: values,
-                borderColor: '#06b6d4',
-                backgroundColor: 'rgba(6,182,212,.1)',
-                fill: true,
-                tension: .4,
-                pointRadius: 4,
-                pointBackgroundColor: '#06b6d4',
-            }],
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
-            scales: {
-                x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(51,65,85,.3)' } },
-                y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(51,65,85,.3)' }, beginAtZero: true },
-            },
-        },
-    });
-}
-
-function renderKPIChart(kpiData) {
-    const ctx = $('#chartKPI');
-    if (!ctx) return;
-    const kpis = (kpiData?.kpis || []).slice(0, 10);
-    const labels = kpis.map(k => truncate(k.metricName || k.metric || k.name || '', 25));
-    const targets = kpis.map(k => (k.target * 100));
-    const actuals = kpis.map(k => (k.actual * 100));
-
-    if (chartKPI) chartKPI.destroy();
-    chartKPI = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels,
-            datasets: [
-                { label: 'Target %', data: targets, backgroundColor: 'rgba(168,85,247,.6)', borderRadius: 4 },
-                { label: 'Actual %', data: actuals, backgroundColor: 'rgba(6,182,212,.7)', borderRadius: 4 },
-            ],
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
-            scales: {
-                x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(51,65,85,.3)' }, max: 120 },
-                y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
-            },
-        },
-    });
-}
-
-function renderSOWChart(sowData) {
-    const ctx = $('#chartSOW');
-    if (!ctx) return;
-    const summary = sowData?.summary || {};
-    const statusMap = summary.projectsByStatus || {};
-    const labels = Object.keys(statusMap);
-    const values = Object.values(statusMap);
-    const colors = ['#22c55e', '#f59e0b', '#06b6d4', '#a855f7', '#ef4444', '#ec4899'];
-
-    if (chartSOW) chartSOW.destroy();
-    chartSOW = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels,
-            datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }],
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 }, padding: 12 } } },
-        },
-    });
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  RISK PANEL
-// ══════════════════════════════════════════════════════════════════
-
-function renderRiskPanel(govData) {
-    const risks = govData?.risks || [];
-    const body = $('#riskPanelBody');
-    const count = $('#riskCount');
-    const activeRisks = risks.filter(r => r.status && r.status.toLowerCase() === 'ongoing');
-    count.textContent = activeRisks.length;
-
-    if (activeRisks.length === 0) {
-        body.innerHTML = '<div style="color:#64748b">No active governance risks. ✅</div>';
-        return;
-    }
-
-    body.innerHTML = activeRisks.map(r => {
-        const impactClass = (r.impact || '').toLowerCase().includes('loss') ? 'impact-high'
-            : (r.impact || '').toLowerCase().includes('delay') ? 'impact-medium' : 'impact-low';
-        return `
-      <div class="risk-item">
-        <div class="risk-project">${esc(r.project)} <span style="color:#64748b;font-weight:400">— ${esc(r.pm)}</span></div>
-        <div class="risk-text">${esc(r.description || r.risk || '')}</div>
-        <span class="risk-impact ${impactClass}">${esc(r.impact || 'Unknown')}</span>
-      </div>`;
-    }).join('');
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  LEAVE PANEL
-// ══════════════════════════════════════════════════════════════════
-
-function renderLeavePanel(leaveData) {
-    const body = $('#leavePanelBody');
-    const cm = leaveData?.currentMonth || {};
-    const byPerson = cm.byPerson || {};
-    const onToday = cm.onLeaveToday || [];
-
-    let html = '';
-    if (onToday.length > 0) {
-        html += `<div style="margin-bottom:10px;color:#f59e0b;font-weight:600">📌 On Leave Today (${onToday.length}):</div>`;
-        html += onToday.map(p => `<div class="leave-item"><span class="leave-name">${esc(p.name)}</span><span style="color:#94a3b8">${esc(p.type)}</span></div>`).join('');
-        html += '<hr style="border-color:#334155;margin:12px 0">';
-    }
-
-    html += `<div style="margin-bottom:8px;font-weight:600;color:#f1f5f9">Month Summary (Total: ${cm.totalLeaves || 0} leaves)</div>`;
-
-    const sorted = Object.entries(byPerson)
-        .filter(([_, count]) => count > 0)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 15);
-
-    if (sorted.length === 0) {
-        html += '<div style="color:#64748b">No leave data for current month.</div>';
-    } else {
-        html += sorted.map(([name, count]) => `
-      <div class="leave-item">
-        <span class="leave-name">${esc(name)}</span>
-        <span class="leave-count">${count} day(s)</span>
-      </div>`).join('');
-    }
-
-    body.innerHTML = html;
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  PROJECT HEALTH TABLE
-// ══════════════════════════════════════════════════════════════════
-
-function renderProjectHealthTable(healthData) {
-    const tbody = $('#healthTableBody');
-    if (!healthData || healthData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="color:#64748b;text-align:center;padding:20px">No project data</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = healthData.map(p => {
-        const cls = p.health === 'Green' ? 'health-green'
-            : p.health === 'Red' ? 'health-red' : 'health-amber';
-        return `
-      <tr>
-        <td><strong>${esc(p.projectName)}</strong></td>
-        <td>${esc(p.client)}</td>
-        <td>${esc(p.pm)}</td>
-        <td>${esc(p.status)}</td>
-        <td>${esc(p.sowStatus)}</td>
-        <td>${esc(p.poStatus)}</td>
-        <td><span class="health-badge ${cls}">${p.health}</span></td>
-        <td style="font-size:.75rem;color:#94a3b8">${esc(p.reasons)}</td>
-      </tr>`;
-    }).join('');
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  HIGHLIGHTS & LOWLIGHTS
-// ══════════════════════════════════════════════════════════════════
-
-function renderHighlightsLowlights(govData) {
-    const highlights = govData?.highlights || [];
-    const lowlights = govData?.lowlights || [];
-
-    const hlEl = $('#highlightsList');
-    const hlItems = highlights.filter(h => h.highlight);
-    if (hlItems.length === 0) {
-        hlEl.innerHTML = '<div style="color:#64748b">No highlights reported.</div>';
-    } else {
-        hlEl.innerHTML = hlItems.slice(0, 10).map(h => `
-      <div class="hl-item">
-        <div class="hl-project">${esc(h.project)} — ${esc(h.month)}</div>
-        <div class="hl-text">${esc(h.highlight)}</div>
-      </div>`).join('');
-    }
-
-    const llEl = $('#lowlightsList');
-    const llItems = lowlights.length > 0 ? lowlights : highlights.filter(h => h.lowlight);
-    if (llItems.length === 0) {
-        llEl.innerHTML = '<div style="color:#64748b">No lowlights reported.</div>';
-    } else {
-        llEl.innerHTML = llItems.slice(0, 10).map(h => `
-      <div class="hl-item">
-        <div class="hl-project">${esc(h.project)} — ${esc(h.month)}</div>
-        <div class="hl-text">${esc(h.lowlight)}</div>
-      </div>`).join('');
-    }
-}
 
 // ══════════════════════════════════════════════════════════════════
 //  DATA SOURCE MANAGEMENT
@@ -531,7 +982,6 @@ async function uploadFiles() {
     const form = $('#uploadForm');
     const formData = new FormData(form);
     const statusEl = $('#execSourceStatus');
-
     let hasFile = false;
     for (const [, file] of formData.entries()) {
         if (file && file.size > 0) { hasFile = true; break; }
@@ -542,26 +992,18 @@ async function uploadFiles() {
         statusEl.classList.remove('hidden');
         return;
     }
-
     statusEl.className = 'source-status-box';
     statusEl.textContent = 'Uploading…';
     statusEl.classList.remove('hidden');
-
     try {
         const res = await fetch('/api/exec/upload-sources', {
-            method: 'POST',
-            headers: { Authorization: 'Bearer ' + getToken() },
-            body: formData,
+            method: 'POST', headers: { Authorization: 'Bearer ' + getToken() }, body: formData,
         });
         const data = await res.json();
         if (data.success) {
             statusEl.className = 'source-status-box success';
             statusEl.textContent = '✓ ' + data.message;
-            setTimeout(() => {
-                fetchAllExecData();
-                fetchAllSheets();
-                $('#execSourceModal').classList.add('hidden');
-            }, 1200);
+            setTimeout(() => { fetchAllExecData(); $('#execSourceModal').classList.add('hidden'); }, 1200);
         } else {
             statusEl.className = 'source-status-box error';
             statusEl.textContent = '✗ ' + (data.error || 'Upload failed');
@@ -574,14 +1016,13 @@ async function uploadFiles() {
 
 async function connectUrls() {
     const sources = {};
-    const keys = ['ftr', 'team', 'sow', 'governance', 'leave', 'kpi'];
-    const ids = ['urlFtr', 'urlTeam', 'urlSow', 'urlGovernance', 'urlLeave', 'urlKpi'];
-
+    const keys = ['ftr', 'team', 'sow', 'governance', 'leave', 'kpi', 'poc'];
+    const ids = ['urlFtr', 'urlTeam', 'urlSow', 'urlGovernance', 'urlLeave', 'urlKpi', 'urlPoc'];
     keys.forEach((key, i) => {
-        const url = $(`#${ids[i]}`).value.trim();
+        const el = $(`#${ids[i]}`);
+        const url = el ? el.value.trim() : '';
         if (url) sources[key] = { url, type: 'sharepoint' };
     });
-
     const statusEl = $('#execSourceStatus');
     if (Object.keys(sources).length === 0) {
         statusEl.className = 'source-status-box error';
@@ -589,26 +1030,18 @@ async function connectUrls() {
         statusEl.classList.remove('hidden');
         return;
     }
-
     statusEl.className = 'source-status-box';
     statusEl.textContent = 'Connecting…';
     statusEl.classList.remove('hidden');
-
     try {
         const res = await fetch('/api/exec/connect-sources', {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({ sources }),
+            method: 'POST', headers: authHeaders(), body: JSON.stringify({ sources }),
         });
         const data = await res.json();
         if (data.success) {
             statusEl.className = 'source-status-box success';
             statusEl.textContent = '✓ ' + data.message;
-            setTimeout(() => {
-                fetchAllExecData();
-                fetchAllSheets();
-                $('#execSourceModal').classList.add('hidden');
-            }, 1200);
+            setTimeout(() => { fetchAllExecData(); $('#execSourceModal').classList.add('hidden'); }, 1200);
         } else {
             statusEl.className = 'source-status-box error';
             statusEl.textContent = '✗ ' + (data.error || 'Connection failed');
@@ -633,4 +1066,15 @@ function esc(str) {
 function truncate(str, len) {
     if (!str) return '';
     return str.length > len ? str.slice(0, len) + '…' : str;
+}
+
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function monthLabel(dateStr) {
+    if (!dateStr) return 'Unknown';
+    const m = String(dateStr).match(/^(\d{4})-(\d{2})/);
+    if (m) return `${MONTH_NAMES[parseInt(m[2], 10) - 1]} ${m[1]}`;
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
+    return 'Unknown';
 }

@@ -15,6 +15,7 @@ const DATA_SOURCES = {
     governance: { path: process.env.EXEC_GOVERNANCE_PATH || '', type: 'local', url: '' },
     leave: { path: process.env.EXEC_LEAVE_PATH || '', type: 'local', url: '' },
     kpi: { path: process.env.EXEC_KPI_PATH || '', type: 'local', url: '' },
+    poc: { path: process.env.EXEC_POC_PATH || '', type: 'local', url: '' },
 };
 
 // Auto-detect previously uploaded files in the uploads directory
@@ -39,6 +40,7 @@ const FRIENDLY_NAMES = {
     governance: 'Governance',
     leave: 'Leave Tracker',
     kpi: 'KPI',
+    poc: 'POV / POC Tracker',
 };
 
 // ══════════════════════════════════════════════════════════════════
@@ -52,6 +54,7 @@ const cache = {
     governance: null,
     leave: null,
     kpi: null,
+    poc: null,
     lastRefresh: null,
 };
 
