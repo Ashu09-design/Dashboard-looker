@@ -4,6 +4,7 @@ const cors = require('cors');
 const XLSX = require('xlsx');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const { verifyToken, signToken } = require('./middleware/auth');
@@ -13,8 +14,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ── Multer config for Excel uploads ───────────────────────────────
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = path.join(os.tmpdir(), 'dashboard-uploads');
+if (!fs.existsSync(uploadDir)) {
+  try {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  } catch (e) {
+    console.warn('Could not create uploadDir:', e.message);
+  }
+}
 const upload = multer({
   dest: uploadDir,
   limits: { fileSize: 50 * 1024 * 1024 },
@@ -37,7 +44,7 @@ const EXCEL_PATH =
   process.env.EXCEL_PATH ||
   path.join(__dirname, '..', 'pov', '_Bandwidth Tracker.xlsx');
 
-const CACHED_SHEET_PATH = path.join(__dirname, '_cached_sheet.xlsx');
+const CACHED_SHEET_PATH = path.join(os.tmpdir(), '_cached_sheet.xlsx');
 
 // ══════════════════════════════════════════════════════════════════════
 //  HELPERS
@@ -559,9 +566,6 @@ function formatCellForDisplay(val) {
 app.get('/api/exec/all-sheets', verifyToken, (req, res) => {
   try {
     const XLSX = require('xlsx');
-    const uploadsDir = path.join(__dirname, 'uploads');
-    if (!fs.existsSync(uploadsDir)) return res.json({ sources: [] });
-
     const FRIENDLY = {
       ftr: { name: 'FTR Tracker', icon: '📊' },
       team: { name: 'Team Details', icon: '👥' },
@@ -572,14 +576,15 @@ app.get('/api/exec/all-sheets', verifyToken, (req, res) => {
       poc: { name: 'POV / POC Tracker', icon: '🧪' },
     };
 
-    const files = fs.readdirSync(uploadsDir).filter(f => /\.(xlsx|xlsb|xls)$/i.test(f));
     const sources = [];
 
-    for (const file of files) {
-      const key = file.replace(/\.[^.]+$/, '').toLowerCase();
+    for (const [key, src] of Object.entries(execData.DATA_SOURCES)) {
+      const filePath = src.path;
+      if (!filePath || !fs.existsSync(filePath)) continue;
+      const file = path.basename(filePath);
       const meta = FRIENDLY[key] || { name: key, icon: '📄' };
       try {
-        const wb = XLSX.readFile(path.join(uploadsDir, file), { type: 'file' });
+        const wb = XLSX.readFile(filePath, { type: 'file' });
         const sheets = [];
         for (const sheetName of wb.SheetNames) {
           const ws = wb.Sheets[sheetName];

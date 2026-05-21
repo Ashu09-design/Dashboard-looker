@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { execSync } = require('child_process');
 
 // ══════════════════════════════════════════════════════════════════
@@ -7,6 +8,16 @@ const { execSync } = require('child_process');
 // ══════════════════════════════════════════════════════════════════
 
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+const WRITABLE_UPLOADS_DIR = path.join(os.tmpdir(), 'dashboard-uploads');
+
+// Ensure writable uploads directory exists
+if (!fs.existsSync(WRITABLE_UPLOADS_DIR)) {
+    try {
+        fs.mkdirSync(WRITABLE_UPLOADS_DIR, { recursive: true });
+    } catch (e) {
+        console.warn(`[ExecData] Could not create writable uploads dir:`, e.message);
+    }
+}
 
 const DATA_SOURCES = {
     ftr: { path: process.env.EXEC_FTR_PATH || '', type: 'local', url: '' },
@@ -18,16 +29,25 @@ const DATA_SOURCES = {
     poc: { path: process.env.EXEC_POC_PATH || '', type: 'local', url: '' },
 };
 
-// Auto-detect previously uploaded files in the uploads directory
-if (fs.existsSync(UPLOADS_DIR)) {
-    const uploadedFiles = fs.readdirSync(UPLOADS_DIR);
-    for (const key of Object.keys(DATA_SOURCES)) {
-        if (!DATA_SOURCES[key].path) {
-            // Look for files matching the key name (e.g. ftr.xlsx, team.xlsx, leave.xlsb)
-            const match = uploadedFiles.find(f => f.toLowerCase().startsWith(key + '.'));
+// Auto-detect previously uploaded files in the writable uploads directory, or fallback to bundled uploads
+for (const key of Object.keys(DATA_SOURCES)) {
+    if (!DATA_SOURCES[key].path) {
+        let match = null;
+        if (fs.existsSync(WRITABLE_UPLOADS_DIR)) {
+            const files = fs.readdirSync(WRITABLE_UPLOADS_DIR);
+            match = files.find(f => f.toLowerCase().startsWith(key + '.'));
+            if (match) {
+                DATA_SOURCES[key].path = path.join(WRITABLE_UPLOADS_DIR, match);
+                console.log(`[ExecData] Auto-detected writable upload: ${key} → ${match}`);
+                continue;
+            }
+        }
+        if (fs.existsSync(UPLOADS_DIR)) {
+            const files = fs.readdirSync(UPLOADS_DIR);
+            match = files.find(f => f.toLowerCase().startsWith(key + '.'));
             if (match) {
                 DATA_SOURCES[key].path = path.join(UPLOADS_DIR, match);
-                console.log(`[ExecData] Auto-detected upload: ${key} → ${match}`);
+                console.log(`[ExecData] Auto-detected bundled fallback: ${key} → ${match}`);
             }
         }
     }
@@ -66,10 +86,16 @@ const diagnosticsCache = {};
 // ══════════════════════════════════════════════════════════════════
 
 const PYTHON_SCRIPT = path.join(__dirname, '..', 'python', 'normalizer.py');
-const DATA_DIR = path.join(__dirname, '..', 'data');
+const DATA_DIR = path.join(os.tmpdir(), 'dashboard-data');
 
 // Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+if (!fs.existsSync(DATA_DIR)) {
+    try {
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+    } catch (e) {
+        console.warn(`[ExecData] Could not create data dir:`, e.message);
+    }
+}
 
 
 // ══════════════════════════════════════════════════════════════════
@@ -174,6 +200,7 @@ function nodeFallbackParse(key) {
             case 'governance': parserFn = require('../parsers/governanceParser').parseGovernance; break;
             case 'leave': parserFn = require('../parsers/leaveParser').parseLeaveTracker; break;
             case 'kpi': parserFn = require('../parsers/kpiParser').parseKPI; break;
+            case 'poc': parserFn = require('../parsers/pocParser').parsePoC; break;
             default: return null;
         }
         const result = parserFn(filePath);
@@ -225,8 +252,14 @@ async function downloadRemoteFile(key) {
     if (src.type !== 'sharepoint' && src.type !== 'google') return;
     if (!src.url) return;
 
-    const uploadDir = path.join(__dirname, '..', 'uploads');
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    const uploadDir = WRITABLE_UPLOADS_DIR;
+    if (!fs.existsSync(uploadDir)) {
+        try {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        } catch (e) {
+            console.warn(`[ExecData] Could not create remote download uploads dir:`, e.message);
+        }
+    }
 
     let downloadUrl = src.url;
     if (src.type === 'google') {
