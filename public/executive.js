@@ -42,9 +42,9 @@ const TABS = [
 function open() {
     if (!state.bound) { bindUI(); state.bound = true; }
     renderTabNav();
-    fetchAllExecData();
+    fetchAllExecData(true); // First load animates
     checkSourceConnection();
-    if (!state.intervalId) state.intervalId = setInterval(fetchAllExecData, REFRESH_MS);
+    if (!state.intervalId) state.intervalId = setInterval(() => fetchAllExecData(false), REFRESH_MS);
     if (!state.sourceCheckId) state.sourceCheckId = setInterval(checkSourceConnection, 60000);
     if (!state.chatbotInitialized) { initChatbot(); state.chatbotInitialized = true; } else { showChatbot(); }
 }
@@ -83,7 +83,7 @@ async function apiFetch(url) {
     return res.json();
 }
 
-async function fetchAllExecData() {
+async function fetchAllExecData(triggerAnimation = false) {
     showLoading(true);
     try {
         const [summary, kpi, sow, gov, leave, ftr, health, team, poc] = await Promise.all([
@@ -99,7 +99,7 @@ async function fetchAllExecData() {
         ]);
         state.data = { summary, kpi, sow, gov, leave, ftr, health, team, poc };
         updateTimestamp();
-        renderTab();
+        renderTab(triggerAnimation);
     } catch (err) {
         console.error('Manager dashboard fetch error:', err);
         if (err.message && err.message.includes('401')) { onUnauthorized(); return; }
@@ -165,7 +165,7 @@ function renderTabNav() {
         btn.addEventListener('click', () => {
             state.activeTab = btn.dataset.tab;
             renderTabNav();
-            renderTab();
+            renderTab(true); // Animate tab change
             $('#execSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
@@ -312,15 +312,17 @@ function getFilter(key) {
 //  TAB DISPATCH
 // ══════════════════════════════════════════════════════════════════
 
-function renderTab() {
+function renderTab(triggerAnimation = false) {
     renderFilterBar();
     destroyCharts();
     const el = $('#tabContent');
     if (!el) return;
     
-    // Reset and trigger smooth fade-in-slide animation on tab change
-    el.classList.remove('fade-in-slide');
-    void el.offsetWidth; // Force reflow
+    if (triggerAnimation) {
+        // Reset and trigger smooth fade-in-slide animation on tab change
+        el.classList.remove('fade-in-slide');
+        void el.offsetWidth; // Force reflow
+    }
     
     el.innerHTML = '';
     const fn = {
@@ -329,7 +331,9 @@ function renderTab() {
     }[state.activeTab];
     if (fn) fn(el);
     
-    el.classList.add('fade-in-slide');
+    if (triggerAnimation) {
+        el.classList.add('fade-in-slide');
+    }
 }
 
 function destroyCharts() {
