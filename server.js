@@ -750,6 +750,499 @@ app.get('/api/exec/data-health', verifyToken, (req, res) => {
   }
 });
 
+// Helper to safely format Markdown-like output from LLM to HTML
+function convertMarkdownToHtml(text) {
+  if (!text) return '';
+  let html = text;
+  // Strip code block wrappers
+  html = html.replace(/```html?/gi, '').replace(/```/g, '');
+  // Bold
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/__(.*?)__/g, '<strong>$1</strong>');
+  // Italic
+  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  html = html.replace(/_(.*?)_/g, '<em>$1</em>');
+  return html.trim();
+}
+
+let cachedWorkingGeminiModel = null;
+
+async function processQuestionWithAI(question, data, healthData, userKeys = {}) {
+  const q = question.toLowerCase().trim();
+  const geminiKey = userKeys.gemini || process.env.GEMINI_API_KEY;
+  const openAiKey = userKeys.openai || process.env.OPENAI_API_KEY;
+
+  // Try Google Gemini API if key is present
+  if (geminiKey) {
+    try {
+      const payload = {
+        contents: [
+          {
+            parts: [
+              {
+                text: `You are a helpful and highly professional AI Assistant for the Digital Enablement Manager Dashboard.
+Your job is to answer the user's question about the team, projects, SOW, POs, KPIs, leaves, and status using ONLY the provided live dashboard data.
+
+Live Dashboard Data in JSON:
+${JSON.stringify({
+  teamSize: data.team?.activeMembers?.length || 0,
+  activeMembers: data.team?.activeMembers || [],
+  projects: data.sow?.projects || [],
+  health: healthData || [],
+  kpiMetrics: data.kpi?.metrics || data.kpi?.kpis || [],
+  governance: {
+    risks: data.governance?.risks || [],
+    highlights: data.governance?.highlights || [],
+    audits: data.governance?.audits || []
+  },
+  leave: data.leave?.currentMonth || {},
+  ftr: data.ftr?.qaMetrics || [],
+  poc: data.poc?.pocs || []
+}, null, 2)}
+
+User's Question: "${question}"
+
+Instructions:
+1. Answer the question directly and concisely. Provide ONLY what was asked—no extra information or unnecessary columns.
+2. If the user asks about a single person (e.g., "who is Bhavani"), reply with a clean, compact bulleted list of 4-5 core details (Role, Designation, Email, Location, Manager). Do NOT construct an HTML table.
+3. Only use HTML tables for comparisons or listing multiple rows/entities. Never use tables for a single person's details.
+4. If you construct an HTML table, keep columns minimal and layout compact so it renders nicely without horizontal wrapping.
+5. Format your response beautifully using standard HTML inline tags (<strong>, <em>, <br>, <ul>, <li>). Do NOT use markdown syntax (like **bold** or *italic*) or code blocks (like \`\`\`html ... \`\`\`).
+6. The user might ask in Hindi, English, or Hinglish. Reply in the matching language style, but keep it highly professional.
+7. Mention at the end of the message: "Powered by Gemini AI model 🤖".`
+              }
+            ]
+          }
+        ]
+      };
+      
+      const modelsToTry = cachedWorkingGeminiModel 
+        ? [cachedWorkingGeminiModel]
+        : [
+            'gemini-2.5-flash',
+            'gemini-2.0-flash-exp',
+            'gemini-1.5-flash',
+            'gemini-1.5-flash-latest',
+            'gemini-pro',
+            'gemini-1.5-pro'
+          ];
+
+      let lastErrText = '';
+      for (const modelName of modelsToTry) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            const json = await res.json();
+            const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              cachedWorkingGeminiModel = modelName; // Cache the successful model
+              return convertMarkdownToHtml(text);
+            }
+          } else {
+            lastErrText = await res.text();
+            console.warn(`[Gemini API] Model ${modelName} failed. Status: ${res.status}. Error: ${lastErrText}`);
+          }
+        } catch (e) {
+          console.warn(`[Gemini API] Exception trying ${modelName}:`, e.message);
+        }
+      }
+
+      // If we used a cached model and it failed, clear cache and retry the search
+      if (cachedWorkingGeminiModel) {
+        console.warn(`[Gemini API] Cached model ${cachedWorkingGeminiModel} failed. Invalidating cache and retrying all models...`);
+        cachedWorkingGeminiModel = null;
+        return await processQuestionWithAI(question, data, healthData, userKeys);
+      }
+
+      // If all models failed, do a diagnostic log of available models
+      console.error(`[Gemini API] All models failed. Last error: ${lastErrText}`);
+      try {
+        const diagRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`);
+        if (diagRes.ok) {
+          const diagJson = await diagRes.json();
+          const available = (diagJson.models || []).map(m => m.name);
+          console.log('[Gemini API] Available models for this key:', available);
+        }
+      } catch (diagErr) {
+        console.error('[Gemini API] Could not fetch available models list:', diagErr.message);
+      }
+    } catch (e) {
+      console.error('[Gemini API] Outermost exception:', e);
+    }
+  }
+
+  // Try OpenAI API if key is present
+  if (openAiKey) {
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openAiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: `You are an AI Chatbot for the Digital Enablement Manager Dashboard. Answer queries based on the provided JSON data. Use HTML tags (<strong>, <em>, <br>, <ul>, <li>, <table>) for formatting. No markdown code blocks. Mention you are powered by OpenAI GPT.`
+            },
+            {
+              role: 'user',
+              content: `Data:\n${JSON.stringify({
+                teamSize: data.team?.activeMembers?.length || 0,
+                activeMembers: data.team?.activeMembers || [],
+                projects: data.sow?.projects || [],
+                health: healthData || [],
+                kpiMetrics: data.kpi?.metrics || data.kpi?.kpis || [],
+                governance: {
+                  risks: data.governance?.risks || [],
+                  highlights: data.governance?.highlights || [],
+                  audits: data.governance?.audits || []
+                },
+                leave: data.leave?.currentMonth || {},
+                ftr: data.ftr?.qaMetrics || [],
+                poc: data.poc?.pocs || []
+              })}\n\nQuestion: ${question}`
+            }
+          ]
+        })
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        const text = json.choices?.[0]?.message?.content;
+        if (text) {
+          return convertMarkdownToHtml(text);
+        }
+      } else {
+        const errText = await res.text();
+        console.error('OpenAI API Error details:', errText);
+      }
+    } catch (e) {
+      console.error('OpenAI API Exception:', e);
+    }
+  }
+
+  // Fallback: Rule-based regex/keyword matcher
+  const answer = processQuestion(q, data, healthData);
+  return answer + `<br><br><span style="font-size: 0.85em; opacity: 0.65; display: block; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 5px; margin-top: 10px;">🤖 <em>Note: Running in Rule-Based mode. Click the ⚙️ settings icon in the chat header to add your Google Gemini API Key and unlock the full power of Gemini AI!</em></span>`;
+}
+
+// ── Chatbot API — answers questions from dashboard data ─────────────
+app.post('/api/exec/chat', verifyToken, async (req, res) => {
+  try {
+    const { question } = req.body;
+    if (!question || typeof question !== 'string') {
+      return res.json({ answer: 'Please ask a valid question.' });
+    }
+    const q = question.toLowerCase().trim();
+    const data = execData.getAllCached();
+    const healthData = execData.computeProjectHealth();
+
+    // Retrieve custom API keys passed by client
+    const userKeys = {
+      gemini: req.headers['x-gemini-api-key'] || '',
+      openai: req.headers['x-openai-api-key'] || ''
+    };
+
+    const answer = await processQuestionWithAI(question, data, healthData, userKeys);
+    res.json({ answer });
+  } catch (err) {
+    res.json({ answer: '❌ Sorry, I encountered an error processing your question: ' + err.message });
+  }
+});
+
+function processQuestion(q, data, healthData) {
+  const team = data.team || {};
+  const sow = data.sow || {};
+  const kpi = data.kpi || {};
+  const gov = data.governance || {};
+  const leave = data.leave || {};
+  const ftr = data.ftr || {};
+  const health = healthData || [];
+  const poc = data.poc || {};
+  const members = team.activeMembers || [];
+  const risks = gov.risks || [];
+  const highlights = gov.highlights || [];
+  const projects = sow.projects || [];
+  const metrics = kpi.metrics || kpi.kpis || [];
+  const leaveData = leave.currentMonth || {};
+  const pocs = poc.pocs || [];
+
+  // ── 1. Reportees / under a manager (MUST be before generic person lookup) ──
+  if (matchWords(q, ['reportee', 'reportees', 'reporting', 'repotee', 'repotees'])) {
+    const mgr = findPersonInQuery(q, members);
+    if (mgr) {
+      const reportees = members.filter(m => m.manager?.toLowerCase() === mgr.name.toLowerCase());
+      if (reportees.length === 0) return `No reportees found under <strong>${mgr.name}</strong>.`;
+      let html = `👥 <strong>${mgr.name}'s Reportees (${reportees.length})</strong><br><br>`;
+      reportees.forEach(r => { html += `• ${r.name} — ${r.designation || r.role || '—'}<br>`; });
+      return html;
+    }
+    return '🤔 Could not identify the manager name. Try: <em>"reportees of [full name]"</em>';
+  }
+
+  // Also catch "under [name]" pattern specifically
+  if (q.includes('under ') || q.includes('ke niche') || q.includes('ke under')) {
+    const mgr = findPersonInQuery(q, members);
+    if (mgr) {
+      const reportees = members.filter(m => m.manager?.toLowerCase() === mgr.name.toLowerCase());
+      if (reportees.length === 0) return `No reportees found under <strong>${mgr.name}</strong>.`;
+      let html = `👥 <strong>${mgr.name}'s Reportees (${reportees.length})</strong><br><br>`;
+      reportees.forEach(r => { html += `• ${r.name} — ${r.designation || r.role || '—'}<br>`; });
+      return html;
+    }
+  }
+
+  // ── 2. Specific person lookup ──
+  if (matchWords(q, ['who is', 'kaun hai', 'tell me about', 'details of', 'find', 'kaun h'])) {
+    const person = findPersonInQuery(q, members);
+    if (person) {
+      let html = `👤 <strong>${person.name}</strong><br>`;
+      html += `Role: ${person.role || '—'}<br>`;
+      html += `Designation: ${person.designation || '—'}<br>`;
+      html += `Manager (RM): ${person.manager || '—'}<br>`;
+      html += `Office: ${person.location || '—'}<br>`;
+      html += `Email: ${person.email || '—'}<br>`;
+      html += `Emp ID: ${person.empId || '—'}<br>`;
+      html += `DOJ: ${person.doj || '—'}`;
+      return html;
+    }
+  }
+
+  // ── 3. Team count / team info ──
+  if (matchWords(q, ['team size', 'team member', 'headcount', 'total member', 'kitne log', 'kitne member', 'how many people', 'how many member', 'team count', 'total team'])) {
+    const total = members.length;
+    const offices = {};
+    members.forEach(m => { if (m.location) offices[m.location] = (offices[m.location] || 0) + 1; });
+    const officeStr = Object.entries(offices).map(([k, v]) => `${k}: ${v}`).join(', ');
+    return `👥 <strong>Team Size: <span class="chat-stat">${total}</span></strong><br><br>` +
+      `<strong>Office-wise:</strong> ${officeStr || 'N/A'}<br><br>` +
+      `<strong>Designations:</strong> ${[...new Set(members.map(m => m.designation).filter(Boolean))].slice(0, 8).join(', ')}`;
+  }
+
+  // ── 4. Leave info ──
+  if (matchWords(q, ['leave', 'chutti', 'absent', 'leave today', 'aaj kaun', 'on leave', 'kon leave'])) {
+    const onToday = leaveData.onLeaveToday || [];
+    const totalLeaves = leaveData.totalLeaves || 0;
+    const byPerson = leaveData.byPerson || {};
+    let html = `🏖️ <strong>Leave Summary — This Month</strong><br>`;
+    html += `Total leaves: <span class="chat-stat">${totalLeaves}</span><br><br>`;
+    if (onToday.length > 0) {
+      html += `<strong>On Leave Today (${onToday.length}):</strong><br>`;
+      onToday.forEach(p => { html += `• ${p.name} (${p.type || 'Leave'})<br>`; });
+    } else {
+      html += `✅ <em>Nobody on leave today!</em><br>`;
+    }
+    const topLeave = Object.entries(byPerson).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    if (topLeave.length > 0) {
+      html += `<br><strong>Top Leave Takers:</strong><br>`;
+      topLeave.forEach(([name, days]) => { html += `• ${name}: ${days} day(s)<br>`; });
+    }
+    return html;
+  }
+
+  // ── 5. Risks ──
+  if (matchWords(q, ['risk', 'risks', 'issue', 'problem', 'challenge', 'blocker', 'dikkat'])) {
+    const active = risks.filter(r => r.status?.toLowerCase() === 'ongoing' || !r.status);
+    if (!active.length) return '✅ <strong>No active risks found!</strong> Everything is looking good.';
+    let html = `⚠️ <strong>Active Risks: <span class="chat-stat">${active.length}</span></strong><br><br>`;
+    active.slice(0, 6).forEach(r => {
+      html += `<strong>${r.project || 'Unknown'}</strong> — ${r.pm || ''}<br>`;
+      html += `${r.risk || r.description || 'No details'}<br>`;
+      if (r.impact) html += `Impact: <em>${r.impact}</em><br>`;
+      if (r.mitigation) html += `Mitigation: <em>${r.mitigation}</em><br>`;
+      html += `<br>`;
+    });
+    if (active.length > 6) html += `<em>...and ${active.length - 6} more risks</em>`;
+    return html;
+  }
+
+  // ── 6. KPI / performance ──
+  if (matchWords(q, ['kpi', 'performance', 'sla', 'utilization', 'quality', 'csat', 'training', 'metric'])) {
+    if (!metrics.length) return '📊 No KPI data available.';
+    let html = `📊 <strong>KPI Performance Summary</strong><br><br>`;
+    const grouped = {};
+    metrics.forEach(m => {
+      const proj = m.project || m.account || 'General';
+      if (!grouped[proj]) grouped[proj] = [];
+      grouped[proj].push(m);
+    });
+    const projKeys = Object.keys(grouped).slice(0, 4);
+    projKeys.forEach(proj => {
+      html += `<strong>${proj}:</strong><br>`;
+      grouped[proj].slice(0, 6).forEach(m => {
+        const target = m.target != null ? (m.target * 100).toFixed(0) + '%' : '—';
+        const actual = m.actual != null ? (m.actual * 100).toFixed(0) + '%' : '—';
+        const status = m.actual >= m.target ? '✅' : '⚠️';
+        html += `${status} ${m.metricName || m.kpiName || 'Metric'}: Target ${target}, Actual ${actual}<br>`;
+      });
+      html += `<br>`;
+    });
+    if (projKeys.length < Object.keys(grouped).length) html += `<em>...${Object.keys(grouped).length - projKeys.length} more projects</em>`;
+    return html;
+  }
+
+  // ── 7. SOW / PO / contract ──
+  if (matchWords(q, ['sow', 'purchase order', 'statement of work', 'financial', 'billing', 'contract'])) {
+    if (!projects.length) return '📋 No SOW data available.';
+    let html = `📋 <strong>SOW & PO Summary</strong><br>`;
+    html += `Total Projects: <span class="chat-stat">${projects.length}</span><br><br>`;
+    const statusCount = {};
+    projects.forEach(p => {
+      const s = p.sowStatus || p.status || 'Unknown';
+      statusCount[s] = (statusCount[s] || 0) + 1;
+    });
+    html += `<strong>Status Breakdown:</strong><br>`;
+    Object.entries(statusCount).forEach(([s, c]) => { html += `• ${s}: ${c}<br>`; });
+    const projName = findProjectInQuery(q, projects);
+    if (projName) {
+      const p = projects.find(pr => pr.projectName?.toLowerCase() === projName.toLowerCase());
+      if (p) {
+        html += `<br><strong>📂 ${p.projectName}:</strong><br>`;
+        html += `Client: ${p.client || '—'}<br>SOW: ${p.sowStatus || '—'}<br>PO: ${p.poStatus || '—'}<br>`;
+        if (p.sowValue) html += `Value: ${p.sowValue}<br>`;
+        if (p.startDate) html += `Start: ${p.startDate}<br>`;
+        if (p.endDate) html += `End: ${p.endDate}<br>`;
+      }
+    }
+    return html;
+  }
+
+  // ── 8. FTR / QA metrics ──
+  if (matchWords(q, ['ftr', 'first time right', 'qa metric', 'pass rate'])) {
+    const qaMetrics = ftr.qaMetrics || ftr.metrics || [];
+    if (!qaMetrics.length) return '✅ No FTR data available.';
+    let html = `✅ <strong>FTR / QA Summary</strong><br>`;
+    html += `Total QA metrics: <span class="chat-stat">${qaMetrics.length}</span><br><br>`;
+    qaMetrics.slice(0, 8).forEach(m => {
+      html += `• ${m.client || m.account || 'Unknown'} — ${m.month || ''}: ${m.passRate || m.ftrRate || '—'}<br>`;
+    });
+    return html;
+  }
+
+  // ── 9. Project health / status ──
+  if (matchWords(q, ['project', 'health', 'active project', 'kitne project', 'project list', 'projects'])) {
+    if (!health.length && !projects.length) return '🏥 No project data available.';
+    const src = health.length ? health : projects;
+    let html = `🏥 <strong>Project Health</strong><br>`;
+    html += `Total: <span class="chat-stat">${src.length}</span><br><br>`;
+    const hCount = { Green: 0, Amber: 0, Red: 0 };
+    src.forEach(p => { const h = p.health || 'Unknown'; if (hCount[h] !== undefined) hCount[h]++; });
+    html += `🟢 Green: ${hCount.Green} &nbsp; 🟡 Amber: ${hCount.Amber} &nbsp; 🔴 Red: ${hCount.Red}<br><br>`;
+    const redProjects = src.filter(p => p.health === 'Red');
+    if (redProjects.length > 0) {
+      html += `<strong>⚠️ Red Status Projects:</strong><br>`;
+      redProjects.forEach(p => {
+        html += `• <strong>${p.projectName || p.project}</strong> — ${p.reasons || p.pm || 'No details'}<br>`;
+      });
+    }
+    return html;
+  }
+
+  // ── 10. Highlights / lowlights ──
+  if (matchWords(q, ['highlight', 'achievement', 'good news', 'lowlight', 'concern'])) {
+    const hl = highlights.filter(h => h.highlight);
+    const ll = highlights.filter(h => h.lowlight);
+    let html = `🌟 <strong>Recent Highlights (${hl.length})</strong><br>`;
+    hl.slice(0, 4).forEach(h => { html += `• <strong>${h.project}</strong>: ${h.highlight}<br>`; });
+    html += `<br>⬇️ <strong>Recent Lowlights (${ll.length})</strong><br>`;
+    ll.slice(0, 4).forEach(h => { html += `• <strong>${h.project}</strong>: ${h.lowlight}<br>`; });
+    return html;
+  }
+
+  // ── 11. POC / POV ──
+  if (matchWords(q, ['poc', 'pov', 'proof of concept', 'proof of value'])) {
+    if (!pocs.length) return '🧪 No POC/POV data available.';
+    let html = `🧪 <strong>POC/POV Summary</strong><br>Total: <span class="chat-stat">${pocs.length}</span><br><br>`;
+    pocs.slice(0, 5).forEach(p => {
+      html += `• <strong>${p.title || p.project || 'Untitled'}</strong> — ${p.status || 'Unknown'} (SPOC: ${p.spoc || '—'})<br>`;
+    });
+    return html;
+  }
+
+  // ── 12. Summary / overview ──
+  if (matchWords(q, ['summary', 'overview', 'dashboard', 'overall', 'sabkuch', 'sab batao', 'everything'])) {
+    let html = `📊 <strong>Dashboard Summary</strong><br><br>`;
+    html += `👥 Team Members: <span class="chat-stat">${members.length}</span><br>`;
+    html += `📂 Projects: <span class="chat-stat">${projects.length || health.length || 0}</span><br>`;
+    html += `⚠️ Active Risks: <span class="chat-stat">${risks.filter(r => r.status?.toLowerCase() === 'ongoing').length}</span><br>`;
+    html += `🏖️ On Leave Today: <span class="chat-stat">${(leaveData.onLeaveToday || []).length}</span><br>`;
+    html += `📊 KPI Metrics: <span class="chat-stat">${metrics.length}</span><br>`;
+    html += `📋 SOW/PO Count: <span class="chat-stat">${projects.length}</span><br>`;
+    html += `🧪 POC/POV: <span class="chat-stat">${pocs.length}</span><br>`;
+    html += `🌟 Highlights: <span class="chat-stat">${highlights.filter(h => h.highlight).length}</span><br>`;
+    html += `⬇️ Lowlights: <span class="chat-stat">${highlights.filter(h => h.lowlight).length}</span>`;
+    return html;
+  }
+
+  // ── 13. Fallback: try to find a person by name anywhere in the query ──
+  const personFallback = findPersonInQuery(q, members);
+  if (personFallback) {
+    let html = `👤 <strong>${personFallback.name}</strong><br>`;
+    html += `Role: ${personFallback.role || '—'}<br>`;
+    html += `Designation: ${personFallback.designation || '—'}<br>`;
+    html += `Manager (RM): ${personFallback.manager || '—'}<br>`;
+    html += `Office: ${personFallback.location || '—'}<br>`;
+    html += `Email: ${personFallback.email || '—'}`;
+    return html;
+  }
+
+  // ── Help / unknown ──
+  return `🤔 I'm not sure about that. Try asking:<br><br>` +
+    `• <strong>"team size"</strong> — how many members<br>` +
+    `• <strong>"who is on leave"</strong> — leave status<br>` +
+    `• <strong>"show risks"</strong> — active risks<br>` +
+    `• <strong>"kpi summary"</strong> — performance metrics<br>` +
+    `• <strong>"sow status"</strong> — contracts<br>` +
+    `• <strong>"project health"</strong> — project overview<br>` +
+    `• <strong>"summary"</strong> — full overview<br>` +
+    `• <strong>"who is [name]"</strong> — person details<br>` +
+    `• <strong>"reportees of [name]"</strong> — team under a manager`;
+}
+
+/** Word-boundary aware matching — prevents 'po' matching inside 'reportee' */
+function matchWords(q, phrases) {
+  for (const phrase of phrases) {
+    // For multi-word phrases, check direct inclusion
+    if (phrase.includes(' ')) {
+      if (q.includes(phrase)) return true;
+      continue;
+    }
+    // For single words, use word boundary regex
+    const regex = new RegExp('\\b' + phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    if (regex.test(q)) return true;
+  }
+  return false;
+}
+
+function findPersonInQuery(q, members) {
+  // Try full name match first (most accurate)
+  for (const m of members) {
+    if (m.name && q.includes(m.name.toLowerCase())) return m;
+  }
+  // Try first name match (at least 3 chars to avoid false positives)
+  for (const m of members) {
+    const firstName = (m.name || '').split(' ')[0].toLowerCase();
+    if (firstName.length >= 3 && q.includes(firstName)) return m;
+  }
+  return null;
+}
+
+function findProjectInQuery(q, projects) {
+  for (const p of projects) {
+    const name = (p.projectName || '').toLowerCase();
+    if (name && name.length > 3 && q.includes(name)) return p.projectName;
+  }
+  return null;
+}
+
 // ── Fallback → SPA ───────────────────────────────────────────────────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -765,4 +1258,23 @@ app.listen(PORT, async () => {
   } catch (e) {
     console.warn('Could not load exec data on startup:', e.message);
   }
+
+  // ── Auto-refresh connected sources every 2 minutes ──
+  // This ensures that when Google Sheets / SharePoint Excel is updated,
+  // the changes flow into the dashboard automatically.
+  const AUTO_REFRESH_MS = 2 * 60 * 1000; // 2 minutes
+  setInterval(async () => {
+    try {
+      const hasRemote = Object.values(execData.DATA_SOURCES).some(
+        s => s.type !== 'local' && s.url
+      );
+      if (hasRemote) {
+        console.log('[Auto-Refresh] Re-downloading connected sources...');
+        await execData.loadAll();
+        console.log('[Auto-Refresh] Data refreshed at', new Date().toISOString());
+      }
+    } catch (e) {
+      console.warn('[Auto-Refresh] Error:', e.message);
+    }
+  }, AUTO_REFRESH_MS);
 });

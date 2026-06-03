@@ -603,7 +603,7 @@ function execLogout() {
     document.getElementById('dashboard').style.display = '';
     document.getElementById('main-footer').style.display = '';
     document.querySelectorAll('.phase1-only').forEach(el => el.style.display = '');
-    document.querySelector('#main-header h1').textContent = 'Digital Enablement Team - Daily Standup Updates';
+    document.querySelector('#main-header h1').textContent = 'Digital Enablement – Executive Overview';
     if (window.ManagerDash) window.ManagerDash.close();
 }
 
@@ -616,7 +616,7 @@ function showExecDashboard() {
     document.getElementById('execSection').style.display = 'block';
     document.getElementById('btnManagerLogin').style.display = 'none';
     document.getElementById('btnExecLogout').style.display = '';
-    document.querySelector('#main-header h1').textContent = 'Executive Overview';
+    document.querySelector('#main-header h1').textContent = 'Digital Enablement – Executive Overview';
     if (window.ManagerDash) window.ManagerDash.open();
 }
 

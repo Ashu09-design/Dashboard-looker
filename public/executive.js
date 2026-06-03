@@ -9,7 +9,7 @@
 'use strict';
 
 const TOKEN_KEY = 'exec_token';
-const REFRESH_MS = 5 * 60 * 1000;
+const REFRESH_MS = 30 * 1000; // 30s auto-refresh for live data from Google Sheets / SharePoint
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
 
@@ -43,12 +43,17 @@ function open() {
     if (!state.bound) { bindUI(); state.bound = true; }
     renderTabNav();
     fetchAllExecData();
+    checkSourceConnection();
     if (!state.intervalId) state.intervalId = setInterval(fetchAllExecData, REFRESH_MS);
+    if (!state.sourceCheckId) state.sourceCheckId = setInterval(checkSourceConnection, 60000);
+    if (!state.chatbotInitialized) { initChatbot(); state.chatbotInitialized = true; } else { showChatbot(); }
 }
 
 function close() {
     if (state.intervalId) { clearInterval(state.intervalId); state.intervalId = null; }
+    if (state.sourceCheckId) { clearInterval(state.sourceCheckId); state.sourceCheckId = null; }
     destroyCharts();
+    hideChatbot();
 }
 
 window.ManagerDash = { open, close };
@@ -102,6 +107,38 @@ async function fetchAllExecData() {
     showLoading(false);
 }
 
+/** Check if a data source (Google Sheet / SharePoint) is connected */
+async function checkSourceConnection() {
+    try {
+        const status = await apiFetch('/api/exec/source-status');
+        state.sourceConnected = status || {};
+        renderConnectionBadge();
+    } catch (_) { /* ignore */ }
+}
+
+function renderConnectionBadge() {
+    let badge = document.getElementById('mdLiveBadge');
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.id = 'mdLiveBadge';
+        badge.className = 'live-badge';
+        const toolbar = document.querySelector('.md-toolbar-right');
+        if (toolbar) toolbar.prepend(badge);
+    }
+    const s = state.sourceConnected || {};
+    const anyConnected = Object.values(s).some(v => v && typeof v === 'object' && v.loaded);
+    if (anyConnected) {
+        const connectedCount = Object.values(s).filter(v => v && typeof v === 'object' && v.loaded).length;
+        badge.innerHTML = `<span class="live-dot"></span> Live · ${connectedCount} source(s)`;
+        badge.classList.add('connected');
+        badge.classList.remove('disconnected');
+    } else {
+        badge.innerHTML = `<span class="live-dot off"></span> No live source`;
+        badge.classList.add('disconnected');
+        badge.classList.remove('connected');
+    }
+}
+
 function showLoading(show) {
     const el = $('#mdLoading');
     if (!el) return;
@@ -139,15 +176,15 @@ function renderTabNav() {
 // ══════════════════════════════════════════════════════════════════
 
 const TAB_FILTERS = {
-    overview: ['client', 'rm', 'month', 'project'],
-    team: ['client', 'office', 'designation', 'rm', 'project'],
-    projects: ['client', 'project', 'month'],
-    sow: ['client', 'project', 'startDate', 'endDate'],
-    kpis: ['client', 'project', 'kpiMetric'],
+    overview: ['rm', 'month', 'project'],
+    team: ['rm', 'project'],
+    projects: ['month'],
+    sow: ['project', 'startDate', 'endDate'],
+    kpis: ['project', 'kpiMetric'],
     ftr: ['client', 'month', 'project'],
     leave: ['rm', 'project'],
     risks: ['client', 'project', 'month'],
-    poc: ['pocStatus', 'manager', 'spoc'],
+    poc: ['spoc'],
 };
 
 function getClientProjects(clientName) {
@@ -280,12 +317,19 @@ function renderTab() {
     destroyCharts();
     const el = $('#tabContent');
     if (!el) return;
+    
+    // Reset and trigger smooth fade-in-slide animation on tab change
+    el.classList.remove('fade-in-slide');
+    void el.offsetWidth; // Force reflow
+    
     el.innerHTML = '';
     const fn = {
         overview: tabOverview, team: tabTeam, projects: tabProjects, sow: tabSow,
         kpis: tabKpis, ftr: tabFtr, leave: tabLeave, risks: tabRisks, poc: tabPoc,
     }[state.activeTab];
     if (fn) fn(el);
+    
+    el.classList.add('fade-in-slide');
 }
 
 function destroyCharts() {
@@ -419,7 +463,7 @@ function membersForPMs(members, pmNames) {
 }
 
 function tabOverview(el) {
-    const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project'), client = getFilter('client');
+    const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project'), client = '';
 
     // 1. Filter Team Size
     let members = state.data.team?.activeMembers || [];
@@ -532,12 +576,8 @@ function tabOverview(el) {
 function tabTeam(el) {
     const t = state.data.team || {};
     let members = t.activeMembers || [];
-    const office = getFilter('office'), designation = getFilter('designation');
-    const rm = getFilter('rm'), proj = getFilter('project'), client = getFilter('client');
-    if (office) members = members.filter(m => m.location === office);
-    if (designation) members = members.filter(m => m.designation === designation);
+    const proj = getFilter('project'), rm = getFilter('rm');
     if (rm) members = members.filter(m => m.manager === rm);
-    if (client) members = membersForPMs(members, pmsForClient(client));
     if (proj) members = membersForPMs(members, pmsForProject(proj));
 
     const desigDist = {};
@@ -582,38 +622,14 @@ function tabTeam(el) {
 // ══════════════════════════════════════════════════════════════════
 
 function tabProjects(el) {
-    const proj = getFilter('project');
     const monthF = getFilter('month');
-    const client = getFilter('client');
     el.innerHTML = `
-        <div class="m-card">${section('🏥 Project Health Status')}<div id="pjHealth"></div></div>
-        <div class="grid-2">
-            <div class="m-card">${section('🌟 Recent Highlights')}<div id="pjHL"></div></div>
-            <div class="m-card">${section('⬇️ Recent Lowlights')}<div id="pjLL"></div></div>
-        </div>
-        <div class="grid-2">
-            <div class="m-card">${section('📈 FTE Utilization Trend')}${chartCanvas('chPjUtil')}</div>
-            <div class="m-card">${section('⚠️ Project Risks')}<div id="pjRisks"></div></div>
-        </div>
-        <div class="m-card">${section('✅ FTR Report', 'Client-wise & monthly')}<div id="pjFtr"></div></div>
-        <div class="grid-2">
-            <div class="m-card">${section('🏆 Top Leave Takers')}<div id="pjLeaveTop"></div></div>
-            <div class="m-card">${section('🏖️ Leave Impact — Today & This Month')}<div id="pjLeaveImpact"></div></div>
-        </div>`;
+        <div class="m-card">${section('🏥 Project Health Status', 'Overall health of all projects')}<div id="pjHealth"></div></div>`;
 
     const pf = {};
-    if (proj) pf.project = proj;
     if (monthF) pf.month = monthF;
-    if (client) pf.client = client;
 
     widgetProjectHealth($('#pjHealth'), pf);
-    widgetHighlights($('#pjHL'), 10, pf);
-    widgetLowlights($('#pjLL'), 10, pf);
-    widgetUtilTrendChart('chPjUtil');
-    widgetRiskList($('#pjRisks'), pf, 10);
-    widgetFtrReport($('#pjFtr'), pf);
-    widgetTopLeaveTakers($('#pjLeaveTop'), pf);
-    widgetLeaveImpact($('#pjLeaveImpact'), pf);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -622,8 +638,8 @@ function tabProjects(el) {
 
 function tabSow(el) {
     let projects = state.data.sow?.projects || [];
-    const client = getFilter('client'), proj = getFilter('project'), startD = getFilter('startDate'), endD = getFilter('endDate');
-    if (client) projects = projects.filter(p => p.client === client);
+    const proj = getFilter('project'), startD = getFilter('startDate'), endD = getFilter('endDate');
+    const client = '';
     if (proj) projects = projects.filter(p => p.projectName === proj);
     if (startD) projects = projects.filter(p => p.startDate >= startD);
     if (endD) projects = projects.filter(p => p.endDate <= endD);
@@ -681,7 +697,7 @@ function tabSow(el) {
 
 function tabKpis(el) {
     const kpi = state.data.kpi || {};
-    const client = getFilter('client'), proj = getFilter('project'), kpiMetric = getFilter('kpiMetric');
+    const proj = getFilter('project'), kpiMetric = getFilter('kpiMetric'), client = '';
 
     let metrics = kpi.metrics || [];
     if (client) metrics = metrics.filter(m => m.account === client);
@@ -937,9 +953,7 @@ function tabRisks(el) {
 function tabPoc(el) {
     const poc = state.data.poc || {};
     let pocs = poc.pocs || [];
-    const st = getFilter('pocStatus'), mgr = getFilter('manager'), spoc = getFilter('spoc');
-    if (st) pocs = pocs.filter(p => p.status === st);
-    if (mgr) pocs = pocs.filter(p => p.manager === mgr);
+    const spoc = getFilter('spoc');
     if (spoc) pocs = pocs.filter(p => p.spoc === spoc);
 
     // Compute dynamic metrics
@@ -1425,21 +1439,29 @@ async function uploadFiles() {
 async function connectUrls() {
     const sources = {};
     const keys = ['ftr', 'team', 'sow', 'governance', 'leave', 'kpi', 'poc'];
-    const ids = ['urlFtr', 'urlTeam', 'urlSow', 'urlGovernance', 'urlLeave', 'urlKpi', 'urlPoc'];
+    const spIds = ['urlFtr', 'urlTeam', 'urlSow', 'urlGovernance', 'urlLeave', 'urlKpi', 'urlPoc'];
+    const gsIds = ['urlFtrGoogle', 'urlTeamGoogle', 'urlSowGoogle', 'urlGovernanceGoogle', 'urlLeaveGoogle', 'urlKpiGoogle', 'urlPocGoogle'];
     keys.forEach((key, i) => {
-        const el = $(`#${ids[i]}`);
-        const url = el ? el.value.trim() : '';
-        if (url) sources[key] = { url, type: 'sharepoint' };
+        // Check Google Sheets first, then SharePoint
+        const gsEl = $(`#${gsIds[i]}`);
+        const spEl = $(`#${spIds[i]}`);
+        const gsUrl = gsEl ? gsEl.value.trim() : '';
+        const spUrl = spEl ? spEl.value.trim() : '';
+        if (gsUrl) {
+            sources[key] = { url: gsUrl, type: 'google' };
+        } else if (spUrl) {
+            sources[key] = { url: spUrl, type: 'sharepoint' };
+        }
     });
     const statusEl = $('#execSourceStatus');
     if (Object.keys(sources).length === 0) {
         statusEl.className = 'source-status-box error';
-        statusEl.textContent = 'Please enter at least one URL.';
+        statusEl.textContent = 'Please enter at least one Google Sheets or SharePoint URL.';
         statusEl.classList.remove('hidden');
         return;
     }
     statusEl.className = 'source-status-box';
-    statusEl.textContent = 'Connecting…';
+    statusEl.textContent = 'Connecting & downloading data…';
     statusEl.classList.remove('hidden');
     try {
         const res = await fetch('/api/exec/connect-sources', {
@@ -1448,8 +1470,8 @@ async function connectUrls() {
         const data = await res.json();
         if (data.success) {
             statusEl.className = 'source-status-box success';
-            statusEl.textContent = '✓ ' + data.message;
-            setTimeout(() => { fetchAllExecData(); $('#mdSourceModal').classList.add('hidden'); }, 1200);
+            statusEl.textContent = '✓ ' + data.message + ' Data will auto-refresh every 2 minutes.';
+            setTimeout(() => { fetchAllExecData(); checkSourceConnection(); $('#mdSourceModal').classList.add('hidden'); }, 1500);
         } else {
             statusEl.className = 'source-status-box error';
             statusEl.textContent = '✗ ' + (data.error || 'Connection failed');
@@ -1480,6 +1502,172 @@ function monthLabel(dateStr) {
     const d = new Date(dateStr);
     if (!isNaN(d.getTime())) return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
     return 'Unknown';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CHATBOT — DE Assistant
+// ══════════════════════════════════════════════════════════════════
+
+function initChatbot() {
+    const widget = document.getElementById('chatbotWidget');
+    const toggle = document.getElementById('chatbotToggle');
+    const panel = document.getElementById('chatbotPanel');
+    const closeBtn = document.getElementById('chatbotClose');
+    const input = document.getElementById('chatbotInput');
+    const sendBtn = document.getElementById('chatbotSend');
+    const messages = document.getElementById('chatbotMessages');
+    if (!widget || !toggle) return;
+
+    // Show widget
+    widget.style.display = 'block';
+
+    // Toggle panel
+    toggle.addEventListener('click', () => {
+        const isHidden = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (isHidden) input.focus();
+    });
+
+    closeBtn.addEventListener('click', () => {
+        panel.classList.add('hidden');
+    });
+
+    // Clear Chat Logic
+    const clearChatBtn = document.getElementById('chatbotClearChat');
+    if (clearChatBtn) {
+        clearChatBtn.addEventListener('click', () => {
+            messages.innerHTML = `
+                <div class="chat-msg bot">
+                  <span class="chat-avatar">🤖</span>
+                  <div class="chat-bubble">Chat history cleared! Ask me anything about your dashboard data.<br><br>
+                  <strong>Try asking:</strong><br>
+                  • "How many team members?"<br>
+                  • "Who is on leave today?"<br>
+                  • "Show active risks"<br>
+                  • "KPI performance summary"<br>
+                  • "SOW status for [project]"
+                  </div>
+                </div>
+            `;
+        });
+    }
+
+    // API Key Settings Panel Toggle & Logic
+    const settingsToggle = document.getElementById('chatbotSettingsToggle');
+    const settingsPanel = document.getElementById('chatbotSettingsPanel');
+    const apiKeyInput = document.getElementById('chatbotApiKeyInput');
+    const saveKeyBtn = document.getElementById('chatbotSaveKey');
+    const clearKeyBtn = document.getElementById('chatbotClearKey');
+    const keyStatusText = document.getElementById('chatbotKeyStatus');
+
+    if (settingsToggle && settingsPanel) {
+        settingsToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsPanel.classList.toggle('hidden');
+            if (!settingsPanel.classList.contains('hidden')) {
+                updateKeySettingsUI();
+            }
+        });
+
+        saveKeyBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                keyStatusText.innerHTML = 'Status: <span style="color:#10b981; font-weight:600;">Custom key saved!</span>';
+                setTimeout(() => { settingsPanel.classList.add('hidden'); }, 1200);
+            } else {
+                alert('Please enter a valid key or click Clear.');
+            }
+        });
+
+        clearKeyBtn.addEventListener('click', () => {
+            localStorage.removeItem('gemini_api_key');
+            apiKeyInput.value = '';
+            keyStatusText.innerHTML = 'Status: <span style="color:#94a3b8;">Using default mode</span>';
+        });
+
+        function updateKeySettingsUI() {
+            const savedKey = localStorage.getItem('gemini_api_key') || '';
+            apiKeyInput.value = savedKey;
+            if (savedKey) {
+                keyStatusText.innerHTML = 'Status: <span style="color:#22d3ee; font-weight:600;">Custom key configured</span>';
+            } else {
+                keyStatusText.innerHTML = 'Status: <span style="color:#94a3b8;">Using default mode</span>';
+            }
+        }
+        
+        // Run once on load
+        updateKeySettingsUI();
+    }
+
+    // Send message
+    sendBtn.addEventListener('click', () => sendChatMessage());
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+    });
+
+    async function sendChatMessage() {
+        const question = input.value.trim();
+        if (!question) return;
+
+        // Add user message
+        appendMessage('user', question);
+        input.value = '';
+
+        // Show typing indicator
+        const typing = document.createElement('div');
+        typing.className = 'chat-msg bot';
+        typing.innerHTML = `<span class="chat-avatar">🤖</span><div class="chat-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div>`;
+        messages.appendChild(typing);
+        messages.scrollTop = messages.scrollHeight;
+
+        try {
+            const token = sessionStorage.getItem(TOKEN_KEY);
+            const userApiKey = localStorage.getItem('gemini_api_key') || '';
+            const res = await fetch('/api/exec/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                    'x-gemini-api-key': userApiKey
+                },
+                body: JSON.stringify({ question }),
+            });
+            const data = await res.json();
+            // Remove typing indicator
+            typing.remove();
+            // Add bot response
+            appendMessage('bot', data.answer || 'Sorry, no answer available.');
+        } catch (err) {
+            typing.remove();
+            appendMessage('bot', '❌ Error communicating with the server. Please try again.');
+        }
+    }
+
+    function appendMessage(type, content) {
+        const msg = document.createElement('div');
+        msg.className = `chat-msg ${type}`;
+        const avatar = type === 'bot' ? '🤖' : '👤';
+        msg.innerHTML = `<span class="chat-avatar">${avatar}</span><div class="chat-bubble">${type === 'user' ? escHtml(content) : content}</div>`;
+        messages.appendChild(msg);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    function escHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+}
+
+function showChatbot() {
+    const w = document.getElementById('chatbotWidget');
+    if (w) w.style.display = 'block';
+}
+
+function hideChatbot() {
+    const w = document.getElementById('chatbotWidget');
+    if (w) w.style.display = 'none';
 }
 
 })();
