@@ -257,6 +257,70 @@ function filterOptions(key) {
 // Names like "Bhavani V", "Bhavani Venkatesh", "Bhavani venkatesh"
 // are recognized as the same person → longest version kept.
 
+function getLevenshteinDistance(a, b) {
+    const tmp = [];
+    for (let i = 0; i <= a.length; i++) {
+        tmp[i] = [i];
+    }
+    for (let j = 0; j <= b.length; j++) {
+        tmp[0][j] = j;
+    }
+    for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+            tmp[i][j] = Math.min(
+                tmp[i - 1][j] + 1,
+                tmp[i][j - 1] + 1,
+                tmp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+            );
+        }
+    }
+    return tmp[a.length][b.length];
+}
+
+function namesMatch(n1, n2) {
+    if (!n1 || !n2) return false;
+    const a = n1.toLowerCase().trim().replace(/\s+/g, ' ');
+    const b = n2.toLowerCase().trim().replace(/\s+/g, ' ');
+    if (a === b) return true;
+
+    const aw = a.split(' ');
+    const bw = b.split(' ');
+
+    function wordMatches(w1, w2) {
+        if (w1 === w2) return true;
+        if (w1.length === 1 && w2.startsWith(w1)) return true;
+        if (w2.length === 1 && w1.startsWith(w2)) return true;
+        if (w1.length <= 3 || w2.length <= 3) return false;
+        
+        // Allow typo distance up to 2 characters for longer words (e.g., apruv vs apurv)
+        const dist = getLevenshteinDistance(w1, w2);
+        return dist <= 2;
+    }
+
+    const shorter = aw.length <= bw.length ? aw : bw;
+    const longer = aw.length <= bw.length ? bw : aw;
+
+    let longIdx = 0;
+    let matchedCount = 0;
+
+    for (let shortIdx = 0; shortIdx < shorter.length; shortIdx++) {
+        const sWord = shorter[shortIdx];
+        let found = false;
+        while (longIdx < longer.length) {
+            const lWord = longer[longIdx];
+            if (wordMatches(sWord, lWord)) {
+                matchedCount++;
+                longIdx++;
+                found = true;
+                break;
+            }
+            longIdx++;
+        }
+        if (!found) return false;
+    }
+    return matchedCount === shorter.length;
+}
+
 function deduplicateNames(names) {
     const trimmed = names.filter(n => n && n.trim()).map(n => n.trim());
     if (!trimmed.length) return {};
@@ -281,24 +345,16 @@ function deduplicateNames(names) {
         const lower = name.toLowerCase();
         if (consumed.has(lower)) continue;
 
-        const words = lower.split(/\s+/);
-        const firstName = words[0];
-
         // This name is canonical (longest not-yet-consumed)
         aliasMap[lower] = name;
         consumed.add(lower);
 
-        // Absorb shorter names that share the first name and whose every
-        // word is a prefix-of or prefixed-by a word in the longer name.
+        // Absorb other similar names
         for (const other of sorted) {
             const ol = other.toLowerCase();
             if (consumed.has(ol)) continue;
-            const ow = ol.split(/\s+/);
-            if (ow[0] !== firstName) continue;
 
-            const isSubset = ow.every(o =>
-                words.some(w => w.startsWith(o) || o.startsWith(w)));
-            if (isSubset) {
+            if (namesMatch(name, other)) {
                 aliasMap[ol] = name;
                 consumed.add(ol);
             }
