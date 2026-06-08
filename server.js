@@ -780,36 +780,70 @@ async function processQuestionWithAI(question, data, healthData, userKeys = {}) 
           {
             parts: [
               {
-                text: `You are a helpful and highly professional AI Assistant for the Digital Enablement Manager Dashboard.
-Your job is to answer the user's question about the team, projects, SOW, POs, KPIs, leaves, and status using ONLY the provided live dashboard data.
+                text: `You are the AI Assistant for the Digital Enablement Manager Dashboard at Indegene. Answer the user's question strictly from the live dashboard JSON below — do NOT invent data, do NOT use outside knowledge for facts. If the answer is not in the data, say "I don't have that information in the dashboard yet."
 
-Live Dashboard Data in JSON:
+LIVE DASHBOARD JSON (the single source of truth):
 ${JSON.stringify({
-  teamSize: data.team?.activeMembers?.length || 0,
-  activeMembers: data.team?.activeMembers || [],
-  projects: data.sow?.projects || [],
-  health: healthData || [],
-  kpiMetrics: data.kpi?.metrics || data.kpi?.kpis || [],
+  lastRefresh: data.lastRefresh || null,
+  team: {
+    totalHeadcount: data.team?.totalHeadcount || (data.team?.activeMembers?.length || 0),
+    activeMembers: data.team?.activeMembers || [],
+    roleDistribution: data.team?.roleDistribution || {},
+    designationDistribution: data.team?.designationDistribution || {},
+    certifications: data.team?.certifications || {},
+    skillMatrix: (data.team?.skillMatrix || []).slice(0, 50),
+    exitResources: data.team?.exitResources || [],
+  },
+  sow: {
+    projects: data.sow?.projects || [],
+    summary: data.sow?.summary || {},
+  },
+  projectHealth: healthData || [],
+  kpi: {
+    metrics: data.kpi?.metrics || data.kpi?.kpis || [],
+    summary: data.kpi?.summary || {},
+    highlights: data.kpi?.highlights || [],
+    lowlights: data.kpi?.lowlights || [],
+  },
   governance: {
     risks: data.governance?.risks || [],
     highlights: data.governance?.highlights || [],
-    audits: data.governance?.audits || []
+    lowlights: data.governance?.lowlights || [],
+    audits: data.governance?.audits || [],
+    qbr: data.governance?.qbr || [],
+    summary: data.governance?.summary || {},
   },
-  leave: data.leave?.currentMonth || {},
-  ftr: data.ftr?.qaMetrics || [],
-  poc: data.poc?.pocs || []
+  leave: {
+    currentMonth: data.leave?.currentMonth || {},
+    months: Object.keys(data.leave?.months || {}),
+  },
+  ftr: {
+    accounts: data.ftr?.accounts || [],
+    qaMetrics: data.ftr?.qaMetrics || [],
+    summary: data.ftr?.summary || {},
+  },
+  poc: {
+    pocs: data.poc?.pocs || [],
+    aiUsecases: data.poc?.aiUsecases || [],
+    summary: data.poc?.summary || {},
+  }
 }, null, 2)}
 
 User's Question: "${question}"
 
-Instructions:
-1. Answer the question directly and concisely. Provide ONLY what was asked—no extra information or unnecessary columns.
-2. If the user asks about a single person (e.g., "who is Bhavani"), reply with a clean, compact bulleted list of 4-5 core details (Role, Designation, Email, Location, Manager). Do NOT construct an HTML table.
-3. Only use HTML tables for comparisons or listing multiple rows/entities. Never use tables for a single person's details.
-4. If you construct an HTML table, keep columns minimal and layout compact so it renders nicely without horizontal wrapping.
-5. Format your response beautifully using standard HTML inline tags (<strong>, <em>, <br>, <ul>, <li>). Do NOT use markdown syntax (like **bold** or *italic*) or code blocks (like \`\`\`html ... \`\`\`).
-6. The user might ask in Hindi, English, or Hinglish. Reply in the matching language style, but keep it highly professional.
-7. Mention at the end of the message: "Powered by Gemini AI model 🤖".`
+RESPONSE RULES:
+1. Be direct and concise. Answer ONLY what was asked.
+2. NAME MATCHING IS FUZZY: when the user names a person/project, match on first name OR partial last name (e.g., "Bhavani" → "Bhavani V" or "Bhavani Venkatesh" — treat them as the SAME person). Same for projects.
+3. For a single person: render a compact <ul> with Role, Designation, Manager (RM), Office, Email, Emp ID. Never a table for one person.
+4. For reportee lookups ("reportees of X", "X ke under kaun hai"): list ALL members whose manager field contains X's first name (case-insensitive substring match), not exact equality. Show name + designation.
+5. For comparisons or multi-row data: use a compact HTML <table> with minimal columns. Add inline style="border-collapse:collapse;width:100%" and <th style="text-align:left;padding:4px 8px;border-bottom:1px solid rgba(255,255,255,0.2)">.
+6. KPI numbers: target/actual are decimals (0.95 = 95%). Always render as percentages.
+7. FTR passRate is already a percentage number — append "%".
+8. Risks: filter status === "Ongoing" when user asks for active/open risks.
+9. Project health (Red/Amber/Green) comes from projectHealth array — use this when asked about project status.
+10. Use HTML inline tags only: <strong>, <em>, <br>, <ul>, <li>, <table>, <tr>, <th>, <td>, <span>. NO markdown (**, *, \`\`\`). NO outer <html>/<body> wrappers.
+11. Match the user's language style (English/Hindi/Hinglish), keep tone professional.
+12. End with: <br><br><span style="font-size:0.8em;opacity:0.7">⚡ Powered by Gemini AI</span>`
               }
             ]
           }
@@ -970,33 +1004,26 @@ function processQuestion(q, data, healthData) {
   const members = team.activeMembers || [];
   const risks = gov.risks || [];
   const highlights = gov.highlights || [];
+  const lowlights = gov.lowlights || [];
   const projects = sow.projects || [];
   const metrics = kpi.metrics || kpi.kpis || [];
   const leaveData = leave.currentMonth || {};
   const pocs = poc.pocs || [];
 
   // ── 1. Reportees / under a manager (MUST be before generic person lookup) ──
-  if (matchWords(q, ['reportee', 'reportees', 'reporting', 'repotee', 'repotees'])) {
+  const isReporteeQ = matchWords(q, ['reportee', 'reportees', 'reporting', 'repotee', 'repotees'])
+    || q.includes('under ') || q.includes('ke niche') || q.includes('ke under');
+  if (isReporteeQ) {
     const mgr = findPersonInQuery(q, members);
     if (mgr) {
-      const reportees = members.filter(m => m.manager?.toLowerCase() === mgr.name.toLowerCase());
+      const reportees = findReportees(mgr, members);
       if (reportees.length === 0) return `No reportees found under <strong>${mgr.name}</strong>.`;
       let html = `👥 <strong>${mgr.name}'s Reportees (${reportees.length})</strong><br><br>`;
       reportees.forEach(r => { html += `• ${r.name} — ${r.designation || r.role || '—'}<br>`; });
       return html;
     }
-    return '🤔 Could not identify the manager name. Try: <em>"reportees of [full name]"</em>';
-  }
-
-  // Also catch "under [name]" pattern specifically
-  if (q.includes('under ') || q.includes('ke niche') || q.includes('ke under')) {
-    const mgr = findPersonInQuery(q, members);
-    if (mgr) {
-      const reportees = members.filter(m => m.manager?.toLowerCase() === mgr.name.toLowerCase());
-      if (reportees.length === 0) return `No reportees found under <strong>${mgr.name}</strong>.`;
-      let html = `👥 <strong>${mgr.name}'s Reportees (${reportees.length})</strong><br><br>`;
-      reportees.forEach(r => { html += `• ${r.name} — ${r.designation || r.role || '—'}<br>`; });
-      return html;
+    if (matchWords(q, ['reportee', 'reportees', 'reporting'])) {
+      return '🤔 Could not identify the manager name. Try: <em>"reportees of [full name]"</em>';
     }
   }
 
@@ -1122,7 +1149,10 @@ function processQuestion(q, data, healthData) {
     let html = `✅ <strong>FTR / QA Summary</strong><br>`;
     html += `Total QA metrics: <span class="chat-stat">${qaMetrics.length}</span><br><br>`;
     qaMetrics.slice(0, 8).forEach(m => {
-      html += `• ${m.client || m.account || 'Unknown'} — ${m.month || ''}: ${m.passRate || m.ftrRate || '—'}<br>`;
+      const rate = m.passRate != null ? `${Number(m.passRate).toFixed(1)}%` : (m.ftrRate || '—');
+      const label = m.project || m.client || m.account || 'Unknown';
+      const when = m.qaDate || m.month || '';
+      html += `• ${label}${when ? ' — ' + when : ''}: <strong>${rate}</strong><br>`;
     });
     return html;
   }
@@ -1147,13 +1177,15 @@ function processQuestion(q, data, healthData) {
   }
 
   // ── 10. Highlights / lowlights ──
-  if (matchWords(q, ['highlight', 'achievement', 'good news', 'lowlight', 'concern'])) {
+  if (matchWords(q, ['highlight', 'highlights', 'achievement', 'achievements', 'good news', 'lowlight', 'lowlights', 'concern', 'concerns'])) {
     const hl = highlights.filter(h => h.highlight);
-    const ll = highlights.filter(h => h.lowlight);
+    const ll = lowlights.filter(h => h.lowlight);
     let html = `🌟 <strong>Recent Highlights (${hl.length})</strong><br>`;
-    hl.slice(0, 4).forEach(h => { html += `• <strong>${h.project}</strong>: ${h.highlight}<br>`; });
+    if (!hl.length) html += `<em>None recorded.</em><br>`;
+    hl.slice(0, 5).forEach(h => { html += `• <strong>${h.project}</strong> (${h.month || ''}): ${h.highlight}<br>`; });
     html += `<br>⬇️ <strong>Recent Lowlights (${ll.length})</strong><br>`;
-    ll.slice(0, 4).forEach(h => { html += `• <strong>${h.project}</strong>: ${h.lowlight}<br>`; });
+    if (!ll.length) html += `<em>None recorded.</em><br>`;
+    ll.slice(0, 5).forEach(h => { html += `• <strong>${h.project}</strong> (${h.month || ''}): ${h.lowlight}<br>`; });
     return html;
   }
 
@@ -1178,7 +1210,7 @@ function processQuestion(q, data, healthData) {
     html += `📋 SOW/PO Count: <span class="chat-stat">${projects.length}</span><br>`;
     html += `🧪 POC/POV: <span class="chat-stat">${pocs.length}</span><br>`;
     html += `🌟 Highlights: <span class="chat-stat">${highlights.filter(h => h.highlight).length}</span><br>`;
-    html += `⬇️ Lowlights: <span class="chat-stat">${highlights.filter(h => h.lowlight).length}</span>`;
+    html += `⬇️ Lowlights: <span class="chat-stat">${lowlights.filter(h => h.lowlight).length}</span>`;
     return html;
   }
 
@@ -1222,17 +1254,49 @@ function matchWords(q, phrases) {
   return false;
 }
 
+/** Reserved tokens that should never be treated as a person's name */
+const RESERVED_TOKENS = new Set([
+  'team', 'kpi', 'sow', 'poc', 'pov', 'ftr', 'qbr', 'leave', 'risk', 'risks',
+  'project', 'projects', 'health', 'metric', 'metrics', 'status', 'summary',
+  'overview', 'dashboard', 'client', 'clients', 'manager', 'reportee', 'highlight',
+  'lowlight', 'who', 'what', 'how', 'when', 'where', 'why', 'show', 'list', 'give',
+  'tell', 'about', 'find', 'details', 'total', 'count', 'active', 'ongoing',
+]);
+
 function findPersonInQuery(q, members) {
-  // Try full name match first (most accurate)
+  const qLower = (q || '').toLowerCase();
+  // 1. Full-name substring match (most accurate)
+  let best = null;
+  let bestLen = 0;
   for (const m of members) {
-    if (m.name && q.includes(m.name.toLowerCase())) return m;
+    if (!m.name) continue;
+    const nm = m.name.toLowerCase();
+    if (qLower.includes(nm) && nm.length > bestLen) { best = m; bestLen = nm.length; }
   }
-  // Try first name match (at least 3 chars to avoid false positives)
+  if (best) return best;
+  // 2. First-name word-boundary match (≥4 chars, not a reserved token)
   for (const m of members) {
     const firstName = (m.name || '').split(' ')[0].toLowerCase();
-    if (firstName.length >= 3 && q.includes(firstName)) return m;
+    if (firstName.length < 4 || RESERVED_TOKENS.has(firstName)) continue;
+    const re = new RegExp('\\b' + firstName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    if (re.test(qLower)) return m;
   }
   return null;
+}
+
+/** Find reportees by fuzzy matching the manager's first name against each member's manager field */
+function findReportees(mgr, members) {
+  if (!mgr || !mgr.name) return [];
+  const mgrFirst = mgr.name.split(' ')[0].toLowerCase();
+  const mgrFull = mgr.name.toLowerCase();
+  return members.filter(m => {
+    const mgrField = (m.manager || '').toLowerCase().trim();
+    if (!mgrField) return false;
+    return mgrField === mgrFull
+      || mgrField.includes(mgrFull)
+      || mgrFull.includes(mgrField)
+      || mgrField.split(/\s+/)[0] === mgrFirst;
+  });
 }
 
 function findProjectInQuery(q, projects) {

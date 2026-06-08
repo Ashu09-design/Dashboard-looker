@@ -2574,4 +2574,325 @@ canvas {
     min-height: 700px;
     box-sizing: border-box;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   v2 POLISH LAYER — Premium client-ready refinements
+   (additive only — does not change existing structure)
+   ═══════════════════════════════════════════════════════════════ */
+
+#execSection {
+    --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #6366f1 100%);
+    --gradient-accent: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    --gradient-success: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+    --gradient-card: linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%);
+    --glass-border: 1px solid rgba(148, 163, 184, 0.12);
+    --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.18);
+    --transition-smooth: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smoother typography */
+#execSection,
+#execSection * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.005em;
+}
+
+/* Refined header with gradient sweep */
+#exec-header {
+    background:
+        radial-gradient(1200px circle at 20% 0%, rgba(6, 182, 212, 0.18), transparent 50%),
+        radial-gradient(800px circle at 90% 100%, rgba(99, 102, 241, 0.16), transparent 50%),
+        linear-gradient(135deg, #0c4a6e 0%, #0f172a 50%, #1e1b4b 100%);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.exec-header-left h1 {
+    background: linear-gradient(135deg, #f1f5f9 0%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* KPI cards — elevated glass treatment */
+.kpi-card {
+    background: var(--gradient-card);
+    border: var(--glass-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(6, 182, 212, 0.05) 100%);
+    opacity: 0;
+    transition: opacity var(--transition-smooth);
+    pointer-events: none;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(6, 182, 212, 0.35);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), var(--glow-cyan);
+}
+
+.kpi-card:hover::after {
+    opacity: 1;
+}
+
+.kpi-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Chart cards — soft glass */
+.chart-card,
+.panel-card {
+    background: var(--gradient-card);
+    border: var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.chart-card:hover,
+.panel-card:hover {
+    border-color: rgba(6, 182, 212, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.chart-title,
+.panel-title {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Sidebar — subtle gradient + smoother active state */
+#sidebar {
+    background:
+        linear-gradient(180deg, rgba(12, 21, 36, 1) 0%, rgba(15, 23, 42, 1) 100%);
+    border-right: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.nav-item {
+    transition: background var(--transition-smooth), color var(--transition-smooth), transform 180ms ease;
+    border-radius: 10px;
+}
+
+.nav-item:hover {
+    transform: translateX(2px);
+}
+
+.nav-item.active {
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.22) 0%, rgba(6, 182, 212, 0.05) 100%);
+    box-shadow: inset 3px 0 0 var(--cyan), 0 4px 12px rgba(6, 182, 212, 0.12);
+}
+
+/* Buttons — refined */
+.exec-btn {
+    transition: transform 180ms ease, background var(--transition-smooth), box-shadow var(--transition-smooth);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.exec-btn:hover {
+    transform: translateY(-1px);
+}
+
+.exec-btn:active {
+    transform: translateY(0);
+}
+
+.exec-btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+}
+
+.exec-btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
+}
+
+/* Tables — cleaner zebra + hover */
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+table tbody tr {
+    transition: background var(--transition-smooth);
+}
+
+table tbody tr:hover {
+    background: rgba(6, 182, 212, 0.06);
+}
+
+/* Risk / status colour chips */
+.impact-high,
+.risk-impact.impact-high {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+
+.impact-medium {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(217, 119, 6, 0.1));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fcd34d;
+}
+
+.impact-low {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(22, 163, 74, 0.1));
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #86efac;
+}
+
+/* Entrance animation for content views */
+.content-view.active {
+    animation: fade-up 320ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scrollbar polish */
+#exec-main::-webkit-scrollbar,
+.panel-body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+#exec-main::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(6, 182, 212, 0.5), rgba(6, 182, 212, 0.25));
+    border-radius: 4px;
+}
+
+#exec-main::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(6, 182, 212, 0.75), rgba(6, 182, 212, 0.4));
+}
+
+/* Loading spinner — dual-ring */
+.exec-spinner {
+    border-top-color: var(--cyan);
+    border-right-color: rgba(6, 182, 212, 0.4);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+}
+
+/* Chatbot bubbles — refined */
+.chat-msg.user .chat-bubble {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+}
+
+.chat-msg.bot .chat-bubble {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.88)) !important;
+    border: 1px solid rgba(6, 182, 212, 0.2) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    line-height: 1.55;
+}
+
+.chat-msg.bot .chat-bubble strong {
+    color: #06b6d4;
+}
+
+.chat-msg.bot .chat-bubble table {
+    margin: 8px 0;
+    font-size: 0.9em;
+}
+
+.chat-msg.bot .chat-bubble table th,
+.chat-msg.bot .chat-bubble table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    text-align: left;
+}
+
+.chat-msg.bot .chat-bubble table th {
+    background: rgba(6, 182, 212, 0.08);
+    color: #06b6d4;
+    font-weight: 600;
+}
+
+.chat-msg.bot .chat-bubble ul {
+    margin: 6px 0 6px 18px;
+    padding: 0;
+}
+
+.chat-msg.bot .chat-bubble li {
+    margin: 3px 0;
+}
+
+.chat-stat {
+    display: inline-block;
+    padding: 1px 8px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(6, 182, 212, 0.12));
+    border: 1px solid rgba(6, 182, 212, 0.35);
+    border-radius: 999px;
+    font-weight: 600;
+    color: #67e8f9;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Focus rings — accessibility */
+.exec-btn:focus-visible,
+.nav-item:focus-visible,
+input:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+}
+
+/* Mobile-friendly tweaks */
+@media (max-width: 768px) {
+    #exec-header {
+        padding: 10px 14px;
+    }
+    .exec-header-left h1 {
+        font-size: 1.05rem;
+    }
+    .kpi-card {
+        padding: 14px;
+    }
+    .kpi-value {
+        font-size: 1.4rem;
+    }
+}
+
+/* Print-friendly (for client exports) */
+@media print {
+    #exec-header,
+    #sidebar,
+    .exec-btn,
+    .chatbot-panel {
+        display: none !important;
+    }
+    #exec-main {
+        margin-left: 0 !important;
+        background: white !important;
+        color: black !important;
+    }
+}
 
