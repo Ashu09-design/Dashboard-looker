@@ -5,7 +5,9 @@
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["uploads/**", "parsers/**", "services/**", "middleware/**", "public/**"]
+        "includeFiles": ["uploads/**", "parsers/**", "services/**", "middleware/**", "public/**"],
+        "memory": 1024,
+        "maxDuration": 30
       }
     }
   ],
@@ -14,12 +16,6 @@
     { "src": "/(.*\\.(css|js|png|jpg|jpeg|svg|ico|woff|woff2|map))$", "dest": "/public/$1" },
     { "src": "/(.*)", "dest": "server.js" }
   ],
-  "functions": {
-    "server.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
   "env": {
     "NODE_ENV": "production"
   }
