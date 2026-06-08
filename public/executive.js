@@ -176,13 +176,13 @@ function renderTabNav() {
 // ══════════════════════════════════════════════════════════════════
 
 const TAB_FILTERS = {
-    overview: ['rm', 'month', 'project'],
-    team: ['rm', 'project'],
-    projects: ['month'],
-    sow: ['project', 'startDate', 'endDate'],
-    kpis: ['project', 'kpiMetric'],
+    overview: ['rm', 'client', 'month', 'project'],
+    team: ['rm', 'client', 'project'],
+    projects: ['client', 'month'],
+    sow: ['client', 'project', 'startDate', 'endDate'],
+    kpis: ['client', 'project', 'kpiMetric'],
     ftr: ['client', 'month', 'project'],
-    leave: ['rm', 'project'],
+    leave: ['rm', 'client', 'project'],
     risks: ['client', 'project', 'month'],
     poc: ['spoc'],
 };
@@ -217,8 +217,10 @@ function filterOptions(key) {
             return uniqueSorted((d.team?.activeMembers || []).map(m => m.role));
         case 'designation':
             return uniqueSorted((d.team?.activeMembers || []).map(m => m.designation));
-        case 'rm':
-            return uniqueSorted((d.team?.activeMembers || []).map(m => m.manager).filter(Boolean));
+        case 'rm': {
+            const rmMap = getRMAliasMap();
+            return [...new Set(Object.values(rmMap))].sort();
+        }
         case 'project':
             return uniqueSorted([
                 ...(d.health || []).map(p => p.projectName),
@@ -249,6 +251,87 @@ function filterOptions(key) {
         default:
             return [];
     }
+}
+
+// ── Smart name deduplication for RM dropdown ─────────────────────
+// Names like "Bhavani V", "Bhavani Venkatesh", "Bhavani venkatesh"
+// are recognized as the same person → longest version kept.
+
+function deduplicateNames(names) {
+    const trimmed = names.filter(n => n && n.trim()).map(n => n.trim());
+    if (!trimmed.length) return {};
+
+    // 1) Group exact case-insensitive duplicates, prefer proper-cased
+    const byLower = {};
+    trimmed.forEach(n => {
+        const key = n.toLowerCase();
+        if (!byLower[key] || (n[0] === n[0].toUpperCase() && byLower[key][0] !== byLower[key][0].toUpperCase())) {
+            byLower[key] = n;
+        }
+    });
+
+    // 2) Sort longest first so most-complete name becomes canonical
+    const unique = Object.values(byLower);
+    const sorted = [...unique].sort((a, b) => b.length - a.length);
+
+    const aliasMap = {};   // lowercase variant → canonical display name
+    const consumed = new Set();
+
+    for (const name of sorted) {
+        const lower = name.toLowerCase();
+        if (consumed.has(lower)) continue;
+
+        const words = lower.split(/\s+/);
+        const firstName = words[0];
+
+        // This name is canonical (longest not-yet-consumed)
+        aliasMap[lower] = name;
+        consumed.add(lower);
+
+        // Absorb shorter names that share the first name and whose every
+        // word is a prefix-of or prefixed-by a word in the longer name.
+        for (const other of sorted) {
+            const ol = other.toLowerCase();
+            if (consumed.has(ol)) continue;
+            const ow = ol.split(/\s+/);
+            if (ow[0] !== firstName) continue;
+
+            const isSubset = ow.every(o =>
+                words.some(w => w.startsWith(o) || o.startsWith(w)));
+            if (isSubset) {
+                aliasMap[ol] = name;
+                consumed.add(ol);
+            }
+        }
+    }
+    return aliasMap;
+}
+
+let _rmAliasMap = null;
+let _rmAliasVersion = null;
+
+function getRMAliasMap() {
+    const members = state.data.team?.activeMembers || [];
+    const version = members.length + '|' + (members[0]?.name || '');
+    if (_rmAliasMap && _rmAliasVersion === version) return _rmAliasMap;
+    const allMgrs = members.map(m => m.manager).filter(Boolean);
+    _rmAliasMap = deduplicateNames(allMgrs);
+    _rmAliasVersion = version;
+    return _rmAliasMap;
+}
+
+/** Map any manager name variant to its canonical form */
+function canonicalRM(name) {
+    if (!name) return '';
+    const map = getRMAliasMap();
+    return map[name.toLowerCase().trim()] || name;
+}
+
+/** True if memberManager (any variant) matches the selected RM canonical name */
+function rmMatches(memberManager, selectedRM) {
+    if (!selectedRM) return true;
+    if (!memberManager) return false;
+    return canonicalRM(memberManager) === selectedRM;
 }
 
 const FILTER_LABELS = {
@@ -419,7 +502,7 @@ function getRmPmAndMemberNames(rmName) {
     const pmNames = new Set();
     if (!rmName) return pmNames;
     pmNames.add(rmName.toLowerCase());
-    const members = (state.data.team?.activeMembers || []).filter(m => m.manager === rmName);
+    const members = (state.data.team?.activeMembers || []).filter(m => rmMatches(m.manager, rmName));
     members.forEach(m => pmNames.add(m.name.toLowerCase()));
     return pmNames;
 }
@@ -467,11 +550,11 @@ function membersForPMs(members, pmNames) {
 }
 
 function tabOverview(el) {
-    const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project'), client = '';
+    const rm = getFilter('rm'), month = getFilter('month'), proj = getFilter('project'), client = getFilter('client');
 
     // 1. Filter Team Size
     let members = state.data.team?.activeMembers || [];
-    if (rm) members = members.filter(m => m.manager === rm);
+    if (rm) members = members.filter(m => rmMatches(m.manager, rm));
     if (client) members = membersForPMs(members, pmsForClient(client));
     if (proj) members = membersForPMs(members, pmsForProject(proj));
     const teamSize = members.length;
@@ -580,8 +663,9 @@ function tabOverview(el) {
 function tabTeam(el) {
     const t = state.data.team || {};
     let members = t.activeMembers || [];
-    const proj = getFilter('project'), rm = getFilter('rm');
-    if (rm) members = members.filter(m => m.manager === rm);
+    const proj = getFilter('project'), rm = getFilter('rm'), client = getFilter('client');
+    if (rm) members = members.filter(m => rmMatches(m.manager, rm));
+    if (client) members = membersForPMs(members, pmsForClient(client));
     if (proj) members = membersForPMs(members, pmsForProject(proj));
 
     const desigDist = {};
@@ -626,12 +710,13 @@ function tabTeam(el) {
 // ══════════════════════════════════════════════════════════════════
 
 function tabProjects(el) {
-    const monthF = getFilter('month');
+    const monthF = getFilter('month'), clientF = getFilter('client');
     el.innerHTML = `
         <div class="m-card">${section('🏥 Project Health Status', 'Overall health of all projects')}<div id="pjHealth"></div></div>`;
 
     const pf = {};
     if (monthF) pf.month = monthF;
+    if (clientF) pf.client = clientF;
 
     widgetProjectHealth($('#pjHealth'), pf);
 }
@@ -643,7 +728,8 @@ function tabProjects(el) {
 function tabSow(el) {
     let projects = state.data.sow?.projects || [];
     const proj = getFilter('project'), startD = getFilter('startDate'), endD = getFilter('endDate');
-    const client = '';
+    const client = getFilter('client');
+    if (client) projects = projects.filter(p => p.client === client);
     if (proj) projects = projects.filter(p => p.projectName === proj);
     if (startD) projects = projects.filter(p => p.startDate >= startD);
     if (endD) projects = projects.filter(p => p.endDate <= endD);
@@ -701,7 +787,7 @@ function tabSow(el) {
 
 function tabKpis(el) {
     const kpi = state.data.kpi || {};
-    const proj = getFilter('project'), kpiMetric = getFilter('kpiMetric'), client = '';
+    const proj = getFilter('project'), kpiMetric = getFilter('kpiMetric'), client = getFilter('client');
 
     let metrics = kpi.metrics || [];
     if (client) metrics = metrics.filter(m => m.account === client);
@@ -857,13 +943,19 @@ function tabFtr(el) {
 function tabLeave(el) {
     const leave = state.data.leave || {};
     const cm = leave.currentMonth || {};
-    const rm = getFilter('rm'), proj = getFilter('project');
+    const rm = getFilter('rm'), proj = getFilter('project'), client = getFilter('client');
 
-    // Get team members filtered by RM and project for filtering leave data
+    // Get team members filtered by RM, client and project for filtering leave data
     let teamMembers = state.data.team?.activeMembers || [];
-    if (rm) teamMembers = teamMembers.filter(m => m.manager === rm);
+    if (rm) teamMembers = teamMembers.filter(m => rmMatches(m.manager, rm));
+    if (client) teamMembers = membersForPMs(teamMembers, pmsForClient(client));
     if (proj) teamMembers = membersForPMs(teamMembers, pmsForProject(proj));
-    const teamNameSet = (rm || proj) ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
+    const teamNameSet = (rm || proj || client) ? new Set(teamMembers.map(m => m.name.toLowerCase())) : null;
+
+    // Build a name→manager lookup from all team members
+    const allMembers = state.data.team?.activeMembers || [];
+    const managerLookup = {};
+    allMembers.forEach(m => { managerLookup[m.name.toLowerCase()] = canonicalRM(m.manager) || '—'; });
 
     let onToday = cm.onLeaveToday || [];
     if (teamNameSet) onToday = onToday.filter(p => teamNameSet.has(p.name.toLowerCase()));
@@ -873,29 +965,69 @@ function tabLeave(el) {
     if (teamNameSet) byPerson = byPerson.filter(([n]) => teamNameSet.has(n.toLowerCase()));
 
     const totalLeavesThisMonth = byPerson.reduce((sum, [, count]) => sum + count, 0);
+    const uniqueRMs = [...new Set(byPerson.map(([n]) => managerLookup[n.toLowerCase()] || '—').filter(v => v !== '—'))];
 
     el.innerHTML = `
         <div class="kpi-row">
             ${statCard('🏖️', onToday.length, 'On Leave Today', onToday.length > 0 ? 'kpi-card-alert' : '')}
             ${statCard('📅', totalLeavesThisMonth, 'Leaves This Month')}
+            ${statCard('👔', rm ? '1' : uniqueRMs.length, rm ? esc(rm) : 'RMs with Leave')}
             ${statCard('🗓️', (leave.months || []).length, 'Months Tracked')}
         </div>
         <div class="grid-2">
-            <div class="m-card">${section('🏖️ On Leave Today')}<div id="lvToday"></div></div>
-            <div class="m-card">${section('🏆 Top Leave Takers — This Month')}<div id="lvTop"></div></div>
+            <div class="m-card">${section('🏖️ On Leave Today', rm ? 'Reportees of ' + rm : '')}<div id="lvToday"></div></div>
+            <div class="m-card">${section('🏆 Top Leave Takers — This Month', rm ? 'Under RM: ' + rm : '')}<div id="lvTop"></div></div>
         </div>
+        <div class="m-card">${section('👔 Leave by Reporting Manager', 'Reportee-wise leave breakdown per RM')}<div id="lvByRM"></div></div>
         <div class="m-card">${section('🗓️ Leave Tracker — Months Available')}<div id="lvMonths"></div></div>`;
 
     $('#lvToday').innerHTML = dataTable(
-        ['Member', 'Leave Type'],
-        onToday.map(p => [`<strong>${esc(p.name)}</strong>`, esc(p.type)]),
+        ['Member', 'Manager (RM)', 'Leave Type'],
+        onToday.map(p => [
+            `<strong>${esc(p.name)}</strong>`,
+            esc(managerLookup[p.name.toLowerCase()] || '—'),
+            esc(p.type),
+        ]),
         { empty: 'Nobody is on leave today. ✅' }
     );
 
     $('#lvTop').innerHTML = dataTable(
-        ['Member', 'Leave Days'],
-        byPerson.slice(0, 20).map(([n, c]) => [`<strong>${esc(n)}</strong>`, badge(c + ' day(s)', 'b-amber')]),
+        ['Member', 'Manager (RM)', 'Leave Days'],
+        byPerson.slice(0, 20).map(([n, c]) => [
+            `<strong>${esc(n)}</strong>`,
+            esc(managerLookup[n.toLowerCase()] || '—'),
+            badge(c + ' day(s)', 'b-amber'),
+        ]),
         { empty: 'No leave records for the current month.' }
+    );
+
+    // Group leave by RM
+    const leaveByRM = {};
+    byPerson.forEach(([n, c]) => {
+        const mgr = managerLookup[n.toLowerCase()] || 'Unknown';
+        if (!leaveByRM[mgr]) leaveByRM[mgr] = [];
+        leaveByRM[mgr].push({ name: n, days: c });
+    });
+    const rmRows = [];
+    Object.entries(leaveByRM).sort((a, b) => {
+        const totalA = a[1].reduce((s, r) => s + r.days, 0);
+        const totalB = b[1].reduce((s, r) => s + r.days, 0);
+        return totalB - totalA;
+    }).forEach(([mgr, reportees]) => {
+        const totalDays = reportees.reduce((s, r) => s + r.days, 0);
+        reportees.forEach((r, idx) => {
+            rmRows.push([
+                idx === 0 ? `<strong>${esc(mgr)}</strong>` : '',
+                `<strong>${esc(r.name)}</strong>`,
+                badge(r.days + ' day(s)', 'b-amber'),
+                idx === 0 ? badge(totalDays + ' total day(s)', 'b-blue') : '',
+            ]);
+        });
+    });
+    $('#lvByRM').innerHTML = dataTable(
+        ['Reporting Manager', 'Reportee', 'Leave Days', 'RM Total'],
+        rmRows,
+        { empty: 'No leave data available for RM breakdown.' }
     );
 
     $('#lvMonths').innerHTML = dataTable(
@@ -1167,7 +1299,7 @@ function widgetTopLeaveTakers(el, filter) {
     const cm = leave.currentMonth || {};
     let teamMembers = state.data.team?.activeMembers || [];
     if (filter) {
-        if (filter.rm) teamMembers = teamMembers.filter(m => m.manager === filter.rm);
+        if (filter.rm) teamMembers = teamMembers.filter(m => rmMatches(m.manager, filter.rm));
         if (filter.client) teamMembers = membersForPMs(teamMembers, pmsForClient(filter.client));
         if (filter.project) teamMembers = membersForPMs(teamMembers, pmsForProject(filter.project));
     }
@@ -1190,7 +1322,7 @@ function widgetLeaveImpact(el, filter) {
     const cm = leave.currentMonth || {};
     let teamMembers = state.data.team?.activeMembers || [];
     if (filter) {
-        if (filter.rm) teamMembers = teamMembers.filter(m => m.manager === filter.rm);
+        if (filter.rm) teamMembers = teamMembers.filter(m => rmMatches(m.manager, filter.rm));
         if (filter.client) teamMembers = membersForPMs(teamMembers, pmsForClient(filter.client));
         if (filter.project) teamMembers = membersForPMs(teamMembers, pmsForProject(filter.project));
     }
