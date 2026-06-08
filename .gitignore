@@ -7,3 +7,6 @@ qbr_test.json
 excel_data.txt
 add_data.py
 fill_recent_data.py
+.claude/
+*_test.json
+_cached_sheet.xlsx

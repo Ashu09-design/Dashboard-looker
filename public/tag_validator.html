@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tag Validator Pro — Automation Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="executive.css">
+    <style>
+        :root {
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .validator-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .hero-section p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-zone {
+            border: 2px dashed #475569;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .upload-zone svg {
+            width: 50px;
+            height: 50px;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px var(--accent-glow);
+        }
+
+        .btn-primary:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .log-container {
+            background: #020617;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #10b981;
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #1e293b;
+        }
+
+        .log-line {
+            margin-bottom: 4px;
+            border-left: 2px solid transparent;
+            padding-left: 8px;
+        }
+
+        .log-line.error { color: #f43f5e; }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th {
+            text-align: left;
+            padding: 15px;
+            color: #94a3b8;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .results-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-pass { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-fail { background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .hidden { display: none; }
+
+        .loading-dots:after {
+            content: ' .';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ' .'; }
+            40% { content: ' ..'; }
+            60% { content: ' ...'; }
+            80%, 100% { content: ''; }
+        }
+    </style>
+</head>
+<body>
+    <header id="exec-header">
+        <div class="exec-header-left">
+            <h1>🚀 Tag Validator Pro</h1>
+            <span class="exec-subtitle">Digital Enablement — Tracking Automation Hub</span>
+        </div>
+        <div class="exec-header-right">
+            <a href="index.html" class="exec-btn" style="text-decoration: none;">🏠 Home</a>
+            <a href="executive.html" class="exec-btn" style="text-decoration: none;">📊 Dashboard</a>
+        </div>
+    </header>
+
+    <div class="validator-container">
+        <div class="hero-section">
+            <h1>Validate Tracking in Bulk</h1>
+            <p>Automate Tealium, GA4, and GTM validation across hundreds of websites in seconds.</p>
+        </div>
+
+        <div class="tool-grid">
+            <!-- Control Panel -->
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">1. Configuration</h2>
+                
+                <div id="uploadZone" class="upload-zone">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <p id="uploadText">Drop your <b>input_sites.xlsx</b> here<br><small>or click to browse</small></p>
+                    <input type="file" id="fileInput" class="hidden" accept=".xlsx">
+                </div>
+
+                <button id="runBtn" class="btn-primary" disabled>Run Validation</button>
+
+                <div id="statusContainer" class="hidden">
+                    <h3 style="margin-top: 30px; font-size: 0.9rem; color: #94a3b8;">Real-time Logs</h3>
+                    <div id="logBox" class="log-container">
+                        <div class="log-line">Waiting for action...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="card">
+                <div class="status-header">
+                    <h2>2. Live Results</h2>
+                    <button id="downloadBtn" class="download-btn hidden">⬇️ Download Excel Report</button>
+                </div>
+
+                <div id="emptyState" style="text-align: center; padding: 60px 0; color: #64748b;">
+                    <p>Results will appear here once the validation starts.</p>
+                </div>
+
+                <div id="resultsTableContainer" class="hidden" style="max-height: 600px; overflow-y: auto;">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Website URL</th>
+                                <th>Tealium</th>
+                                <th>View Fired</th>
+                                <th>GA4/GTM</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                            <!-- Rows injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="tag_validator.js"></script>
+</body>
+</html>
