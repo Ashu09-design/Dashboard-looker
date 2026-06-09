@@ -1312,33 +1312,40 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, async () => {
-  console.log(`Dashboard server running at http://localhost:${PORT}`);
-  console.log(`Excel path: ${EXCEL_PATH}`);
-  // Load executive data sources on startup
-  try {
-    await execData.loadAll();
-    console.log('Executive data sources loaded on startup.');
-  } catch (e) {
-    console.warn('Could not load exec data on startup:', e.message);
-  }
+// ── Export for Vercel serverless ──────────────────────────────────────
+module.exports = app;
 
-  // ── Auto-refresh connected sources every 2 minutes ──
-  // This ensures that when Google Sheets / SharePoint Excel is updated,
-  // the changes flow into the dashboard automatically.
-  const AUTO_REFRESH_MS = 2 * 60 * 1000; // 2 minutes
-  setInterval(async () => {
+// ── Only listen when running locally (not on Vercel) ─────────────────
+if (!process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    console.log(`Dashboard server running at http://localhost:${PORT}`);
+    console.log(`Excel path: ${EXCEL_PATH}`);
+    // Load executive data sources on startup
     try {
-      const hasRemote = Object.values(execData.DATA_SOURCES).some(
-        s => s.type !== 'local' && s.url
-      );
-      if (hasRemote) {
-        console.log('[Auto-Refresh] Re-downloading connected sources...');
-        await execData.loadAll();
-        console.log('[Auto-Refresh] Data refreshed at', new Date().toISOString());
-      }
+      await execData.loadAll();
+      console.log('Executive data sources loaded on startup.');
     } catch (e) {
-      console.warn('[Auto-Refresh] Error:', e.message);
+      console.warn('Could not load exec data on startup:', e.message);
     }
-  }, AUTO_REFRESH_MS);
-});
+
+    // ── Auto-refresh connected sources every 2 minutes ──
+    // This ensures that when Google Sheets / SharePoint Excel is updated,
+    // the changes flow into the dashboard automatically.
+    const AUTO_REFRESH_MS = 2 * 60 * 1000; // 2 minutes
+    setInterval(async () => {
+      try {
+        const hasRemote = Object.values(execData.DATA_SOURCES).some(
+          s => s.type !== 'local' && s.url
+        );
+        if (hasRemote) {
+          console.log('[Auto-Refresh] Re-downloading connected sources...');
+          await execData.loadAll();
+          console.log('[Auto-Refresh] Data refreshed at', new Date().toISOString());
+        }
+      } catch (e) {
+        console.warn('[Auto-Refresh] Error:', e.message);
+      }
+    }, AUTO_REFRESH_MS);
+  });
+}
+

@@ -5,15 +5,13 @@
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["uploads/**", "parsers/**", "services/**", "middleware/**", "public/**"],
+        "includeFiles": ["uploads/**", "parsers/**", "services/**", "middleware/**", "public/**", "data/**"],
         "memory": 1024,
         "maxDuration": 30
       }
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "server.js" },
-    { "src": "/(.*\\.(css|js|png|jpg|jpeg|svg|ico|woff|woff2|map))$", "dest": "/public/$1" },
     { "src": "/(.*)", "dest": "server.js" }
   ],
   "env": {
